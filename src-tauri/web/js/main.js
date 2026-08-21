@@ -1,5 +1,9 @@
 const { invoke } = window.__TAURI__.core;
 
+let currentFile = null;
+let currentFileContent = "";
+
+
 async function startDragonIDE() {
 
     const name = await invoke("get_ide_name");
@@ -73,6 +77,10 @@ function createFileEntry(entry) {
     } else {
         arrow.textContent = "";
         icon.textContent = "📄";
+
+        element.addEventListener("click", () => {
+            openFile(entry);
+        });
     }
 
 
@@ -130,6 +138,68 @@ async function toggleDirectory(element, entry, arrow) {
     }
 }
 
+
+async function openFile(entry) {
+
+    try {
+
+        console.log("Opening fille:", entry.path);
+
+        const content = await invoke("read_file", {
+            path: entry.path
+        });
+
+        currentFile = entry;
+        currentFileContent = content;
+
+        const welcome = document.getElementById("welcome-screen");
+
+        const editor = document.getElementById("code-editor");
+
+        if (welcome) {
+            welcome.style.display = "none";
+        }
+
+        if (editor) {
+            editor.style.display = "block";
+            editor.value = content;
+            editor.focus();
+        }
+
+
+        updateEditorTab(entry.name);
+
+        console.log("Opened: ", entry.name);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to open file:",
+            error
+        );
+    }
+}
+
+function updateEditorTab(fileName) {
+
+    const tabs = document.getElementById("tabs");
+
+    tabs.innerHTML = `
+        <div class="tab active">
+            <span>${fileName}</span>
+            <span class="tab-close">×</span>
+        </div>
+    `;
+}
+
+function escapeHtml(value) {
+
+    const element = document.createElement("div");
+
+    element.textContent = value;
+
+    return element.innerHTML;
+}
 
 function renderFileTree(files) {
 

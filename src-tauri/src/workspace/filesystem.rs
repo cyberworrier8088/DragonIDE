@@ -36,3 +36,8 @@ pub fn read_directory(root: &Path) -> Result<Vec<FileEntry>, String> {
 
     Ok(files)
 }
+
+pub fn read_file(path: &Path) -> Result<String, String> {
+
+    fs::read_to_string(path).map_err(|error| error.to_string())
+}
