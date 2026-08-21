@@ -66,6 +66,10 @@ function createFileEntry(entry) {
     if (entry.is_directory) {
         arrow.textContent = ":>"
         icon.textContent = "📁"
+
+        element.addEventListener("click", () => {
+            toggleDirectory(element, entry, arrow);
+        });
     } else {
         arrow.textContent = "";
         icon.textContent = "📄";
@@ -79,6 +83,51 @@ function createFileEntry(entry) {
     return element;
 
 
+}
+
+async function toggleDirectory(element, entry, arrow) {
+
+    const existingChildren = element.nextElementSibling;
+
+    if (
+        existingChildren && existingChildren.classList.contains("file-children")
+    ) {
+
+        existingChildren.remove();
+
+        arrow.textContent = ":>";
+
+        return;
+    }
+
+    try {
+
+        arrow.textContent = "↓";
+
+        const files = await invoke("read_workspace", {
+            path: entry.path
+        });
+
+        const children = document.createElement("div");
+
+        children.className = "file-children";
+
+        for (const file of files) {
+
+            const child = createFileEntry(file);
+
+            children.appendChild(child);
+        }
+
+        element.after(children);
+    } catch (error) {
+        console.error(
+            "Failed to read directory: ",
+            error
+        );
+
+        arrow.textContent = ":>";
+    }
 }
 
 
