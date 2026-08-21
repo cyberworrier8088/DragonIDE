@@ -22,7 +22,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder])
+        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -45,4 +45,13 @@ async fn open_folder(app: tauri::AppHandle) -> Result<Option<String>, String> {
 
     None => Ok(None),
   }
+}
+
+
+
+#[tauri::command]
+fn read_workspace(path: String) -> Result<Vec<workspace::filesystem::FileEntry>, String> {
+    let path = PathBuf::from(path);
+
+    workspace::filesystem::read_directory(&path)
 }

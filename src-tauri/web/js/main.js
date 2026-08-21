@@ -32,9 +32,14 @@ async function openFolder() {
                 folder.split(/[\\/]/).pop();
         }
 
+        const files = await invoke("read_workspace", {
+            path: folder
+        });
+
+        console.log("Workspace files: ", files);
+
         if (explorerEmpty) {
-            explorerEmpty.textContent =
-                "Loading files...";
+            explorerEmpty.remove();
         }
     } catch (error) {
         console.error("Failed to open folder: ", error);
