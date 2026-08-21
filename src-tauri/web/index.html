@@ -5,10 +5,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DragonFoxIDE</title>
+
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
-    <h1>init</h1>
+
+    <div id="app">
+
+        <aside id="activity-bar">
+            <button class="activity-button active">EX</button>
+            <button class="activity-button">SR</button>
+            <button class="activity-button">GI</button>
+            <button class="activity-button">DB</button>
+
+            <div class="activity-spacer"></div>
+
+            <button class="activity-button">ST</button>
+        </aside>
+
+        <aside id="sidebar">
+
+            <div class="sidebar-header">
+                <span>EXPLORER</span>
+            </div>
+
+            <div id="file-explorer">
+
+                <div class="explorer-section">
+                    <span>DragonFoxIDE</span>
+                </div>
+
+                <div class="explorer-empty">
+                    Open a Folder to start
+                </div>
+            </div>
+        </aside>
+
+
+        <main id="main">
+            <div id="tabs">
+
+                <div class="tab active">
+                    <span>Welcome</span>
+                    <span class="tab-close">×</span>
+                </div>
+
+
+            </div>
+
+            <section id="editor">
+
+                <div class="welcome">
+
+                    <h1>DragonFoxIDE</h1>
+
+                    <p>A Powerful IDE built with Rust</p>
+
+                    <div class="welcome-actions">
+
+                        <button>Open Folder</button>
+
+                        <button>Create Project</button>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="bottom-panel">
+
+                <div class="panel-tabs">
+
+                    <button class="panel-tab active">PROBLEMS</button>
+
+                    <button class="panel-tab">OUTPUT</button>
+
+                    <button class="panel-tab">TERMINAL</button>
+
+                </div>
+
+                <div id="panel-content">No Problems detected</div>
+            </section>
+
+            <footer id="status-right">
+
+                <span>No</span>
+                <span>UTF-8</span>
+                <span>LF</span>
+                <span>Ln 1, Col 1</span>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+
 </body>
 
 </html>
