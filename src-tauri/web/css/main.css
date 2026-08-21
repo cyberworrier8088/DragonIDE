@@ -303,3 +303,68 @@ button {
 
     gap: 16px;
 }
+
+
+
+#file-tree {
+    padding: 4px 0;
+    overflow-y: auto;
+}
+
+
+.file-entry {
+    display: flex;
+    align-items: center;
+
+    min-height: 24px;
+
+    padding: 2px 8px;
+
+    color: #cccccc;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+.file-entry:hover {
+    background: #2a2d2e;
+}
+
+.file-entry.directory {
+    font-weight: 500;
+}
+
+.file-arrow {
+    width: 18px;
+
+    flex-shrink: 0;
+
+    color: #888;
+
+    text-align: center;
+}
+
+.file-icon {
+    width: 20px;
+
+    flex-shrink: 0;
+
+    margin-right: 3px;
+}
+
+
+.file-name {
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+.file-children {
+    margin-left: 18px;
+}

@@ -19,13 +19,8 @@ async function openFolder() {
 
         console.log("Selected workspace: ", folder);
 
-        const explorerName = document.querySelector(
-            ".explorer-section span"
-        );
-
-        const explorerEmpty = document.querySelector(
-            ".explorer-empty"
-        );
+        const explorerName =
+            document.getElementById("workspace-name");
 
         if (explorerName) {
             explorerName.textContent =
@@ -38,11 +33,65 @@ async function openFolder() {
 
         console.log("Workspace files: ", files);
 
-        if (explorerEmpty) {
-            explorerEmpty.remove();
-        }
+        renderFileTree(files);
+
     } catch (error) {
         console.error("Failed to open folder: ", error);
+    }
+}
+
+
+function createFileEntry(entry) {
+
+    const element = document.createElement("div");
+
+    element.classList.add("file-entry");
+
+    if (entry.is_directory) {
+        element.classList.add("directory");
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "file-arrow";
+
+    const icon = document.createElement("span");
+    icon.className = "file-icon";
+
+    const name = document.createElement("span");
+    name.className = "file-name";
+
+
+    name.textContent = entry.name;
+
+    if (entry.is_directory) {
+        arrow.textContent = ":>"
+        icon.textContent = "📁"
+    } else {
+        arrow.textContent = "";
+        icon.textContent = "📄";
+    }
+
+
+    element.appendChild(arrow);
+    element.appendChild(icon);
+    element.appendChild(name);
+
+    return element;
+
+
+}
+
+
+function renderFileTree(files) {
+
+    const tree = document.getElementById("file-tree");
+
+    tree.innerHTML = "";
+
+    for (const file of files) {
+        const entry = createFileEntry(file);
+
+        tree.appendChild(entry);
     }
 }
 
