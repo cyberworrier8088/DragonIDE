@@ -172,6 +172,7 @@ async function openFile(entry) {
         if (editor) {
             editor.style.display = "block";
             editor.value = content;
+            updateLineNumbers();
             editor.focus();
         }
 
@@ -371,9 +372,57 @@ function closeTab(path) {
     renderTabs();
 }
 
+
+function updateLineNumbers() {
+
+    const editor = document.getElementById("code-editor");
+
+    const lineNumbers = document.getElementById("line-numbers");
+
+    if (!editor || !lineNumbers) {
+        return;
+    }
+
+    const lineCount = editor.value.split("\n").length;
+
+    let html = "";
+
+    for (let i = 1; i <= lineCount; i++) {
+        html += `<div>${i}</div>`;
+    }
+
+    lineNumbers.innerHTML = html;
+}
+
+
+function updateCursorPosition() {
+    const editor = document.getElementById("code-editor");
+
+    const position = document.getElementById("cursor-position");
+
+    if (!editor || !position) {
+        return;
+    }
+
+    const cursor = editor.selectionStart;
+
+    const beforeCursor = editor.value.slice(0, cursor);
+
+    const lines = beforeCursor.split("\n");
+
+    const line = lines.length;
+
+    const column = lines[lines.length - 1].length + 1;
+
+    position.textContent = `Ln ${line}, Col ${column}`;
+}
+
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
 
 document.getElementById("code-editor").addEventListener("input", () => {
+    updateLineNumbers();
+    updateCursorPosition();
+
     clearTimeout(editorChangeTimer);
 
     editorChangeTimer = setTimeout(
@@ -414,5 +463,23 @@ document.addEventListener("keydown", async (event) => {
         }
     }
 });
+
+const codeEditor =
+    document.getElementById("code-editor");
+
+codeEditor.addEventListener(
+    "keyup",
+    updateCursorPosition
+);
+
+codeEditor.addEventListener(
+    "click",
+    updateCursorPosition
+);
+
+codeEditor.addEventListener(
+    "select",
+    updateCursorPosition
+);
 
 startDragonIDE();

@@ -70,8 +70,12 @@
 
                 </div>
 
-                <textarea id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off"
-                    autocapitalize="off"></textarea>
+                <div id="editor-container">
+                    <div id="line-numbers"></div>
+
+                    <textarea id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off"
+                        autocapitalize="off"></textarea>
+                </div>
 
             </section>
 
@@ -95,7 +99,7 @@
                 <span>No</span>
                 <span>UTF-8</span>
                 <span>LF</span>
-                <span>Ln 1, Col 1</span>
+                <span id="cursor-position">Ln 1, Col 1</span>
             </footer>
         </main>
     </div>
