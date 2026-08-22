@@ -75,7 +75,7 @@ function createFileEntry(entry) {
     name.textContent = entry.name;
 
     if (entry.is_directory) {
-        arrow.textContent = ":>"
+        arrow.textContent = "▶";
         icon.textContent = "📁"
 
         element.addEventListener("click", () => {
@@ -110,14 +110,14 @@ async function toggleDirectory(element, entry, arrow) {
 
         existingChildren.remove();
 
-        arrow.textContent = ":>";
+        arrow.textContent = "▼";
 
         return;
     }
 
     try {
 
-        arrow.textContent = "↓";
+        arrow.textContent = "▼";
 
         const files = await invoke("read_workspace", {
             path: entry.path
@@ -141,7 +141,7 @@ async function toggleDirectory(element, entry, arrow) {
             error
         );
 
-        arrow.textContent = ":>";
+        arrow.textContent = "↓";
     }
 }
 
@@ -319,7 +319,7 @@ function renderTabs() {
         element.appendChild(close);
 
         element.addEventListener("click", () => {
-            addOrActivateTab(tab.path)
+            activateTab(tab.path);
         });
 
         close.addEventListener("click", (event) => {
@@ -330,6 +330,58 @@ function renderTabs() {
 
         tabs.appendChild(element);
     }
+}
+
+
+async function activateTab(path) {
+
+    const tab = openTabs.find(
+        tab => tab.path === path
+    );
+
+    if (!tab) {
+        return;
+    }
+
+    try {
+
+        const content = await invoke("open_document", {
+            path: tab.path
+        });
+
+        currentFile = {
+            name: tab.name,
+            path: tab.path
+        };
+
+        currentFileContent = content;
+
+        const editor = document.getElementById("code-editor");
+
+        const welcome = document.getElementById("welcome-screen");
+
+        if (welcome) {
+            welcome.style.display = "none";
+        }
+
+        if (editor) {
+            editor.style.display = "block";
+            editor.value = content;
+
+            updateLineNumbers();
+            updateCursorPosition();
+
+            editor.focus();
+        }
+
+        renderTabs();
+    } catch (error) {
+        console.error(
+            "Failed to activate tab: ",
+            error
+        );
+    }
+
 }
 
 function closeTab(path) {
@@ -365,7 +417,7 @@ function closeTab(path) {
         } else {
             const nextIndex = Math.min(index, openTabs.length - 1);
 
-            addOrActivateTab(openTabs[nextIndex].path);
+            activateTab(openTabs[nextIndex].path);
         }
     }
 
@@ -451,7 +503,16 @@ document.addEventListener("keydown", async (event) => {
             currentFileContent =
                 document.getElementById("code-editor").value;
 
-            updateEditorTab(currentFile.name, false);
+
+            const tab = openTabs.find(
+                tab => tab.path === currentFile.path
+            );
+
+            if (tab) {
+                tab.modified = false;
+            }
+
+            renderTabs();
 
             console.log("Saved:", currentFile.path);
 
