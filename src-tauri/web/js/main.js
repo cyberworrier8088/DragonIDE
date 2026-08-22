@@ -3,6 +3,7 @@ const { invoke } = window.__TAURI__.core;
 let currentFile = null;
 let currentFileContent = "";
 let editorChangeTimer = null;
+let openTabs = [];
 
 
 async function startDragonIDE() {
@@ -175,7 +176,7 @@ async function openFile(entry) {
         }
 
 
-        updateEditorTab(entry.name);
+        addOrActivateTab(entry);
 
         console.log("Opened: ", entry.name);
 
@@ -250,7 +251,15 @@ async function updateCurrentDocument() {
 
         currentFileContent = editor.value;
 
-        updateEditorTab(currentFile.name, true);
+        const tab = openTabs.find(
+            tab => tab.path === currentFile.path
+        );
+
+        if (tab) {
+            tab.modified = true;
+        }
+
+        renderTabs();
     } catch (error) {
 
         console.error(
@@ -258,6 +267,108 @@ async function updateCurrentDocument() {
             error
         );
     }
+}
+
+
+function addOrActivateTab(entry) {
+
+    const existing = openTabs.find(
+        tab => tab.path === entry.path
+    );
+
+    if (!existing) {
+        openTabs.push({
+            path: entry.path,
+            name: entry.name,
+            modified: false
+        });
+    }
+
+    renderTabs();
+}
+
+
+function renderTabs() {
+    const tabs = document.getElementById("tabs");
+
+    tabs.innerHTML = "";
+
+    for (const tab of openTabs) {
+        const element = document.createElement("div");
+
+        element.classList = "tab";
+
+
+        if (
+            currentFile && currentFile.path === tab.path
+        ) {
+            element.classList.add("active");
+        }
+
+        const name = document.createElement("span");
+
+        name.textContent = tab.name + (tab.modified ? " *" : "");
+
+        const close = document.createElement("span");
+
+        close.className = "tab-close";
+        close.textContent = "×";
+
+        element.appendChild(name);
+        element.appendChild(close);
+
+        element.addEventListener("click", () => {
+            addOrActivateTab(tab.path)
+        });
+
+        close.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            closeTab(tab.path);
+        });
+
+        tabs.appendChild(element);
+    }
+}
+
+function closeTab(path) {
+    const index = openTabs.findIndex(
+        tab => tab.path === path
+    );
+
+    if (index === -1) {
+        return;
+    }
+
+    const wasActive = currentFile && currentFile.path === path;
+
+    openTabs.splice(index, 1);
+
+    if (wasActive) {
+        if (openTabs.length === 0) {
+            currentFile = null;
+            currentFileContent = "";
+
+            const editor = document.getElementById("code-editor");
+
+            const welcome = document.getElementById("welcome-screen");
+
+            if (editor) {
+                editor.style.display = "none";
+                editor.value = "";
+            }
+
+            if (welcome) {
+                welcome.style.display = "block";
+            }
+        } else {
+            const nextIndex = Math.min(index, openTabs.length - 1);
+
+            addOrActivateTab(openTabs[nextIndex].path);
+        }
+    }
+
+    renderTabs();
 }
 
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
