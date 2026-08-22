@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace, read_file, document_count, open_document])
+        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace, read_file, document_count, open_document, save_document, update_document])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -94,4 +94,37 @@ fn open_document(
   let document = documents.open(path, content);
 
   Ok(document.text.clone())
+}
+
+
+#[tauri::command]
+fn update_document(
+  path: String,
+  text: String,
+  state: tauri::State<'_, core::state::IdeState>,
+) -> Result<(), String> {
+
+  let path = PathBuf::from(path);
+
+  let mut documents = state.documents.lock().map_err(|error| error.to_string())?;
+
+  let document = documents.get_mut(&path).ok_or_else(|| "Document is not open".to_string())?;
+
+  document.set_text(text);
+
+  Ok(())
+}
+
+#[tauri::command]
+fn save_document(
+  path: String,
+  state: tauri::State<'_, core::state::IdeState>,
+) -> Result<(), String> {
+
+  let path = PathBuf::from(path);
+
+  let mut documents = state.documents.lock().map_err(|error| error.to_string())?;
+
+
+  documents.save(&path)
 }

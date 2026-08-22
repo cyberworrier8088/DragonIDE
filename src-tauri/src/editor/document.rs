@@ -6,6 +6,7 @@ pub struct Document {
     pub text: String,
     pub language: String,
     pub version: usize,
+    pub modified: bool,
 }
 
 
@@ -21,7 +22,19 @@ impl Document {
             text,
             language,
             version: 1,
+            modified: false,
         }
+    }
+
+
+    pub fn set_text(&mut self, text: String) {
+        self.text = text;
+        self.version += 1;
+        self.modified = true;
+    }
+
+    pub fn mark_saved(&mut self) {
+        self.modified = false;
     }
 }
 

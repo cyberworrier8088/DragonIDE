@@ -41,6 +41,19 @@ impl DocumentManager {
     pub fn count(&self) -> usize {
         self.documents.len()
     }
+
+    pub fn save(&mut self, path: &PathBuf) -> Result<(), String> {
+
+        let document = self.documents.get_mut(path).ok_or_else(|| "Document is not open".to_string())?;
+
+        std::fs::write(&document.path, &document.text).map_err(|error| error.to_string())?;
+
+        document.mark_saved();
+
+        Ok(())
+    }
+
+
 }
 
 #[cfg(test)]

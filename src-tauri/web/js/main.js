@@ -2,6 +2,7 @@ const { invoke } = window.__TAURI__.core;
 
 let currentFile = null;
 let currentFileContent = "";
+let editorChangeTimer = null;
 
 
 async function startDragonIDE() {
@@ -191,16 +192,19 @@ async function openFile(entry) {
     }
 }
 
-function updateEditorTab(fileName) {
+function updateEditorTab(fileName, modified = false) {
 
     const tabs = document.getElementById("tabs");
 
+    const marker = modified ? " *" : "";
+
     tabs.innerHTML = `
         <div class="tab active">
-            <span>${fileName}</span>
+            <span>${escapeHtml(fileName + marker)}</span>
             <span class="tab-close">×</span>
         </div>
     `;
+
 }
 
 function escapeHtml(value) {
@@ -225,6 +229,79 @@ function renderFileTree(files) {
     }
 }
 
+async function updateCurrentDocument() {
+
+    if (!currentFile) {
+        return;
+    }
+
+    const editor = document.getElementById("code-editor");
+
+    if (!editor) {
+        return;
+    }
+
+
+    try {
+        await invoke("update_document", {
+            path: currentFile.path,
+            text: editor.value
+        });
+
+        currentFileContent = editor.value;
+
+        updateEditorTab(currentFile.name, true);
+    } catch (error) {
+
+        console.error(
+            "Failed to update document:",
+            error
+        );
+    }
+}
+
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
+
+document.getElementById("code-editor").addEventListener("input", () => {
+    clearTimeout(editorChangeTimer);
+
+    editorChangeTimer = setTimeout(
+        updateCurrentDocument,
+        150
+    );
+});
+
+
+document.addEventListener("keydown", async (event) => {
+    if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "s"
+    ) {
+        event.preventDefault();
+
+        if (!currentFile) {
+            return;
+        }
+
+        try {
+            await invoke("save_document", {
+                path: currentFile.path
+            });
+
+            currentFileContent =
+                document.getElementById("code-editor").value;
+
+            updateEditorTab(currentFile.name, false);
+
+            console.log("Saved:", currentFile.path);
+
+        } catch (error) {
+            console.error(
+                "Failed to save document:",
+                error
+            );
+        }
+    }
+});
 
 startDragonIDE();
