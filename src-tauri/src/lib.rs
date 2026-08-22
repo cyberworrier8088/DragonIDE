@@ -2,6 +2,10 @@ use std::path::PathBuf;
 
 mod core;
 mod workspace;
+mod editor;
+
+
+use core::state::IdeState;
 
 #[tauri::command]
 fn get_ide_name() -> String {
@@ -11,6 +15,7 @@ fn get_ide_name() -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(IdeState::default())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
@@ -22,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace, read_file])
+        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace, read_file, document_count, open_document])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -61,4 +66,32 @@ fn read_workspace(path: String) -> Result<Vec<workspace::filesystem::FileEntry>,
 fn read_file(path: String) -> Result<String, String> {
   let path = PathBuf::from(path);
   workspace::filesystem::read_file(&path)
+}
+
+
+#[tauri::command]
+fn document_count(
+  state: tauri::State<'_, IdeState>,
+) -> Result<usize, String> {
+
+  let documents = state.documents.lock().map_err(|error| error.to_string())?;
+
+  Ok(documents.count())
+}
+
+#[tauri::command]
+fn open_document(
+  path: String,
+  state: tauri::State<'_, IdeState>,
+) -> Result<String, String> {
+  
+  let path = PathBuf::from(path);
+
+  let content = workspace::filesystem::read_file(&path)?;
+
+  let mut documents = state.documents.lock().map_err(|error| error.to_string())?;
+
+  let document = documents.open(path, content);
+
+  Ok(document.text.clone())
 }

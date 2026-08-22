@@ -9,6 +9,11 @@ async function startDragonIDE() {
     const name = await invoke("get_ide_name");
 
     console.log("Rust says: ", name);
+
+
+    const count = await invoke("document_count");
+
+    console.log("Open Document: ", count);
 }
 
 async function openFolder() {
@@ -145,9 +150,11 @@ async function openFile(entry) {
 
         console.log("Opening fille:", entry.path);
 
-        const content = await invoke("read_file", {
+        const content = await invoke("open_document", {
             path: entry.path
         });
+
+
 
         currentFile = entry;
         currentFileContent = content;
@@ -170,6 +177,10 @@ async function openFile(entry) {
         updateEditorTab(entry.name);
 
         console.log("Opened: ", entry.name);
+
+        const count = await invoke("document_count");
+
+        console.log("Open documents:", count);
 
     } catch (error) {
 
