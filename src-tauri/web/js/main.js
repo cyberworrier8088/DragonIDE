@@ -469,6 +469,20 @@ function updateCursorPosition() {
     position.textContent = `Ln ${line}, Col ${column}`;
 }
 
+
+
+function syncEditorScroll() {
+    const editor = document.getElementById("code-editor");
+
+    const lineNumbers = document.getElementById("line-numbers");
+
+    if (!editor || !lineNumbers) {
+        return;
+    }
+
+    lineNumbers.scrollTop = editor.scrollTop;
+}
+
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
 
 document.getElementById("code-editor").addEventListener("input", () => {
@@ -525,8 +539,12 @@ document.addEventListener("keydown", async (event) => {
     }
 });
 
-const codeEditor =
-    document.getElementById("code-editor");
+const codeEditor = document.getElementById("code-editor");
+
+codeEditor.addEventListener(
+    "scroll",
+    syncEditorScroll
+);
 
 codeEditor.addEventListener(
     "keyup",
@@ -541,6 +559,37 @@ codeEditor.addEventListener(
 codeEditor.addEventListener(
     "select",
     updateCursorPosition
+);
+
+codeEditor.addEventListener(
+    "keydown",
+    (event) => {
+        if (event.key !== "Tab") {
+            return;
+        }
+
+        event.preventDefault();
+
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+
+        codeEditor.setRangeText(
+            "    ",
+            start,
+            end,
+            "end"
+        );
+
+        updateLineNumbers();
+        updateCursorPosition();
+
+        clearTimeout(editorChangeTimer);
+
+        editorChangeTimer = setTimeout(
+            updateCurrentDocument,
+            150
+        );
+    }
 );
 
 startDragonIDE();
