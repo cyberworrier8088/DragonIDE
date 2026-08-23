@@ -539,6 +539,43 @@ document.addEventListener("keydown", async (event) => {
     }
 });
 
+
+
+
+// function for enter key handle
+function handleEnterKey(event) {
+
+    const start = codeEditor.selectionStart;
+
+    const text = codeEditor.value.slice(0, start);
+
+    const currentLine = text.split("\n").pop();
+
+    const indentation = currentLine.match(/^[ \t]*/)?.[0] ?? ""
+
+    event.preventDefault();
+
+    const extraIndent = currentLine.trimEnd().endsWith("{") ? "    " : "";
+
+    const insertion = "\n" + indentation + extraIndent;
+
+    codeEditor.setRangeText(
+        insertion,
+        start,
+        codeEditor.selectionEnd,
+        "end"
+    );
+
+    updateLineNumbers();
+    updateCursorPosition();
+    clearTimeout(editorChangeTimer);
+
+    editorChangeTimer = setTimeout(
+        updateCurrentDocument,
+        150
+    );
+}
+
 const codeEditor = document.getElementById("code-editor");
 
 codeEditor.addEventListener(
@@ -564,31 +601,35 @@ codeEditor.addEventListener(
 codeEditor.addEventListener(
     "keydown",
     (event) => {
-        if (event.key !== "Tab") {
+        if (event.key === "Tab") {
+            event.preventDefault();
+
+            const start = codeEditor.selectionStart;
+            const end = codeEditor.selectionEnd;
+
+            codeEditor.setRangeText(
+                "    ",
+                start,
+                end,
+                "end"
+            );
+
+            updateLineNumbers();
+            updateCursorPosition();
+
+            clearTimeout(editorChangeTimer);
+
+            editorChangeTimer = setTimeout(
+                updateCurrentDocument,
+                150
+            );
+
             return;
         }
 
-        event.preventDefault();
-
-        const start = codeEditor.selectionStart;
-        const end = codeEditor.selectionEnd;
-
-        codeEditor.setRangeText(
-            "    ",
-            start,
-            end,
-            "end"
-        );
-
-        updateLineNumbers();
-        updateCursorPosition();
-
-        clearTimeout(editorChangeTimer);
-
-        editorChangeTimer = setTimeout(
-            updateCurrentDocument,
-            150
-        );
+        if (event.key === "Enter") {
+            handleEnterKey(event);
+        }
     }
 );
 
