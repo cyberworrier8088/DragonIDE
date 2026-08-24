@@ -163,15 +163,20 @@ async function openFile(entry) {
 
         const welcome = document.getElementById("welcome-screen");
 
+        const editorContainer = document.getElementById("editor-container");
         const editor = document.getElementById("code-editor");
 
         if (welcome) {
             welcome.style.display = "none";
         }
 
+        if (editorContainer) {
+            editorContainer.style.display = "flex";
+        }
+
         if (editor) {
-            editor.style.display = "block";
             editor.value = content;
+            syncHighlight();
             updateLineNumbers();
             editor.focus();
         }
@@ -356,20 +361,24 @@ async function activateTab(path) {
 
         currentFileContent = content;
 
+        const editorContainer = document.getElementById("editor-container");
         const editor = document.getElementById("code-editor");
-
         const welcome = document.getElementById("welcome-screen");
 
         if (welcome) {
             welcome.style.display = "none";
         }
 
+        if (editorContainer) {
+            editorContainer.style.display = "flex";
+        }
+
         if (editor) {
-            editor.style.display = "block";
             editor.value = content;
 
             updateLineNumbers();
             updateCursorPosition();
+            syncHighlight();
 
             editor.focus();
         }
@@ -402,12 +411,15 @@ function closeTab(path) {
             currentFile = null;
             currentFileContent = "";
 
+            const editorContainer = document.getElementById("editor-container");
             const editor = document.getElementById("code-editor");
-
             const welcome = document.getElementById("welcome-screen");
 
+            if (editorContainer) {
+                editorContainer.style.display = "none";
+            }
+            
             if (editor) {
-                editor.style.display = "none";
                 editor.value = "";
             }
 
@@ -485,17 +497,7 @@ function syncEditorScroll() {
 
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
 
-document.getElementById("code-editor").addEventListener("input", () => {
-    updateLineNumbers();
-    updateCursorPosition();
 
-    clearTimeout(editorChangeTimer);
-
-    editorChangeTimer = setTimeout(
-        updateCurrentDocument,
-        150
-    );
-});
 
 
 document.addEventListener("keydown", async (event) => {
@@ -576,61 +578,78 @@ function handleEnterKey(event) {
     );
 }
 
+
+function syncHighlight() {
+    const editor = document.getElementById("code-editor");
+    const highlight = document.getElementById("code-highlight");
+    const highlightInner = document.getElementById("code-highlight-inner");
+
+
+    if (!editor || !highlight) return;
+
+    // sync scrool
+    highlight.scrollTop = editor.scrollTop;
+    highlight.scrollLeft = editor.scrollLeft;
+
+    // Update highlight
+    const language = currentFile ? detectLanguageFromPath(currentFile.path) : "text";
+
+    highlightInner.textContent = editor.value;
+    highlightInner.className = `language-${language}`;
+
+    // highlight the code
+    hljs.highlightElement(highlightInner);
+
+    updateLineNumbers();
+}
+
+function detectLanguageFromPath(path) {
+    const ext = path.split(".").pop().toLowerCase();
+    const langMap = {
+        "rs": "rust",
+        "js": "javascript",
+        "jsx": "javascript",
+        "html": "html",
+        "css": "css",
+        "py": "python",
+        "go": "go",
+    };
+    return langMap[ext] || "text";
+}
+
 const codeEditor = document.getElementById("code-editor");
 
-codeEditor.addEventListener(
-    "scroll",
-    syncEditorScroll
-);
+codeEditor.addEventListener("input", () => {
+    syncHighlight();
+    updateCursorPosition();
 
-codeEditor.addEventListener(
-    "keyup",
-    updateCursorPosition
-);
+    clearTimeout(editorChangeTimer);
+    editorChangeTimer = setTimeout(updateCurrentDocument, 150);
+});
 
-codeEditor.addEventListener(
-    "click",
-    updateCursorPosition
-);
+codeEditor.addEventListener("scroll", () => {
+    syncHighlight();
+});
 
-codeEditor.addEventListener(
-    "select",
-    updateCursorPosition
-);
+codeEditor.addEventListener("keyup", updateCursorPosition);
+codeEditor.addEventListener("click", updateCursorPosition);
+codeEditor.addEventListener("select", updateCursorPosition);
 
-codeEditor.addEventListener(
-    "keydown",
-    (event) => {
-        if (event.key === "Tab") {
-            event.preventDefault();
-
-            const start = codeEditor.selectionStart;
-            const end = codeEditor.selectionEnd;
-
-            codeEditor.setRangeText(
-                "    ",
-                start,
-                end,
-                "end"
-            );
-
-            updateLineNumbers();
-            updateCursorPosition();
-
-            clearTimeout(editorChangeTimer);
-
-            editorChangeTimer = setTimeout(
-                updateCurrentDocument,
-                150
-            );
-
-            return;
-        }
-
-        if (event.key === "Enter") {
-            handleEnterKey(event);
-        }
+codeEditor.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") {
+        event.preventDefault();
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+        codeEditor.setRangeText("    ", start, end, "end");
+        syncHighlight();
+        updateCursorPosition();
+        clearTimeout(editorChangeTimer);
+        editorChangeTimer = setTimeout(updateCurrentDocument, 150);
+        return;
     }
-);
 
-startDragonIDE();
+    if (event.key === "Enter") {
+        handleEnterKey(event);
+        syncHighlight(); // Add this line
+    }
+});

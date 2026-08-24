@@ -370,37 +370,6 @@ button {
 }
 
 
-#code-editor {
-
-    display: none;
-
-    flex: 1;
-
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 16px;
-
-    border: 0;
-    outline: 0;
-
-    resize: none;
-
-    background: #1e1e1e;
-    color: #d4d4d4;
-
-    font-family: "Cascadia Code", "Consolas", monospace;
-
-    font-size: 14px;
-    line-height: 1.6;
-
-    tab-size: 4;
-
-    white-space: pre;
-
-    overflow: auto;
-}
 
 #code-editor:focus {
     outline: none;
@@ -445,4 +414,72 @@ button {
     padding-right: 12px;
 
     height: 22.4px;
+}
+
+
+
+#code-editor-wrapper {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#code-editor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 16px;
+
+    border: 0;
+    outline: 0;
+    resize: none;
+
+    background: transparent;
+    color: transparent;
+    caret-color: #d4d4d4;
+
+    font-family: "Cascadia Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    tab-size: 4;
+    white-space: pre;
+
+    overflow: auto;
+    z-index: 2;
+}
+
+#code-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 16px;
+
+    background: #1e1e1e;
+    color: #d4d4d4;
+
+    font-family: "Cascadia Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    tab-size: 4;
+    white-space: pre;
+
+    overflow: auto;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#code-highlight code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
 }
