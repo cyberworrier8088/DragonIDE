@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" href="css/main.css">
 
+    <link rel="stylesheet" href="css/settings.css">
+
 </head>
 
 <body>
@@ -22,7 +24,8 @@
 
             <div class="activity-spacer"></div>
 
-            <button class="activity-button">ST</button>
+            <button class="activity-button" id="settings-button"><img src="assets/icon/setting.svg"
+                    alt="setting"></button>
         </aside>
 
         <aside id="sidebar">
@@ -107,13 +110,66 @@
                 <span id="cursor-position">Ln 1, Col 1</span>
             </footer>
         </main>
+
+
+
+        <div id="settings-modal" class="modal hidden">
+
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="modal-close" id="close-settings">×</button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="settings-section">
+                        <label class="settings-label">Theme</label>
+                        <div class="settings-options">
+                            <button class="theme-option active" data-theme="dark">Dark</button>
+                            <button class="theme-option" data-theme="light">Light</button>
+                            <button class="theme-option" data-theme="nord">Nord (blue)</button>
+                            <button class="theme-option" data-theme="monokai">Monokai</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">Font Size</label>
+                        <div class="settings-slider">
+                            <input type="range" id="font-size-slider" min="10" max="34" value="14">
+                            <span id="font-size-value">14px</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">Tab Size</label>
+                        <div class="settings-options">
+                            <button class="tab-option" data-tab-size="2">2</button>
+                            <button class="tab-option active" data-tab-size="4">4</button>
+                            <button class="tab-option" data-tab-size="6">6</button>
+                            <button class="tab-option" data-tab-size="8">8</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">
+                            <input type="checkbox" id="line-wrap-toggle">
+                            Word Wrap
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Theme stylesheet loaded locally -->
+    <link id="highlight-theme" rel="stylesheet" href="css/themes/dark.css">
+    <script src="lib/highlight.min.js"></script>
 
+    <script src="js/settings.js"></script>
     <script src="js/main.js"></script>
 
 </body>

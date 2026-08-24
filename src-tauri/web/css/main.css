@@ -43,27 +43,40 @@ button {
 }
 
 .activity-button {
-
     width: 52px;
     height: 52px;
-
     border: 0;
-
     background: transparent;
     color: #777;
-
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.activity-button img {
+    width: 22px;
+    height: 22px;
+    filter: invert(0.7);
+    transition: filter 0.15s ease;
 }
 
 .activity-button:hover {
     color: #fff;
 }
 
+.activity-button:hover img {
+    filter: invert(1);
+}
+
 .activity-button.active {
     color: #fff;
-
     border-left: 2px solid #fff;
+}
 
+.activity-button.active img {
+    filter: invert(1);
 }
 
 .activity-spacer {
@@ -412,8 +425,8 @@ button {
 
 #line-numbers div {
     padding-right: 12px;
-
-    height: 22.4px;
+    height: 1.6em;
+    line-height: 1.6;
 }
 
 
@@ -482,4 +495,4 @@ button {
     background: none;
     padding: 0;
     border-radius: 0;
-}
+}

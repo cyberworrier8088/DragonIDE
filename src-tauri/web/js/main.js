@@ -7,15 +7,19 @@ let openTabs = [];
 
 
 async function startDragonIDE() {
+    if (typeof applyAllSettings === "function") {
+        applyAllSettings();
+    }
 
-    const name = await invoke("get_ide_name");
+    try {
+        const name = await invoke("get_ide_name");
+        console.log("Rust says: ", name);
 
-    console.log("Rust says: ", name);
-
-
-    const count = await invoke("document_count");
-
-    console.log("Open Document: ", count);
+        const count = await invoke("document_count");
+        console.log("Open Document: ", count);
+    } catch (error) {
+        console.error("Error during startup:", error);
+    }
 }
 
 async function openFolder() {
@@ -418,7 +422,7 @@ function closeTab(path) {
             if (editorContainer) {
                 editorContainer.style.display = "none";
             }
-            
+
             if (editor) {
                 editor.value = "";
             }
@@ -544,21 +548,16 @@ document.addEventListener("keydown", async (event) => {
 
 
 
-// function for enter key handle
 function handleEnterKey(event) {
-
     const start = codeEditor.selectionStart;
-
     const text = codeEditor.value.slice(0, start);
-
     const currentLine = text.split("\n").pop();
-
-    const indentation = currentLine.match(/^[ \t]*/)?.[0] ?? ""
+    const indentation = currentLine.match(/^[ \t]*/)?.[0] ?? "";
 
     event.preventDefault();
 
-    const extraIndent = currentLine.trimEnd().endsWith("{") ? "    " : "";
-
+    const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
+    const extraIndent = currentLine.trimEnd().endsWith("{") ? " ".repeat(tabWidth) : "";
     const insertion = "\n" + indentation + extraIndent;
 
     codeEditor.setRangeText(
@@ -584,21 +583,31 @@ function syncHighlight() {
     const highlight = document.getElementById("code-highlight");
     const highlightInner = document.getElementById("code-highlight-inner");
 
+    if (!editor || !highlight || !highlightInner) return;
 
-    if (!editor || !highlight) return;
-
-    // sync scrool
+    // sync scroll
     highlight.scrollTop = editor.scrollTop;
     highlight.scrollLeft = editor.scrollLeft;
 
     // Update highlight
     const language = currentFile ? detectLanguageFromPath(currentFile.path) : "text";
+    const text = editor.value || "";
 
-    highlightInner.textContent = editor.value;
-    highlightInner.className = `language-${language}`;
+    if (typeof hljs !== "undefined" && language !== "text" && hljs.getLanguage(language)) {
+        try {
+            const result = hljs.highlight(text, { language: language, ignoreIllegals: true });
+            highlightInner.innerHTML = result.value + (text.endsWith("\n") ? "\n" : "");
+            highlightInner.className = `language-${language} hljs`;
+        } catch (e) {
+            highlightInner.textContent = text;
+            highlightInner.className = "hljs";
+        }
+    } else {
+        highlightInner.textContent = text;
+        highlightInner.className = "hljs";
+    }
 
-    // highlight the code
-    hljs.highlightElement(highlightInner);
+    delete highlightInner.dataset.highlighted;
 
     updateLineNumbers();
 }
@@ -609,13 +618,19 @@ function detectLanguageFromPath(path) {
         "rs": "rust",
         "js": "javascript",
         "jsx": "javascript",
+        "ts": "typescript",
+        "tsx": "typescript",
         "html": "html",
         "css": "css",
         "py": "python",
         "go": "go",
+        "json": "json",
+        "md": "markdown",
+        "toml": "toml",
     };
     return langMap[ext] || "text";
 }
+
 
 const codeEditor = document.getElementById("code-editor");
 
@@ -640,7 +655,8 @@ codeEditor.addEventListener("keydown", (event) => {
         event.preventDefault();
         const start = codeEditor.selectionStart;
         const end = codeEditor.selectionEnd;
-        codeEditor.setRangeText("    ", start, end, "end");
+        const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
+        codeEditor.setRangeText(" ".repeat(tabWidth), start, end, "end");
         syncHighlight();
         updateCursorPosition();
         clearTimeout(editorChangeTimer);
@@ -650,6 +666,13 @@ codeEditor.addEventListener("keydown", (event) => {
 
     if (event.key === "Enter") {
         handleEnterKey(event);
-        syncHighlight(); // Add this line
+        syncHighlight();
     }
 });
+
+// Startup trigger
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startDragonIDE);
+} else {
+    startDragonIDE();
+}
