@@ -1,1 +1,242 @@
-pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{color:#383a42;background:#fafafa}.hljs-comment,.hljs-quote{color:#a0a1a7;font-style:italic}.hljs-doctag,.hljs-formula,.hljs-keyword{color:#a626a4}.hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#e45649}.hljs-literal{color:#0184bb}.hljs-addition,.hljs-attribute,.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#50a14f}.hljs-attr,.hljs-number,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-pseudo,.hljs-template-variable,.hljs-type,.hljs-variable{color:#986801}.hljs-bullet,.hljs-link,.hljs-meta,.hljs-selector-id,.hljs-symbol,.hljs-title{color:#4078f2}.hljs-built_in,.hljs-class .hljs-title,.hljs-title.class_{color:#c18401}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}.hljs-link{text-decoration:underline}
+:root {
+  /* Editor Colors */
+  --editor-bg: #fafafa;
+  --editor-text: #383a42;
+  --editor-line-number: #9ca0a4;
+  --editor-line-number-bg: #fafafa;
+  --editor-cursor: #383a42;
+  
+  /* UI Colors */
+  --bg-primary: #fafafa;
+  --bg-secondary: #f0f0f0;
+  --bg-tertiary: #e8e8e8;
+  --text-primary: #383a42;
+  --text-secondary: #666666;
+  --text-muted: #888888;
+  --border: #d4d4d4;
+  
+  /* Highlights */
+  --accent-blue: #0184bc;
+  --accent-hover: #efefef;
+  --accent-active: #e0e0e0;
+  
+  /* Syntax Colors (from Atom One Light) */
+  --syntax-keyword: #a626a4;
+  --syntax-string: #50a14f;
+  --syntax-number: #986801;
+  --syntax-comment: #a0a1a7;
+  --syntax-function: #c18401;
+  --syntax-operator: #383a42;
+}
+
+/* Apply theme to all elements */
+html, body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+#activity-bar {
+  background: var(--bg-secondary);
+  border-right-color: var(--border);
+}
+
+.activity-button {
+  color: var(--text-muted);
+}
+
+.activity-button:hover {
+  color: var(--text-primary);
+}
+
+.activity-button.active {
+  color: var(--text-primary);
+  border-left-color: var(--text-primary);
+}
+
+#sidebar {
+  background: var(--bg-secondary);
+  border-right-color: var(--border);
+  color: var(--text-primary);
+}
+
+#tabs {
+  background: var(--bg-secondary);
+  border-bottom-color: var(--border);
+}
+
+.tab {
+  background: var(--bg-primary);
+  border-right-color: var(--border);
+  color: var(--text-primary);
+}
+
+.tab-close {
+  color: var(--text-secondary);
+}
+
+.tab-close:hover {
+  color: var(--text-primary);
+}
+
+#editor {
+  background: var(--bg-primary);
+}
+
+.welcome h1 {
+  color: var(--text-primary);
+}
+
+.welcome p {
+  color: var(--text-secondary);
+}
+
+.welcome-actions button {
+  border-color: var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.welcome-actions button:hover {
+  background: var(--bg-tertiary);
+}
+
+#bottom-panel {
+  background: var(--bg-secondary);
+  border-top-color: var(--border);
+}
+
+.panel-tabs {
+  border-bottom-color: var(--border);
+}
+
+.panel-tab {
+  color: var(--text-secondary);
+}
+
+.panel-tab:hover {
+  color: var(--text-primary);
+}
+
+.panel-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+}
+
+#panel-content {
+  color: var(--text-secondary);
+}
+
+#code-editor {
+  background: transparent;
+  color: transparent;
+  caret-color: var(--editor-cursor);
+}
+
+#code-highlight {
+  background: var(--editor-bg);
+  color: var(--editor-text);
+}
+
+#line-numbers {
+  background: var(--editor-line-number-bg);
+  color: var(--editor-line-number);
+}
+
+/* Modal */
+.modal-content {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+}
+
+.modal-header {
+  border-bottom-color: var(--border);
+  color: var(--text-primary);
+}
+
+.modal-header h2 {
+  color: var(--text-primary);
+}
+
+.modal-close {
+  color: var(--text-secondary);
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+  background: var(--accent-hover);
+}
+
+.settings-label {
+  color: var(--text-secondary);
+}
+
+.theme-option, .tab-option {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.theme-option:hover, .tab-option:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-active);
+}
+
+.theme-option.active, .tab-option.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+
+/* File explorer */
+.file-entry {
+  color: var(--text-primary);
+}
+
+.file-entry:hover {
+  background: var(--accent-hover);
+}
+
+.file-arrow, .file-icon {
+  color: var(--text-secondary);
+}
+
+.sidebar-header {
+  color: var(--text-primary);
+}
+
+.explorer-section {
+  color: var(--text-primary);
+}
+
+/* Settings slider */
+.settings-slider input[type="range"] {
+  background: var(--accent-active);
+}
+
+.settings-slider input[type="range"]::-webkit-slider-thumb {
+  background: var(--accent-blue);
+}
+
+.settings-slider input[type="range"]::-moz-range-thumb {
+  background: var(--accent-blue);
+}
+
+#font-size-value {
+  color: var(--text-primary);
+}
+
+/* ===== Highlight.js Syntax Theme (Atom One Light) ===== */
+pre code.hljs{display:block;overflow-x:auto;padding:1em}
+code.hljs{padding:3px 5px}
+.hljs{color:#383a42;background:#fafafa}
+.hljs-comment,.hljs-quote{color:#a0a1a7;font-style:italic}
+.hljs-doctag,.hljs-formula,.hljs-keyword{color:#a626a4}
+.hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#e45649}
+.hljs-literal{color:#0184bb}
+.hljs-addition,.hljs-attribute,.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#50a14f}
+.hljs-attr,.hljs-number,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-pseudo,.hljs-template-variable,.hljs-type,.hljs-variable{color:#986801}
+.hljs-bullet,.hljs-link,.hljs-meta,.hljs-selector-id,.hljs-symbol,.hljs-title{color:#4078f2}
+.hljs-built_in,.hljs-class .hljs-title,.hljs-title.class_{color:#c18401}
+.hljs-emphasis{font-style:italic}
+.hljs-strong{font-weight:700}
+.hljs-link{text-decoration:underline}

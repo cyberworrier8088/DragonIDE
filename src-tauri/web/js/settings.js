@@ -74,7 +74,10 @@ function applyTheme(themeName) {
         "monokai": "css/themes/monokai.css"
     };
 
-    if (!themeMap[themeName]) return;
+    if (!themeMap[themeName]) {
+        console.error("Theme not found:", themeName);
+        return;
+    }
 
     let themeLink = document.getElementById("highlight-theme");
     if (!themeLink) {
@@ -87,6 +90,7 @@ function applyTheme(themeName) {
     themeLink.href = themeMap[themeName];
     settings.theme = themeName;
     saveSettings(settings);
+    console.log("Theme applied:", themeName);
 }
 
 function applyFontSize(size) {

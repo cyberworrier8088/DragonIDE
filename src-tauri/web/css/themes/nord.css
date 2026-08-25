@@ -1,1 +1,186 @@
-pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:#2e3440}.hljs,.hljs-subst{color:#d8dee9}.hljs-selector-tag{color:#81a1c1}.hljs-selector-id{color:#8fbcbb;font-weight:700}.hljs-selector-attr,.hljs-selector-class{color:#8fbcbb}.hljs-property,.hljs-selector-pseudo{color:#88c0d0}.hljs-addition{background-color:rgba(163,190,140,.5)}.hljs-deletion{background-color:rgba(191,97,106,.5)}.hljs-built_in,.hljs-class,.hljs-type{color:#8fbcbb}.hljs-function,.hljs-function>.hljs-title,.hljs-title.hljs-function{color:#88c0d0}.hljs-keyword,.hljs-literal,.hljs-symbol{color:#81a1c1}.hljs-number{color:#b48ead}.hljs-regexp{color:#ebcb8b}.hljs-string{color:#a3be8c}.hljs-title{color:#8fbcbb}.hljs-params{color:#d8dee9}.hljs-bullet{color:#81a1c1}.hljs-code{color:#8fbcbb}.hljs-emphasis{font-style:italic}.hljs-formula{color:#8fbcbb}.hljs-strong{font-weight:700}.hljs-link:hover{text-decoration:underline}.hljs-comment,.hljs-quote{color:#4c566a}.hljs-doctag{color:#8fbcbb}.hljs-meta,.hljs-meta .hljs-keyword{color:#5e81ac}.hljs-meta .hljs-string{color:#a3be8c}.hljs-attr{color:#8fbcbb}.hljs-attribute{color:#d8dee9}.hljs-name{color:#81a1c1}.hljs-section{color:#88c0d0}.hljs-tag{color:#81a1c1}.hljs-template-variable,.hljs-variable{color:#d8dee9}.hljs-template-tag{color:#5e81ac}.language-abnf .hljs-attribute{color:#88c0d0}.language-abnf .hljs-symbol{color:#ebcb8b}.language-apache .hljs-attribute{color:#88c0d0}.language-apache .hljs-section{color:#81a1c1}.language-arduino .hljs-built_in{color:#88c0d0}.language-aspectj .hljs-meta{color:#d08770}.language-aspectj>.hljs-title{color:#88c0d0}.language-bnf .hljs-attribute{color:#8fbcbb}.language-clojure .hljs-name{color:#88c0d0}.language-clojure .hljs-symbol{color:#ebcb8b}.language-coq .hljs-built_in{color:#88c0d0}.language-cpp .hljs-meta .hljs-string{color:#8fbcbb}.language-css .hljs-built_in{color:#88c0d0}.language-css .hljs-keyword{color:#d08770}.language-diff .hljs-meta,.language-ebnf .hljs-attribute{color:#8fbcbb}.language-glsl .hljs-built_in{color:#88c0d0}.language-groovy .hljs-meta:not(:first-child),.language-haxe .hljs-meta,.language-java .hljs-meta{color:#d08770}.language-ldif .hljs-attribute{color:#8fbcbb}.language-lisp .hljs-name,.language-lua .hljs-built_in,.language-moonscript .hljs-built_in,.language-nginx .hljs-attribute{color:#88c0d0}.language-nginx .hljs-section{color:#5e81ac}.language-pf .hljs-built_in,.language-processing .hljs-built_in{color:#88c0d0}.language-scss .hljs-keyword,.language-stylus .hljs-keyword{color:#81a1c1}.language-swift .hljs-meta{color:#d08770}.language-vim .hljs-built_in{color:#88c0d0;font-style:italic}.language-yaml .hljs-meta{color:#d08770}
+:root {
+  /* Editor Colors */
+  --editor-bg: #2e3440;
+  --editor-text: #eceff4;
+  --editor-line-number: #4c566a;
+  --editor-line-number-bg: #2e3440;
+  --editor-cursor: #eceff4;
+  
+  /* UI Colors */
+  --bg-primary: #2e3440;
+  --bg-secondary: #3b4252;
+  --bg-tertiary: #434c5e;
+  --text-primary: #eceff4;
+  --text-secondary: #d0d8e0;
+  --text-muted: #81a1c1;
+  --border: #4c566a;
+  
+  /* Highlights */
+  --accent-blue: #88c0d0;
+  --accent-hover: #3b4252;
+  --accent-active: #434c5e;
+  
+  /* Syntax Colors (Nord) */
+  --syntax-keyword: #81a1c1;
+  --syntax-string: #a3be8c;
+  --syntax-number: #b48ead;
+  --syntax-comment: #616e88;
+  --syntax-function: #8fbcbb;
+  --syntax-operator: #eceff4;
+}
+
+html, body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+#activity-bar {
+  background: var(--bg-secondary);
+  border-right-color: var(--border);
+}
+
+.activity-button {
+  color: var(--text-muted);
+}
+
+.activity-button:hover {
+  color: var(--text-primary);
+}
+
+.activity-button.active {
+  color: var(--text-primary);
+  border-left-color: var(--accent-blue);
+}
+
+#sidebar {
+  background: var(--bg-secondary);
+  border-right-color: var(--border);
+}
+
+#tabs {
+  background: var(--bg-secondary);
+  border-bottom-color: var(--border);
+}
+
+.tab {
+  background: var(--bg-primary);
+  border-right-color: var(--border);
+}
+
+.tab.active {
+  border-top-color: var(--accent-blue);
+}
+
+.tab-close {
+  color: var(--text-muted);
+}
+
+#editor {
+  background: var(--bg-primary);
+}
+
+#bottom-panel {
+  background: var(--bg-secondary);
+  border-top-color: var(--border);
+}
+
+.panel-tabs {
+  border-bottom-color: var(--border);
+}
+
+.panel-tab {
+  color: var(--text-muted);
+}
+
+.panel-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-blue);
+}
+
+#code-editor {
+  caret-color: var(--editor-cursor);
+}
+
+#code-highlight {
+  background: var(--editor-bg);
+  color: var(--editor-text);
+}
+
+#line-numbers {
+  background: var(--editor-line-number-bg);
+  color: var(--editor-line-number);
+}
+
+.modal-content {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+}
+
+.modal-header {
+  border-bottom-color: var(--border);
+}
+
+.theme-option, .tab-option {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.theme-option.active, .tab-option.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #2e3440;
+}
+
+.file-entry:hover {
+  background: var(--accent-hover);
+}
+
+.settings-slider input[type="range"] {
+  background: var(--border);
+}
+
+.settings-slider input[type="range"]::-webkit-slider-thumb {
+  background: var(--accent-blue);
+}
+
+.settings-slider input[type="range"]::-moz-range-thumb {
+  background: var(--accent-blue);
+}
+
+/* ===== Highlight.js Syntax Theme (Nord) ===== */
+pre code.hljs{display:block;overflow-x:auto;padding:1em}
+code.hljs{padding:3px 5px}
+.hljs{background:#2e3440}
+.hljs,.hljs-subst{color:#d8dee9}
+.hljs-selector-tag{color:#81a1c1}
+.hljs-selector-id{color:#8fbcbb;font-weight:700}
+.hljs-selector-attr,.hljs-selector-class{color:#8fbcbb}
+.hljs-property,.hljs-selector-pseudo{color:#88c0d0}
+.hljs-addition{background-color:rgba(163,190,140,.5)}
+.hljs-deletion{background-color:rgba(191,97,106,.5)}
+.hljs-built_in,.hljs-class,.hljs-type{color:#8fbcbb}
+.hljs-function,.hljs-function>.hljs-title,.hljs-title.hljs-function{color:#88c0d0}
+.hljs-keyword,.hljs-literal,.hljs-symbol{color:#81a1c1}
+.hljs-number{color:#b48ead}
+.hljs-regexp{color:#ebcb8b}
+.hljs-string{color:#a3be8c}
+.hljs-title{color:#8fbcbb}
+.hljs-params{color:#d8dee9}
+.hljs-bullet{color:#81a1c1}
+.hljs-code{color:#8fbcbb}
+.hljs-emphasis{font-style:italic}
+.hljs-formula{color:#8fbcbb}
+.hljs-strong{font-weight:700}
+.hljs-link:hover{text-decoration:underline}
+.hljs-comment,.hljs-quote{color:#4c566a}
+.hljs-doctag{color:#8fbcbb}
+.hljs-meta,.hljs-meta .hljs-keyword{color:#5e81ac}
+.hljs-meta .hljs-string{color:#a3be8c}
+.hljs-attr{color:#8fbcbb}
+.hljs-attribute{color:#d8dee9}
+.hljs-name{color:#81a1c1}
+.hljs-section{color:#88c0d0}
+.hljs-tag{color:#81a1c1}
+.hljs-template-variable,.hljs-variable{color:#d8dee9}
+.hljs-template-tag{color:#5e81ac}

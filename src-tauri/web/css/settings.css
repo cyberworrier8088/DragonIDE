@@ -27,8 +27,8 @@
 .modal-content {
     position: relative;
     z-index: 2;
-    background: #252526;
-    border: 1px solid #3e3e42;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
     border-radius: 8px;
     width: 90%;
     max-width: 480px;
@@ -43,20 +43,20 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid #3e3e42;
+    border-bottom: 1px solid var(--border);
 }
 
 .modal-header h2 {
     margin: 0;
     font-size: 16px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
 .modal-close {
     background: transparent;
     border: none;
-    color: #888;
+    color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
     padding: 0;
@@ -70,8 +70,8 @@
 }
 
 .modal-close:hover {
-    color: #fff;
-    background: #333333;
+    color: var(--text-primary);
+    background: var(--accent-hover);
 }
 
 .modal-body {
@@ -93,7 +93,7 @@
     align-items: center;
     font-size: 12px;
     font-weight: 600;
-    color: #aaaaaa;
+    color: var(--text-secondary);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -103,7 +103,7 @@
 .settings-label input[type="checkbox"] {
     margin-right: 10px;
     cursor: pointer;
-    accent-color: #0e639c;
+    accent-color: var(--accent-blue);
     width: 16px;
     height: 16px;
 }
@@ -117,10 +117,10 @@
 .theme-option,
 .tab-option {
     padding: 8px 12px;
-    border: 1px solid #3e3e42;
+    border: 1px solid var(--border);
     border-radius: 4px;
-    background: #1e1e1e;
-    color: #cccccc;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 13px;
     transition: all 0.15s ease;
@@ -129,15 +129,15 @@
 
 .theme-option:hover,
 .tab-option:hover {
-    background: #2d2d30;
-    border-color: #555;
+    background: var(--accent-hover);
+    border-color: var(--accent-active);
 }
 
 .theme-option.active,
 .tab-option.active {
-    background: #0e639c;
-    border-color: #0e639c;
-    color: #fff;
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
     font-weight: 500;
 }
 
@@ -151,7 +151,7 @@
     flex: 1;
     height: 6px;
     border-radius: 3px;
-    background: #3e3e42;
+    background: var(--accent-active);
     outline: none;
     -webkit-appearance: none;
 }
@@ -162,7 +162,7 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #0e639c;
+    background: var(--accent-blue);
     cursor: pointer;
 }
 
@@ -170,15 +170,15 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #0e639c;
+    background: var(--accent-blue);
     cursor: pointer;
     border: none;
 }
 
 #font-size-value {
     font-size: 13px;
-    color: #cccccc;
+    color: var(--text-primary);
     min-width: 40px;
     text-align: right;
     font-family: monospace;
-}
+}
