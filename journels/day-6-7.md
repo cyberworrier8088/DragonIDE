@@ -29,3 +29,10 @@ monokai:
 Glass theme is not fuly complitd i think last intruduce that theme :)
 
 ## 7
+today i was added big thing
+
+that was a custom title bar
+
+from linux style to windows style i was changed to my own.
+
+![titlebar-1](img/titlebar.png)
