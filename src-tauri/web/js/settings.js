@@ -71,7 +71,8 @@ function applyTheme(themeName) {
         "dark": "css/themes/dark.css",
         "light": "css/themes/light.css",
         "nord": "css/themes/nord.css",
-        "monokai": "css/themes/monokai.css"
+        "monokai": "css/themes/monokai.css",
+        "glassmorphism": "css/themes/glassmorphism.css"
     };
 
     if (!themeMap[themeName]) {
@@ -194,4 +195,4 @@ document.addEventListener("DOMContentLoaded", () => {
             closeSettings();
         }
     });
-});
+});

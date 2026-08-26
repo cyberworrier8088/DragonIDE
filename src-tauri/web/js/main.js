@@ -79,15 +79,14 @@ function createFileEntry(entry) {
     name.textContent = entry.name;
 
     if (entry.is_directory) {
-        arrow.textContent = "▶";
-        icon.textContent = "📁"
+        arrow.classList.add("collapsed");
+        icon.classList.add("folder");
 
         element.addEventListener("click", () => {
             toggleDirectory(element, entry, arrow);
         });
     } else {
-        arrow.textContent = "";
-        icon.textContent = "📄";
+        icon.classList.add("file");
 
         element.addEventListener("click", () => {
             openFile(entry);
@@ -114,14 +113,16 @@ async function toggleDirectory(element, entry, arrow) {
 
         existingChildren.remove();
 
-        arrow.textContent = "▼";
+        arrow.classList.add("collapsed");
+        arrow.classList.remove("expanded");
 
         return;
     }
 
     try {
 
-        arrow.textContent = "▼";
+        arrow.classList.remove("collapsed");
+        arrow.classList.add("expanded");
 
         const files = await invoke("read_workspace", {
             path: entry.path
@@ -145,7 +146,8 @@ async function toggleDirectory(element, entry, arrow) {
             error
         );
 
-        arrow.textContent = "↓";
+        arrow.classList.add("collapsed");
+        arrow.classList.remove("expanded");
     }
 }
 

@@ -1,24 +1,24 @@
 :root {
   /* Editor Colors */
-  --editor-bg: #2e3440;
+  --editor-bg: #29313f;
   --editor-text: #eceff4;
   --editor-line-number: #4c566a;
-  --editor-line-number-bg: #2e3440;
+  --editor-line-number-bg: #29313f;
   --editor-cursor: #eceff4;
   
   /* UI Colors */
-  --bg-primary: #2e3440;
-  --bg-secondary: #3b4252;
-  --bg-tertiary: #434c5e;
+  --bg-primary: #29313f;
+  --bg-secondary: #354052;
+  --bg-tertiary: #414e63;
   --text-primary: #eceff4;
   --text-secondary: #d0d8e0;
   --text-muted: #81a1c1;
-  --border: #4c566a;
+  --border: #4d5b71;
   
   /* Highlights */
   --accent-blue: #88c0d0;
-  --accent-hover: #3b4252;
-  --accent-active: #434c5e;
+  --accent-hover: #3f4d61;
+  --accent-active: #4b5c73;
   
   /* Syntax Colors (Nord) */
   --syntax-keyword: #81a1c1;

@@ -1,24 +1,24 @@
 :root {
   /* Editor Colors */
-  --editor-bg: #272822;
+  --editor-bg: #20231d;
   --editor-text: #f8f8f2;
   --editor-line-number: #90908a;
-  --editor-line-number-bg: #272822;
+  --editor-line-number-bg: #20231d;
   --editor-cursor: #f8f8f0;
   
   /* UI Colors */
-  --bg-primary: #272822;
-  --bg-secondary: #3e3d32;
-  --bg-tertiary: #49483e;
+  --bg-primary: #20231d;
+  --bg-secondary: #292d25;
+  --bg-tertiary: #353a2f;
   --text-primary: #f8f8f2;
   --text-secondary: #ccccc6;
   --text-muted: #8f8f8b;
-  --border: #3e3d32;
+  --border: #41483a;
   
   /* Highlights */
   --accent-blue: #66d9ef;
-  --accent-hover: #3e3d32;
-  --accent-active: #49483e;
+  --accent-hover: #333a2d;
+  --accent-active: #404a39;
   
   /* Syntax Colors (Monokai) */
   --syntax-keyword: #f92672;

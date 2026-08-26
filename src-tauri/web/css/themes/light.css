@@ -1,24 +1,24 @@
 :root {
   /* Editor Colors */
-  --editor-bg: #fafafa;
-  --editor-text: #383a42;
-  --editor-line-number: #9ca0a4;
-  --editor-line-number-bg: #fafafa;
-  --editor-cursor: #383a42;
+  --editor-bg: #f9fbff;
+  --editor-text: #263449;
+  --editor-line-number: #95a4b8;
+  --editor-line-number-bg: #f9fbff;
+  --editor-cursor: #263449;
   
   /* UI Colors */
-  --bg-primary: #fafafa;
-  --bg-secondary: #f0f0f0;
-  --bg-tertiary: #e8e8e8;
-  --text-primary: #383a42;
-  --text-secondary: #666666;
-  --text-muted: #888888;
-  --border: #d4d4d4;
+  --bg-primary: #f9fbff;
+  --bg-secondary: #edf2f8;
+  --bg-tertiary: #e2e9f2;
+  --text-primary: #263449;
+  --text-secondary: #5d6d82;
+  --text-muted: #8290a3;
+  --border: #d4dde9;
   
   /* Highlights */
-  --accent-blue: #0184bc;
-  --accent-hover: #efefef;
-  --accent-active: #e0e0e0;
+  --accent-blue: #1676d2;
+  --accent-hover: #e2eaf5;
+  --accent-active: #d4e1f0;
   
   /* Syntax Colors (from Atom One Light) */
   --syntax-keyword: #a626a4;
