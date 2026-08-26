@@ -1,4 +1,5 @@
 :root {
+  --titlebar-bg: #303a4a;
   /* Editor Colors */
   --editor-bg: #29313f;
   --editor-text: #eceff4;

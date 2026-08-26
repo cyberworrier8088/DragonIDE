@@ -1,0 +1,75 @@
+#titlebar {
+    height: 32px;
+    flex: 0 0 32px;
+    background: var(--titlebar-bg, #191b22);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#titlebar-content {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 1fr) 1fr;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#titlebar-left,
+#titlebar-center,
+#titlebar-right {
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#titlebar-left {
+    padding-left: 14px;
+}
+
+#app-title {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#titlebar-center {
+    justify-content: center;
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#titlebar-right {
+    justify-content: flex-end;
+}
+
+.titlebar-button {
+    width: 46px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+}
+
+.titlebar-button:hover {
+    background: var(--accent-hover);
+    color: var(--text-primary);
+}
+
+#close-btn:hover,
+#close-btn:active {
+    background: #c42b1c;
+    color: #fff;
+}
+
+#app {
+    height: calc(100vh - 32px);
+}

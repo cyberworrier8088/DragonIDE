@@ -1,4 +1,5 @@
 :root {
+  --titlebar-bg: #111824;
   --editor-bg: rgba(9, 15, 31, 0.34);
   --editor-text: #eaf2ff;
   --editor-line-number: rgba(210, 226, 255, 0.46);
@@ -60,6 +61,10 @@ body::after {
   z-index: 1;
   isolation: isolate;
   background: linear-gradient(120deg, rgba(255, 255, 255, 0.025), transparent 32%, rgba(162, 200, 255, 0.045));
+}
+
+#titlebar {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
 }
 
 #activity-bar,

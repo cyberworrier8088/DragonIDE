@@ -11,11 +11,11 @@
     "windows": [
       {
         "title": "DragonFoxIDE",
-        "width": 800,
-        "height": 600,
+        "width": 1400,
+        "height": 900,
         "resizable": true,
         "fullscreen": false,
-        "transparent": true,
+        "transparent": false,
         "decorations": false
       }
     ],

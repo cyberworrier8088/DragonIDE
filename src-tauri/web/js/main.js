@@ -190,6 +190,9 @@ async function openFile(entry) {
 
         addOrActivateTab(entry);
 
+        const fileName = entry.path.split(/[\\/]/).pop();
+        window.dispatchEvent(new CustomEvent("file-opened", { detail: fileName }));
+
         console.log("Opened: ", entry.name);
 
         const count = await invoke("document_count");
@@ -204,6 +207,7 @@ async function openFile(entry) {
         );
     }
 }
+
 
 function updateEditorTab(fileName, modified = false) {
 
@@ -367,6 +371,8 @@ async function activateTab(path) {
 
         currentFileContent = content;
 
+        window.dispatchEvent(new CustomEvent("file-opened", { detail: tab.name }));
+
         const editorContainer = document.getElementById("editor-container");
         const editor = document.getElementById("code-editor");
         const welcome = document.getElementById("welcome-screen");
@@ -432,6 +438,8 @@ function closeTab(path) {
             if (welcome) {
                 welcome.style.display = "block";
             }
+
+            window.dispatchEvent(new CustomEvent("file-opened", { detail: null }));
         } else {
             const nextIndex = Math.min(index, openTabs.length - 1);
 
