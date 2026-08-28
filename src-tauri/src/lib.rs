@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, document_count, open_document, save_document, update_document])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -44,6 +44,39 @@ fn read_file(path: String) -> Result<String, String> {
   let path = PathBuf::from(path);
   workspace::filesystem::read_file(&path)
 }
+
+
+#[tauri::command]
+fn create_file(path: String) -> Result<(), String> {
+
+  let path = PathBuf::from(path);
+
+  workspace::filesystem::create_file(&path)
+}
+
+#[tauri::command]
+fn create_directory(path: String) -> Result<(), String> {
+
+  let path = PathBuf::from(path);
+
+  workspace::filesystem::create_directory(&path)
+}
+
+#[tauri::command]
+fn rename_entry(old_path: String, new_path: String) -> Result<(), String> {
+    let old_path = PathBuf::from(old_path);
+    let new_path = PathBuf::from(new_path);
+    workspace::filesystem::rename_entry(&old_path, &new_path)
+}
+
+#[tauri::command]
+fn delete_entry(path: String, is_directory: bool) -> Result<(), String> {
+    let path = PathBuf::from(path);
+    workspace::filesystem::delete_entry(&path, is_directory)
+}
+
+
+
 
 
 #[tauri::command]

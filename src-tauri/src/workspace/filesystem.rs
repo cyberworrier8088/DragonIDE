@@ -41,3 +41,30 @@ pub fn read_file(path: &Path) -> Result<String, String> {
 
     fs::read_to_string(path).map_err(|error| error.to_string())
 }
+
+pub fn create_file(path: &Path) -> Result<(), String> {
+
+    fs::File::create(path).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+pub fn create_directory(path: &Path) -> Result<(), String> {
+    fs::create_dir_all(path).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+pub fn rename_entry(old_path: &Path, new_path: &Path) -> Result<(), String> {
+    fs::rename(old_path, new_path).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+pub fn delete_entry(path: &Path, is_directory: bool) -> Result<(), String> {
+    if is_directory {
+        fs::remove_dir_all(path).map_err(|e| e.to_string())?;
+    } else {
+        fs::remove_file(path).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}

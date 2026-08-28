@@ -15,5 +15,10 @@
     "tabSize": "Tamaño de tabulación",
     "wordWrap": "Ajuste de línea",
     "language": "Idioma",
-    "unsavedChangesMsg": "\"{fileName}\" tiene cambios sin guardar. ¿Desea cerrarlo sin guardar?"
+    "unsavedChangesMsg": "\"{fileName}\" tiene cambios sin guardar. ¿Desea cerrarlo sin guardar?",
+    "newFile": "Nuevo archivo",
+    "newFolder": "Nueva carpeta",
+    "rename": "Renombrar",
+    "delete": "Eliminar",
+    "copyPath": "Copiar ruta"
 }

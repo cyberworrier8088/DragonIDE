@@ -438,3 +438,45 @@ button:focus-visible {
     padding: 0;
     border-radius: 0;
 }
+
+
+
+
+
+/* file tree context menu */
+.context-menu {
+    position: fixed;
+    z-index: 2000;
+
+    min-width: 180px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    font-size: 13px;
+    user-select: none;
+}
+
+.context-menu.hidden {
+    display: none;
+}
+
+.context-menu .menu-item {
+    min-height: 30px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.context-menu .menu-item:hover {
+    background: var(--accent-hover);
+}
+
+.context-menu .menu-separator {
+    height: 1px;
+    background: var(--border);
+    margin: 5px 4px;
+}

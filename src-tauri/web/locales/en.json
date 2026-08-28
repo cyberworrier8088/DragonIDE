@@ -15,5 +15,10 @@
     "tabSize": "Tab Size",
     "wordWrap": "Word Wrap",
     "language": "Language",
-    "unsavedChangesMsg": "\"{fileName}\" has unsaved changes. Do you want to close it without saving?"
+    "unsavedChangesMsg": "\"{fileName}\" has unsaved changes. Do you want to close it without saving?",
+    "newFile": "New File",
+    "newFolder": "New Folder",
+    "rename": "Rename",
+    "delete": "Delete",
+    "copyPath": "Copy Path"
 }

@@ -1,11 +1,10 @@
 const { invoke } = window.__TAURI__.core;
 
-const { ask } = window.__TAURI__.dialog || (window.__TAURI__.plugin ? window.__TAURI__.plugin.dialog : {});
-
 let currentFile = null;
 let currentFileContent = "";
 let editorChangeTimer = null;
 let openTabs = [];
+let currentWorkspace = null;
 
 
 async function startDragonIDE() {
@@ -22,6 +21,105 @@ async function startDragonIDE() {
     } catch (error) {
         console.error("Error during startup:", error);
     }
+
+    // --- CONTEXT MENU ACTION LISTENERS ---
+
+    // New File
+    document.getElementById("ctx-new-file")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+
+        const targetDir = selectedContextEntry.is_directory
+            ? selectedContextEntry.path
+            : getParentPath(selectedContextEntry.path);
+
+        const fileName = prompt("Enter new file name:");
+        if (!fileName) return;
+
+        const newPath = joinPath(targetDir, fileName);
+        try {
+            await invoke("create_file", { path: newPath });
+            await refreshWorkspace();
+            hideContextMenu();
+        } catch (err) {
+            console.error("Error creating file:", err);
+        }
+    });
+
+    // New Folder
+    document.getElementById("ctx-new-folder")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+
+        const targetDir = selectedContextEntry.is_directory
+            ? selectedContextEntry.path
+            : getParentPath(selectedContextEntry.path);
+
+        const folderName = prompt("Enter new folder name:");
+        if (!folderName) return;
+
+        const newPath = joinPath(targetDir, folderName);
+        try {
+            await invoke("create_directory", { path: newPath });
+            await refreshWorkspace();
+            hideContextMenu();
+        } catch (err) {
+            console.error("Error creating folder:", err);
+        }
+    });
+
+    // Rename
+    document.getElementById("ctx-rename")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+
+        const oldPath = selectedContextEntry.path;
+        const currentName = selectedContextEntry.name;
+        const newName = prompt("Enter new name:", currentName);
+
+        if (!newName || newName === currentName) return;
+
+        const parentDir = getParentPath(oldPath);
+        const newPath = joinPath(parentDir, newName);
+
+        try {
+            await invoke("rename_entry", { oldPath, newPath });
+            await refreshWorkspace();
+            hideContextMenu();
+        } catch (err) {
+            console.error("Error renaming entry:", err);
+        }
+    });
+
+    // Delete
+    document.getElementById("ctx-delete")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+
+        const confirmDelete = confirm(`Are you sure you want to delete "${selectedContextEntry.name}"?`);
+        if (!confirmDelete) return;
+
+        try {
+            await invoke("delete_entry", {
+                path: selectedContextEntry.path,
+                isDirectory: selectedContextEntry.is_directory
+            });
+
+            await closeTab(selectedContextEntry.path, true);
+            await refreshWorkspace();
+            hideContextMenu();
+        } catch (err) {
+            console.error("Error deleting entry:", err);
+        }
+    });
+
+    // Copy Path
+    document.getElementById("ctx-copy-path")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+        await navigator.clipboard.writeText(selectedContextEntry.path);
+        hideContextMenu();
+    });
 }
 
 async function openFolder() {
@@ -37,6 +135,8 @@ async function openFolder() {
             return;
         }
 
+        currentWorkspace = folder;
+
         console.log("Selected workspace: ", folder);
 
         const explorerName =
@@ -47,17 +147,18 @@ async function openFolder() {
                 folder.split(/[\\/]/).pop();
         }
 
-        const files = await invoke("read_workspace", {
-            path: folder
-        });
-
-        console.log("Workspace files: ", files);
-
-        renderFileTree(files);
+        await refreshWorkspace();
 
     } catch (error) {
         console.error("Failed to open folder: ", error);
     }
+}
+
+async function refreshWorkspace() {
+    if (!currentWorkspace) return;
+
+    const files = await invoke("read_workspace", { path: currentWorkspace });
+    renderFileTree(files);
 }
 
 
@@ -70,6 +171,11 @@ function createFileEntry(entry) {
     if (entry.is_directory) {
         element.classList.add("directory");
     }
+
+    // RIGHT-CLICK CONTEXT MENU EVENT
+    element.addEventListener("contextmenu", (event) => {
+        showContextMenu(event, entry);
+    });
 
     const arrow = document.createElement("span");
     arrow.className = "file-arrow";
@@ -410,7 +516,7 @@ async function activateTab(path) {
 
 }
 
-async function closeTab(path) {
+async function closeTab(path, force = false) {
     const index = openTabs.findIndex(
         tab => tab.path === path
     );
@@ -422,7 +528,7 @@ async function closeTab(path) {
 
     const tab = openTabs[index];
 
-    if (tab.modified) {
+    if (tab.modified && !force) {
         let confirmClose = false;
 
         if (window.__TAURI__ && window.__TAURI__.dialog) {
@@ -671,6 +777,50 @@ function detectLanguageFromPath(path) {
     };
     return langMap[ext] || "text";
 }
+
+
+// --- Context Menu Code ---
+
+let selectedContextEntry = null;
+
+function showContextMenu(event, entry) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    selectedContextEntry = entry;
+    const menu = document.getElementById("file-context-menu");
+    if (!menu) return;
+
+    menu.classList.remove("hidden");
+    menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - menu.offsetWidth - 8))}px`;
+    menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - menu.offsetHeight - 8))}px`;
+}
+
+function hideContextMenu() {
+    const menu = document.getElementById("file-context-menu");
+    if (menu) {
+        menu.classList.add("hidden");
+    }
+}
+
+function getParentPath(path) {
+    const separator = path.includes("\\") ? "\\" : "/";
+    const parts = path.split(separator);
+    parts.pop();
+    return parts.join(separator);
+}
+
+function joinPath(dir, name) {
+    const separator = dir.includes("\\") ? "\\" : "/";
+    return dir.endsWith(separator) ? `${dir}${name}` : `${dir}${separator}${name}`;
+}
+
+// Global click closes context menu
+document.addEventListener("click", hideContextMenu);
+document.addEventListener("contextmenu", event => {
+    if (!event.target.closest(".file-entry")) hideContextMenu();
+});
+window.addEventListener("blur", hideContextMenu);
 
 
 const codeEditor = document.getElementById("code-editor");
