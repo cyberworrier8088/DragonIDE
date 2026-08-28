@@ -1,5 +1,7 @@
 const { invoke } = window.__TAURI__.core;
 
+const { ask } = window.__TAURI__.dialog || (window.__TAURI__.plugin ? window.__TAURI__.plugin.dialog : {});
+
 let currentFile = null;
 let currentFileContent = "";
 let editorChangeTimer = null;
@@ -25,7 +27,10 @@ async function startDragonIDE() {
 async function openFolder() {
     try {
 
-        const folder = await invoke("open_folder");
+        const folder = await window.__TAURI__.dialog.open({
+            directory: true,
+            multiple: false
+        });
 
         if (folder === null) {
             console.log("Folder selection cancelled");
@@ -337,10 +342,10 @@ function renderTabs() {
             activateTab(tab.path);
         });
 
-        close.addEventListener("click", (event) => {
+        close.addEventListener("click", async (event) => {
             event.stopPropagation();
 
-            closeTab(tab.path);
+            await closeTab(tab.path);
         });
 
         tabs.appendChild(element);
@@ -405,16 +410,39 @@ async function activateTab(path) {
 
 }
 
-function closeTab(path) {
+async function closeTab(path) {
     const index = openTabs.findIndex(
         tab => tab.path === path
     );
+
 
     if (index === -1) {
         return;
     }
 
+    const tab = openTabs[index];
+
+    if (tab.modified) {
+        let confirmClose = false;
+
+        if (window.__TAURI__ && window.__TAURI__.dialog) {
+
+            confirmClose = await window.__TAURI__.dialog.confirm(
+                `"${tab.name}" has unsaved changes. Do you want to close it without saving?`,
+                { title: "DragonFoxIDE", kind: "warning" }
+            );
+        } else {
+
+            confirmClose = confirm(`"${tab.name}" has unsaved changes. Do you want to close it without saving?`);
+        }
+
+        if (!confirmClose) {
+            return;
+        }
+    }
+
     const wasActive = currentFile && currentFile.path === path;
+
 
     openTabs.splice(index, 1);
 
@@ -423,12 +451,14 @@ function closeTab(path) {
             currentFile = null;
             currentFileContent = "";
 
+
             const editorContainer = document.getElementById("editor-container");
             const editor = document.getElementById("code-editor");
             const welcome = document.getElementById("welcome-screen");
 
             if (editorContainer) {
                 editorContainer.style.display = "none";
+
             }
 
             if (editor) {
@@ -440,10 +470,11 @@ function closeTab(path) {
             }
 
             window.dispatchEvent(new CustomEvent("file-opened", { detail: null }));
+
         } else {
             const nextIndex = Math.min(index, openTabs.length - 1);
 
-            activateTab(openTabs[nextIndex].path);
+            activateTab(openTabs[nextIndex].path)
         }
     }
 

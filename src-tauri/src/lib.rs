@@ -27,33 +27,10 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, open_folder, read_workspace, read_file, document_count, open_document, save_document, update_document])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, document_count, open_document, save_document, update_document])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
-
-#[tauri::command]
-async fn open_folder(app: tauri::AppHandle) -> Result<Option<String>, String> {
-
-  let folder = tauri_plugin_dialog::DialogExt::dialog(&app).file().blocking_pick_folder();
-
-  match folder {
-
-    Some(path) => {
-
-      let path: PathBuf = path.into_path().map_err(|e| e.to_string())?;
-
-      Ok(Some(path.to_string_lossy().to_string()))
-    }
-
-    None => Ok(None),
-  }
-}
-
-
-
 #[tauri::command]
 fn read_workspace(path: String) -> Result<Vec<workspace::filesystem::FileEntry>, String> {
     let path = PathBuf::from(path);
