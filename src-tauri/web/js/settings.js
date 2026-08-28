@@ -5,7 +5,8 @@ const defaultSettings = {
     theme: "dark",
     fontSize: 14,
     tabSize: 4,
-    lineWrap: false
+    lineWrap: false,
+    language: "en"
 };
 
 // Load settings from localStorage
@@ -58,6 +59,10 @@ function updateSettingsUI() {
 
     document.querySelectorAll(".tab-option").forEach(btn => {
         btn.classList.toggle("active", parseInt(btn.dataset.tabSize, 10) === settings.tabSize);
+    });
+
+    document.querySelectorAll(".lang-option").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === settings.language);
     });
 
     const lineWrapToggle = document.getElementById("line-wrap-toggle");
@@ -139,7 +144,7 @@ function applyAllSettings() {
 // Bind event listeners when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
     applyAllSettings();
-    updateSettingsUI();
+    setLanguage(settings.language).then(updateSettingsUI);
 
     const settingsBtn = document.getElementById("settings-button");
     if (settingsBtn) {
@@ -179,6 +184,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".tab-option").forEach(btn => {
         btn.addEventListener("click", () => {
             applyTabSize(parseInt(btn.dataset.tabSize, 10));
+            updateSettingsUI();
+        });
+    });
+
+    document.querySelectorAll(".lang-option").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            await setLanguage(btn.dataset.lang);
             updateSettingsUI();
         });
     });

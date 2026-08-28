@@ -70,7 +70,7 @@
         <aside id="sidebar">
 
             <div class="sidebar-header">
-                <span>EXPLORER</span>
+                <span data-i18n="explorer">EXPLORER</span>
             </div>
 
             <div id="file-explorer">
@@ -89,7 +89,7 @@
             <div id="tabs">
 
                 <div class="tab active">
-                    <span>Welcome</span>
+                    <span data-i18n="welcomeTab">Welcome</span>
                     <span class="tab-close">×</span>
                 </div>
 
@@ -102,13 +102,13 @@
 
                     <h1>DragonFoxIDE</h1>
 
-                    <p>A Powerful IDE built with Rust</p>
+                    <p data-i18n="welcomeSub">A Powerful IDE built with Rust</p>
 
                     <div class="welcome-actions">
 
-                        <button id="open-folder-button">Open Folder</button>
+                        <button id="open-folder-button" data-i18n="openFolder">Open Folder</button>
 
-                        <button id="create-project-button">Create Project</button>
+                        <button id="create-project-button" data-i18n="createProject">Create Project</button>
                     </div>
 
                 </div>
@@ -130,15 +130,15 @@
 
                 <div class="panel-tabs">
 
-                    <button class="panel-tab active">PROBLEMS</button>
+                    <button class="panel-tab active" data-i18n="problems">PROBLEMS</button>
 
-                    <button class="panel-tab">OUTPUT</button>
+                    <button class="panel-tab" data-i18n="output">OUTPUT</button>
 
-                    <button class="panel-tab">TERMINAL</button>
+                    <button class="panel-tab" data-i18n="terminal">TERMINAL</button>
 
                 </div>
 
-                <div id="panel-content">No Problems detected</div>
+                <div id="panel-content" data-i18n="noProblems">No Problems detected</div>
             </section>
 
             <footer id="status-right">
@@ -158,14 +158,14 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h2>Settings</h2>
+                    <h2 data-i18n="settingsTitle">Settings</h2>
                     <button class="modal-close" id="close-settings">×</button>
                 </div>
 
                 <div class="modal-body">
 
                     <div class="settings-section">
-                        <label class="settings-label">Theme</label>
+                        <label class="settings-label" data-i18n="theme">Theme</label>
                         <div class="settings-options">
                             <button class="theme-option active" data-theme="dark">Dark</button>
                             <button class="theme-option" data-theme="light">Light</button>
@@ -176,7 +176,7 @@
                     </div>
 
                     <div class="settings-section">
-                        <label class="settings-label">Font Size</label>
+                        <label class="settings-label" data-i18n="fontSize">Font Size</label>
                         <div class="settings-slider">
                             <input type="range" id="font-size-slider" min="10" max="34" value="14">
                             <span id="font-size-value">14px</span>
@@ -184,7 +184,7 @@
                     </div>
 
                     <div class="settings-section">
-                        <label class="settings-label">Tab Size</label>
+                        <label class="settings-label" data-i18n="tabSize">Tab Size</label>
                         <div class="settings-options">
                             <button class="tab-option" data-tab-size="2">2</button>
                             <button class="tab-option active" data-tab-size="4">4</button>
@@ -196,12 +196,12 @@
                     <div class="settings-section">
                         <label class="settings-label">
                             <input type="checkbox" id="line-wrap-toggle">
-                            Word Wrap
+                            <span data-i18n="wordWrap">Word Wrap</span>
                         </label>
                     </div>
 
                     <div class="settings-section">
-                        <label class="settings-label">Language</label>
+                        <label class="settings-label" data-i18n="language">Language</label>
 
                         <div class="settings-options">
                             <button class="lang-option active" data-lang="en">English</button>
@@ -215,7 +215,7 @@
 
 
     <script src="lib/highlight.min.js"></script>
-
+    <script src="js/i18n.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>

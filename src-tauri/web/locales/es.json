@@ -1,0 +1,19 @@
+{
+    "explorer": "EXPLORADOR",
+    "welcomeTitle": "DragonFoxIDE",
+    "welcomeSub": "Un potente IDE construido con Rust",
+    "openFolder": "Abrir Carpeta",
+    "createProject": "Crear Proyecto",
+    "welcomeTab": "Bienvenida",
+    "problems": "PROBLEMAS",
+    "output": "SALIDA",
+    "terminal": "TERMINAL",
+    "noProblems": "No se detectaron problemas",
+    "settingsTitle": "Configuración",
+    "theme": "Tema",
+    "fontSize": "Tamaño de fuente",
+    "tabSize": "Tamaño de tabulación",
+    "wordWrap": "Ajuste de línea",
+    "language": "Idioma",
+    "unsavedChangesMsg": "\"{fileName}\" tiene cambios sin guardar. ¿Desea cerrarlo sin guardar?"
+}

@@ -1,0 +1,19 @@
+{
+    "explorer": "EXPLORER",
+    "welcomeTitle": "DragonFoxIDE",
+    "welcomeSub": "A Powerful IDE built with Rust",
+    "openFolder": "Open Folder",
+    "createProject": "Create Project",
+    "welcomeTab": "Welcome",
+    "problems": "PROBLEMS",
+    "output": "OUTPUT",
+    "terminal": "TERMINAL",
+    "noProblems": "No Problems detected",
+    "settingsTitle": "Settings",
+    "theme": "Theme",
+    "fontSize": "Font Size",
+    "tabSize": "Tab Size",
+    "wordWrap": "Word Wrap",
+    "language": "Language",
+    "unsavedChangesMsg": "\"{fileName}\" has unsaved changes. Do you want to close it without saving?"
+}

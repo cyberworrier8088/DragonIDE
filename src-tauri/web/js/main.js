@@ -428,7 +428,7 @@ async function closeTab(path) {
         if (window.__TAURI__ && window.__TAURI__.dialog) {
 
             confirmClose = await window.__TAURI__.dialog.confirm(
-                `"${tab.name}" has unsaved changes. Do you want to close it without saving?`,
+                t("unsavedChangesMsg", { fileName: tab.name }),
                 { title: "DragonFoxIDE", kind: "warning" }
             );
         } else {
