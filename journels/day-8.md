@@ -4,7 +4,8 @@ Today was amazing.
 
 I was worked on features:
 - unsaved change prompt before clossing a file
-- right click context menu for files and directories. 
+- Multiple language support English and spanish
+- right click context menu for files and directories.:
     - copy path
     - rename
     - delete
