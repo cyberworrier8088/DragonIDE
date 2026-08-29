@@ -669,9 +669,12 @@ function undoEdit() {
 
     redoStack.push(currentText);
 
-    const previousText = undoStack.pop();
+    const previousState = undoStack.pop();
 
-    editor.value = previousText;
+    editor.value = previousState.text;
+
+    editor.selectionStart = previousState.selectionStart;
+    editor.selectionEnd = previousState.selectionEnd;
 
     syncHighlight();
     updateLineNumbers();
@@ -682,6 +685,7 @@ function undoEdit() {
 
 
 function redoEdit() {
+
     const editor = document.getElementById("code-editor");
 
     if (!editor || redoStack.length === 0) {
@@ -690,19 +694,37 @@ function redoEdit() {
 
     isUndoRedo = true;
 
-    const currentText = editor.value;
+    undoStack.push({
+        text: editor.value,
+        selectionStart: editor.selectionStart,
+        selectionEnd: editor.selectionEnd
+    });
 
-    undoStack.push(currentText);
+    const nextState = redoStack.pop();
 
-    const nextText = redoStack.pop();
+    editor.value = nextState.text;
 
-    editor.value = nextText;
+    editor.selectionStart = nextState.selectionStart;
+    editor.selectionEnd = nextState.selectionEnd;
 
     syncHighlight();
     updateLineNumbers();
     updateCursorPosition();
 
     isUndoRedo = false;
+}
+
+
+function saveUndoState() {
+    const editor = document.getElementById("code-editor");
+
+    undoStack.push({
+        text: editor.value,
+        selectionStart: editor.selectionStart,
+        selectionEnd: editor.selectionEnd
+    });
+
+    redoStack = [];
 }
 
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
@@ -912,8 +934,7 @@ const codeEditor = document.getElementById("code-editor");
 codeEditor.addEventListener("input", () => {
 
     if (!isUndoRedo) {
-        undoStack.push(currentFileContent);
-        redoStack = [];
+        saveUndoState();
     }
 
 
