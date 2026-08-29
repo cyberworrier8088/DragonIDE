@@ -6,6 +6,10 @@ let editorChangeTimer = null;
 let openTabs = [];
 let currentWorkspace = null;
 
+let undoStack = [];
+let redoStack = [];
+let isUndoRedo = false;
+
 
 async function startDragonIDE() {
     if (typeof applyAllSettings === "function") {
@@ -272,6 +276,10 @@ async function openFile(entry) {
         const content = await invoke("open_document", {
             path: entry.path
         });
+
+
+        undoStack = [];
+        redoStack = [];
 
 
 
@@ -646,6 +654,57 @@ function syncEditorScroll() {
     lineNumbers.scrollTop = editor.scrollTop;
 }
 
+
+
+function undoEdit() {
+    const editor = document.getElementById("code-editor");
+
+    if (!editor || undoStack.length === 0) {
+        return;
+    }
+
+    isUndoRedo = true;
+
+    const currentText = editor.value;
+
+    redoStack.push(currentText);
+
+    const previousText = undoStack.pop();
+
+    editor.value = previousText;
+
+    syncHighlight();
+    updateLineNumbers();
+    updateCursorPosition();
+
+    isUndoRedo = false;
+}
+
+
+function redoEdit() {
+    const editor = document.getElementById("code-editor");
+
+    if (!editor || redoStack.length === 0) {
+        return;
+    }
+
+    isUndoRedo = true;
+
+    const currentText = editor.value;
+
+    undoStack.push(currentText);
+
+    const nextText = redoStack.pop();
+
+    editor.value = nextText;
+
+    syncHighlight();
+    updateLineNumbers();
+    updateCursorPosition();
+
+    isUndoRedo = false;
+}
+
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
 
 
@@ -815,6 +874,31 @@ function joinPath(dir, name) {
     return dir.endsWith(separator) ? `${dir}${name}` : `${dir}${separator}${name}`;
 }
 
+
+
+document.addEventListener("keydown", (event) => {
+
+    if (!event.ctrlKey) {
+        return;
+    }
+
+
+    if (event.key.toLowerCase() == "z") {
+        event.preventDefault();
+
+        if (event.shiftKey) {
+            redoEdit();
+        } else {
+            undoEdit();
+        }
+    }
+
+    if (event.key.toLowerCase() === "y") {
+        event.preventDefault();
+        redoEdit();
+    }
+});
+
 // Global click closes context menu
 document.addEventListener("click", hideContextMenu);
 document.addEventListener("contextmenu", event => {
@@ -826,6 +910,13 @@ window.addEventListener("blur", hideContextMenu);
 const codeEditor = document.getElementById("code-editor");
 
 codeEditor.addEventListener("input", () => {
+
+    if (!isUndoRedo) {
+        undoStack.push(currentFileContent);
+        redoStack = [];
+    }
+
+
     syncHighlight();
     updateCursorPosition();
 
