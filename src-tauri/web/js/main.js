@@ -9,6 +9,30 @@ let currentWorkspace = null;
 let undoStack = [];
 let redoStack = [];
 let isUndoRedo = false;
+let lastSavedState = null;
+
+function saveCurrentTabHistory() {
+    if (currentFile) {
+        const tab = openTabs.find(t => t.path === currentFile.path);
+        if (tab) {
+            tab.undoStack = [...undoStack];
+            tab.redoStack = [...redoStack];
+            tab.lastSavedState = lastSavedState ? { ...lastSavedState } : null;
+        }
+    }
+}
+
+function loadTabHistory(tab) {
+    if (tab) {
+        undoStack = tab.undoStack || [];
+        redoStack = tab.redoStack || [];
+        lastSavedState = tab.lastSavedState || null;
+    } else {
+        undoStack = [];
+        redoStack = [];
+        lastSavedState = null;
+    }
+}
 
 
 async function startDragonIDE() {
@@ -277,11 +301,20 @@ async function openFile(entry) {
             path: entry.path
         });
 
+        saveCurrentTabHistory();
 
-        undoStack = [];
-        redoStack = [];
-
-
+        const existingTab = openTabs.find(t => t.path === entry.path);
+        if (existingTab) {
+            loadTabHistory(existingTab);
+        } else {
+            undoStack = [];
+            redoStack = [];
+            lastSavedState = {
+                text: content,
+                selectionStart: 0,
+                selectionEnd: 0
+            };
+        }
 
         currentFile = entry;
         currentFileContent = content;
@@ -415,7 +448,10 @@ function addOrActivateTab(entry) {
         openTabs.push({
             path: entry.path,
             name: entry.name,
-            modified: false
+            modified: false,
+            undoStack: [...undoStack],
+            redoStack: [...redoStack],
+            lastSavedState: lastSavedState ? { ...lastSavedState } : null
         });
     }
 
@@ -477,6 +513,8 @@ async function activateTab(path) {
         return;
     }
 
+    saveCurrentTabHistory();
+
     try {
 
         const content = await invoke("open_document", {
@@ -489,6 +527,15 @@ async function activateTab(path) {
         };
 
         currentFileContent = content;
+
+        loadTabHistory(tab);
+        if (!lastSavedState) {
+            lastSavedState = {
+                text: content,
+                selectionStart: 0,
+                selectionEnd: 0
+            };
+        }
 
         window.dispatchEvent(new CustomEvent("file-opened", { detail: tab.name }));
 
@@ -564,6 +611,9 @@ async function closeTab(path, force = false) {
         if (openTabs.length === 0) {
             currentFile = null;
             currentFileContent = "";
+            undoStack = [];
+            redoStack = [];
+            lastSavedState = null;
 
 
             const editorContainer = document.getElementById("editor-container");
@@ -638,6 +688,11 @@ function updateCursorPosition() {
     const column = lines[lines.length - 1].length + 1;
 
     position.textContent = `Ln ${line}, Col ${column}`;
+
+    if (lastSavedState && lastSavedState.text === editor.value) {
+        lastSavedState.selectionStart = editor.selectionStart;
+        lastSavedState.selectionEnd = editor.selectionEnd;
+    }
 }
 
 
@@ -658,23 +713,28 @@ function syncEditorScroll() {
 
 function undoEdit() {
     const editor = document.getElementById("code-editor");
-
     if (!editor || undoStack.length === 0) {
         return;
     }
 
     isUndoRedo = true;
 
-    const currentText = editor.value;
-
-    redoStack.push(currentText);
+    redoStack.push({
+        text: editor.value,
+        selectionStart: editor.selectionStart,
+        selectionEnd: editor.selectionEnd
+    });
 
     const previousState = undoStack.pop();
-
     editor.value = previousState.text;
-
     editor.selectionStart = previousState.selectionStart;
     editor.selectionEnd = previousState.selectionEnd;
+
+    lastSavedState = {
+        text: previousState.text,
+        selectionStart: previousState.selectionStart,
+        selectionEnd: previousState.selectionEnd
+    };
 
     syncHighlight();
     updateLineNumbers();
@@ -685,9 +745,7 @@ function undoEdit() {
 
 
 function redoEdit() {
-
     const editor = document.getElementById("code-editor");
-
     if (!editor || redoStack.length === 0) {
         return;
     }
@@ -701,11 +759,15 @@ function redoEdit() {
     });
 
     const nextState = redoStack.pop();
-
     editor.value = nextState.text;
-
     editor.selectionStart = nextState.selectionStart;
     editor.selectionEnd = nextState.selectionEnd;
+
+    lastSavedState = {
+        text: nextState.text,
+        selectionStart: nextState.selectionStart,
+        selectionEnd: nextState.selectionEnd
+    };
 
     syncHighlight();
     updateLineNumbers();
@@ -717,14 +779,32 @@ function redoEdit() {
 
 function saveUndoState() {
     const editor = document.getElementById("code-editor");
+    if (!editor) return;
 
-    undoStack.push({
-        text: editor.value,
-        selectionStart: editor.selectionStart,
-        selectionEnd: editor.selectionEnd
-    });
+    const currentText = editor.value;
+    const currentStart = editor.selectionStart;
+    const currentEnd = editor.selectionEnd;
 
-    redoStack = [];
+    if (lastSavedState && lastSavedState.text === currentText) {
+        lastSavedState.selectionStart = currentStart;
+        lastSavedState.selectionEnd = currentEnd;
+        return;
+    }
+
+    if (lastSavedState) {
+        undoStack.push({
+            text: lastSavedState.text,
+            selectionStart: lastSavedState.selectionStart,
+            selectionEnd: lastSavedState.selectionEnd
+        });
+        redoStack = [];
+    }
+
+    lastSavedState = {
+        text: currentText,
+        selectionStart: currentStart,
+        selectionEnd: currentEnd
+    };
 }
 
 document.getElementById("open-folder-button").addEventListener("click", openFolder);
