@@ -10,6 +10,8 @@ let undoStack = [];
 let redoStack = [];
 let isUndoRedo = false;
 let lastSavedState = null;
+let renderedLineCount = 0;
+let highlightFrame = null;
 
 function saveCurrentTabHistory() {
     if (currentFile) {
@@ -295,11 +297,21 @@ async function openFile(entry) {
 
     try {
 
+        if (currentFile?.path === entry.path) {
+            document.getElementById("code-editor")?.focus();
+            return;
+        }
+
         console.log("Opening fille:", entry.path);
 
         const content = await invoke("open_document", {
             path: entry.path
         });
+
+        if (currentFile && currentFile.path !== entry.path) {
+            clearTimeout(editorChangeTimer);
+            await updateCurrentDocument();
+        }
 
         saveCurrentTabHistory();
 
@@ -334,8 +346,12 @@ async function openFile(entry) {
 
         if (editor) {
             editor.value = content;
+            const selectionStart = Math.min(lastSavedState?.selectionStart ?? 0, content.length);
+            const selectionEnd = Math.min(lastSavedState?.selectionEnd ?? selectionStart, content.length);
+            editor.setSelectionRange(selectionStart, selectionEnd);
             syncHighlight();
             updateLineNumbers();
+            updateCursorPosition();
             editor.focus();
         }
 
@@ -398,29 +414,24 @@ function renderFileTree(files) {
     }
 }
 
-async function updateCurrentDocument() {
+async function updateCurrentDocument(path = currentFile?.path, text = document.getElementById("code-editor")?.value) {
 
-    if (!currentFile) {
+    if (!path || text === undefined) {
         return;
     }
-
-    const editor = document.getElementById("code-editor");
-
-    if (!editor) {
-        return;
-    }
-
 
     try {
         await invoke("update_document", {
-            path: currentFile.path,
-            text: editor.value
+            path,
+            text
         });
 
-        currentFileContent = editor.value;
+        if (currentFile?.path === path) {
+            currentFileContent = text;
+        }
 
         const tab = openTabs.find(
-            tab => tab.path === currentFile.path
+            tab => tab.path === path
         );
 
         if (tab) {
@@ -435,6 +446,21 @@ async function updateCurrentDocument() {
             error
         );
     }
+}
+
+function queueDocumentUpdate() {
+    clearTimeout(editorChangeTimer);
+    const path = currentFile?.path;
+    const text = codeEditor.value;
+    editorChangeTimer = setTimeout(() => updateCurrentDocument(path, text), 150);
+}
+
+function queueHighlight() {
+    cancelAnimationFrame(highlightFrame);
+    highlightFrame = requestAnimationFrame(() => {
+        highlightFrame = null;
+        syncHighlight();
+    });
 }
 
 
@@ -505,12 +531,22 @@ function renderTabs() {
 
 async function activateTab(path) {
 
+    if (currentFile?.path === path) {
+        document.getElementById("code-editor")?.focus();
+        return;
+    }
+
     const tab = openTabs.find(
         tab => tab.path === path
     );
 
     if (!tab) {
         return;
+    }
+
+    if (currentFile && currentFile.path !== path) {
+        clearTimeout(editorChangeTimer);
+        await updateCurrentDocument();
     }
 
     saveCurrentTabHistory();
@@ -553,6 +589,9 @@ async function activateTab(path) {
 
         if (editor) {
             editor.value = content;
+            const selectionStart = Math.min(lastSavedState?.selectionStart ?? 0, content.length);
+            const selectionEnd = Math.min(lastSavedState?.selectionEnd ?? selectionStart, content.length);
+            editor.setSelectionRange(selectionStart, selectionEnd);
 
             updateLineNumbers();
             updateCursorPosition();
@@ -657,6 +696,9 @@ function updateLineNumbers() {
     }
 
     const lineCount = editor.value.split("\n").length;
+    if (lineCount === renderedLineCount) {
+        return;
+    }
 
     let html = "";
 
@@ -665,6 +707,7 @@ function updateLineNumbers() {
     }
 
     lineNumbers.innerHTML = html;
+    renderedLineCount = lineCount;
 }
 
 
@@ -685,9 +728,14 @@ function updateCursorPosition() {
 
     const line = lines.length;
 
-    const column = lines[lines.length - 1].length + 1;
+    const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
+    const column = [...lines[lines.length - 1]].reduce(
+        (value, character) => character === "\t" ? value + tabWidth - ((value - 1) % tabWidth) : value + 1,
+        1
+    );
+    const selected = editor.selectionEnd - cursor;
 
-    position.textContent = `Ln ${line}, Col ${column}`;
+    position.textContent = `Ln ${line}, Col ${column}${selected ? ` (${selected} selected)` : ""}`;
 
     if (lastSavedState && lastSavedState.text === editor.value) {
         lastSavedState.selectionStart = editor.selectionStart;
@@ -701,12 +749,15 @@ function syncEditorScroll() {
     const editor = document.getElementById("code-editor");
 
     const lineNumbers = document.getElementById("line-numbers");
+    const highlight = document.getElementById("code-highlight");
 
-    if (!editor || !lineNumbers) {
+    if (!editor || !lineNumbers || !highlight) {
         return;
     }
 
     lineNumbers.scrollTop = editor.scrollTop;
+    highlight.scrollTop = editor.scrollTop;
+    highlight.scrollLeft = editor.scrollLeft;
 }
 
 
@@ -739,6 +790,7 @@ function undoEdit() {
     syncHighlight();
     updateLineNumbers();
     updateCursorPosition();
+    queueDocumentUpdate();
 
     isUndoRedo = false;
 }
@@ -772,6 +824,7 @@ function redoEdit() {
     syncHighlight();
     updateLineNumbers();
     updateCursorPosition();
+    queueDocumentUpdate();
 
     isUndoRedo = false;
 }
@@ -824,16 +877,19 @@ document.addEventListener("keydown", async (event) => {
         }
 
         try {
+            const path = currentFile.path;
+            const text = document.getElementById("code-editor").value;
+            clearTimeout(editorChangeTimer);
+            await invoke("update_document", { path, text });
             await invoke("save_document", {
-                path: currentFile.path
+                path
             });
 
-            currentFileContent =
-                document.getElementById("code-editor").value;
+            currentFileContent = text;
 
 
             const tab = openTabs.find(
-                tab => tab.path === currentFile.path
+                tab => tab.path === path
             );
 
             if (tab) {
@@ -875,14 +931,7 @@ function handleEnterKey(event) {
         "end"
     );
 
-    updateLineNumbers();
-    updateCursorPosition();
-    clearTimeout(editorChangeTimer);
-
-    editorChangeTimer = setTimeout(
-        updateCurrentDocument,
-        150
-    );
+    handleEditorChange();
 }
 
 
@@ -893,9 +942,7 @@ function syncHighlight() {
 
     if (!editor || !highlight || !highlightInner) return;
 
-    // sync scroll
-    highlight.scrollTop = editor.scrollTop;
-    highlight.scrollLeft = editor.scrollLeft;
+    syncEditorScroll();
 
     // Update highlight
     const language = currentFile ? detectLanguageFromPath(currentFile.path) : "text";
@@ -980,7 +1027,7 @@ function joinPath(dir, name) {
 
 document.addEventListener("keydown", (event) => {
 
-    if (!event.ctrlKey) {
+    if (!(event.ctrlKey || event.metaKey) || event.target !== codeEditor) {
         return;
     }
 
@@ -1011,22 +1058,27 @@ window.addEventListener("blur", hideContextMenu);
 
 const codeEditor = document.getElementById("code-editor");
 
-codeEditor.addEventListener("input", () => {
+function handleEditorChange() {
 
     if (!isUndoRedo) {
         saveUndoState();
     }
 
+    const tab = openTabs.find(tab => tab.path === currentFile?.path);
+    if (tab && !tab.modified) {
+        tab.modified = true;
+        renderTabs();
+    }
 
-    syncHighlight();
+    queueHighlight();
     updateCursorPosition();
+    queueDocumentUpdate();
+}
 
-    clearTimeout(editorChangeTimer);
-    editorChangeTimer = setTimeout(updateCurrentDocument, 150);
-});
+codeEditor.addEventListener("input", handleEditorChange);
 
 codeEditor.addEventListener("scroll", () => {
-    syncHighlight();
+    syncEditorScroll();
 });
 
 codeEditor.addEventListener("keyup", updateCursorPosition);
@@ -1040,16 +1092,12 @@ codeEditor.addEventListener("keydown", (event) => {
         const end = codeEditor.selectionEnd;
         const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
         codeEditor.setRangeText(" ".repeat(tabWidth), start, end, "end");
-        syncHighlight();
-        updateCursorPosition();
-        clearTimeout(editorChangeTimer);
-        editorChangeTimer = setTimeout(updateCurrentDocument, 150);
+        handleEditorChange();
         return;
     }
 
     if (event.key === "Enter") {
         handleEnterKey(event);
-        syncHighlight();
     }
 });
 

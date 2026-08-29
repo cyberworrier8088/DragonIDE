@@ -127,7 +127,10 @@ function applyLineWrap(enabled) {
     const editor = document.getElementById("code-editor");
     const highlight = document.getElementById("code-highlight");
 
-    if (editor) editor.style.whiteSpace = enabled ? "pre-wrap" : "pre";
+    if (editor) {
+        editor.wrap = enabled ? "soft" : "off";
+        editor.style.whiteSpace = enabled ? "pre-wrap" : "pre";
+    }
     if (highlight) highlight.style.whiteSpace = enabled ? "pre-wrap" : "pre";
 
     settings.lineWrap = enabled;

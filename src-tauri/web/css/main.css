@@ -158,7 +158,7 @@ button:focus-visible {
 #editor {
     flex: 1;
     position: relative;
-    overflow: auto;
+    overflow: hidden;
     background: var(--bg-primary);
 }
 
@@ -355,6 +355,10 @@ button:focus-visible {
     outline: none;
 }
 
+#code-editor::selection {
+    background: color-mix(in srgb, var(--accent-blue) 45%, transparent);
+}
+
 #editor-container {
     display: flex;
     width: 100%;
@@ -409,7 +413,10 @@ button:focus-visible {
     line-height: 1.6;
     tab-size: 4;
     white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
     overflow: auto;
+    scrollbar-gutter: stable;
     z-index: 2;
 }
 
@@ -428,12 +435,16 @@ button:focus-visible {
     line-height: 1.6;
     tab-size: 4;
     white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
     overflow: auto;
+    scrollbar-gutter: stable;
     pointer-events: none;
     z-index: 1;
 }
 
 #code-highlight code {
+    display: block;
     background: none;
     padding: 0;
     border-radius: 0;
