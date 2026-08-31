@@ -20,5 +20,7 @@
     "newFolder": "New Folder",
     "rename": "Rename",
     "delete": "Delete",
-    "copyPath": "Copy Path"
+    "copyPath": "Copy Path",
+    "lineNumber": "Line Number",
+    "go": "Go"
 }

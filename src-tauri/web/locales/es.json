@@ -20,5 +20,7 @@
     "newFolder": "Nueva carpeta",
     "rename": "Renombrar",
     "delete": "Eliminar",
-    "copyPath": "Copiar ruta"
+    "copyPath": "Copiar ruta",
+    "lineNumber": "Número de línea",
+    "go": "Ir"
 }

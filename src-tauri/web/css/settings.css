@@ -182,3 +182,87 @@
     text-align: right;
     font-family: monospace;
 }
+
+
+/* go to line dialog style */
+
+.go-to-line-content {
+    max-width: 400px;
+}
+
+.go-to-line-body {
+    padding: 20px !important;
+}
+
+.go-to-line-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.go-to-line-input-group label {
+
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.go-to-line-input-group input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: monospace;
+}
+
+.go-to-line-input-group input:focus {
+    outline: 1px solid var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.go-to-line-input-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.go-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--accent-blue);
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+
+.go-btn:hover {
+    background: color-mix(in srgb, var(--accent-blue) 80%, black 20%);
+    border-color: color-mix(in srgb, var(--accent-blue) 80%, black 20%);
+}
+
+.go-btn:active {
+    transform: scale(0.98);
+}
+
+.go-to-line-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 10px;
+    background: var(--accent-active);
+    border-radius: 4px;
+    text-align: center;
+}
+
+#total-lines {
+    display: block;
+}
