@@ -212,6 +212,70 @@
             </div>
         </div>
 
+        <div id="find-replace-modal" class="modal hidden">
+
+            <div class="modal-backdrop"></div>
+
+            <div class="modal-content find-replace-modal">
+                <div class="modal-header">
+                    <h2 data-i18n="findReplace">Find & Replace</h2>
+                    <button class="modal-close" id="close-find-replace">×</button>
+                </div>
+
+                <div class="modal-body find-replace-body">
+
+                    <div class="find-replace-group">
+                        <label for="find-input" data-i18n="find">Find:</label>
+
+                        <div class="find-input-wrapper">
+
+                            <input type="text" id="find-input" placeholder="Find text..." autocomplete="off">
+
+                            <button id="find-prev-btn" class="find-nav-btn" title="Previous match">↑</button>
+
+                            <button id="find-next-btn" class="find-nav-btn" title="Next match">↓</button>
+                        </div>
+
+                        <div class="find-counter">
+                            <span id="match-counter">0/0</span>
+                        </div>
+                    </div>
+
+                    <div class="find-replace-group">
+                        <label for="replace-input" data-i18n="replace">Replace:</label>
+
+                        <div class="replace-input-wrapper">
+                            <input type="text" id="replace-input" placeholder="Replace with..." autocomplete="off">
+
+                            <button id="replace-btn" class="replace-action-btn" data-i18n="replaceOne">Replace</button>
+                            <button id="replace-all-btn" class="replace-action-btn" data-i18n="replaceAll">Replace
+                                All</button>
+                        </div>
+                    </div>
+
+                    <div class="find-options">
+                        <label class="find-option-label">
+
+                            <input type="checkbox" id="case-sensitive-check">
+                            <span data-i18n="caseSensitive">Case Sensitive</span>
+
+                        </label>
+
+                        <label class="find-option-label">
+
+                            <input type="checkbox" id="whole-word-check">
+                            <span data-i18n="wholeWord">Whole Word</span>
+                        </label>
+
+                        <label class="find-option-label">
+                            <input type="checkbox" id="regex-check">
+                            <span data-i18n="regex">Regex</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="go-to-line-modal" class="modal hidden">
 
             <div class="modal-backdrop"></div>
@@ -263,7 +327,7 @@
     <script src="js/go-to-line.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>
-
+    <script src="js/find-replace.js"></script>
 </body>
 
 </html>

@@ -22,5 +22,13 @@
     "delete": "Eliminar",
     "copyPath": "Copiar ruta",
     "lineNumber": "Número de línea",
-    "go": "Ir"
+    "go": "Ir",
+    "findReplace": "Buscar y Reemplazar",
+    "find": "Buscar",
+    "replace": "Reemplazar",
+    "replaceOne": "Reemplazar",
+    "replaceAll": "Reemplazar Todo",
+    "caseSensitive": "Sensible a mayúsculas",
+    "wholeWord": "Palabra completa",
+    "regex": "Expresión regular"
 }

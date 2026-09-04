@@ -25,11 +25,13 @@ function openGoToLine() {
     }
 
     input.focus();
-    input.ariaSelected();
+    if (typeof input.select === 'function') {
+        input.select();
+    }
 }
 
 
-function closeGoToline() {
+function closeGoToLine() {
     const modal = document.getElementById("go-to-line-modal");
 
     if (modal) {
@@ -37,6 +39,7 @@ function closeGoToline() {
         isGoToLineOpen = false;
     }
 }
+const closeGoToline = closeGoToLine;
 
 function goToLineNumber(lineNum) {
     const editor = document.getElementById("code-editor");

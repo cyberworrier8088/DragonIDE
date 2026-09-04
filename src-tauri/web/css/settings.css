@@ -266,3 +266,162 @@
 #total-lines {
     display: block;
 }
+
+
+/* find and replace dialog style */
+
+.find-replace-content {
+    max-width: 500px;
+    min-width: 450px;
+}
+
+.find-replace-body {
+    padding: 16px !important;
+    gap: 12px !important;
+}
+
+.find-replace-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.find-replace-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.find-input-wrapper,
+.replace-input-wrapper {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.find-input-wrapper input,
+.replace-input-wrapper input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: monospace;
+}
+
+.find-input-wrapper input:focus,
+.replace-input-wrapper input:focus {
+    outline: 1px solid var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.find-input-wrapper input::placeholder,
+.replace-input-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+.find-nav-btn {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    min-width: 32px;
+}
+
+.find-nav-btn:hover {
+
+    background: var(--accent-hover);
+    color: var(--text-primary);
+    border-color: var(--accent-active)
+}
+
+.find-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.find-counter {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    background: var(--accent-active);
+    border-radius: 4px;
+    text-align: center;
+    min-width: 50px;
+}
+
+#match-counter {
+    font-family: monospace;
+    font-weight: 600;
+}
+
+.replace-action-btn {
+
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.replace-action-btn:hover {
+    background: color-mix(in srgb, var(--accent-blue) 80%, black 20%);
+    border-color: var(--accent-blue);
+}
+
+.replace-action-btn:active {
+    transform: scale(0.95);
+}
+
+.find-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.find-option-label {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    gap: 6px;
+}
+
+.find-option-label input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--accent-blue);
+    width: 14px;
+    height: 14px;
+}
+
+.find-option-label span {
+    text-transform: capitalize;
+}
+
+
+
+.find-highlight {
+    background: rgba(100, 181, 246, 0.3);
+    border-bottom: 2px solid var(--accent-blue);
+}
+
+.find-highlight.current {
+    background: rgba(100, 181, 246, 0.6);
+    border-bottom: 2px solid #fff;
+}

@@ -22,5 +22,13 @@
     "delete": "Delete",
     "copyPath": "Copy Path",
     "lineNumber": "Line Number",
-    "go": "Go"
+    "go": "Go",
+    "findReplace": "Find & Replace",
+    "find": "Find",
+    "replace": "Replace",
+    "replaceOne": "Replace",
+    "replaceAll": "Replace All",
+    "caseSensitive": "Case Sensitive",
+    "wholeWord": "Whole Word",
+    "regex": "Regex"
 }
