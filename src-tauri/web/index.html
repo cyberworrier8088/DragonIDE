@@ -141,12 +141,17 @@
                 <div id="panel-content" data-i18n="noProblems">No Problems detected</div>
             </section>
 
-            <footer id="status-right">
-
-                <span>No</span>
-                <span>UTF-8</span>
-                <span>LF</span>
-                <span id="cursor-position">Ln 1, Col 1</span>
+            <footer id="status-bar">
+                <div id="status-left">
+                    <span>DragonFoxIDE</span>
+                </div>
+                <div id="status-right">
+                    <span>UTF-8</span>
+                    <span>LF</span>
+                    <span id="cursor-position">Ln 1, Col 1</span>
+                    <span id="saved-indicator" style="display: none;"></span>
+                    <span id="saving-indicator" style="display: none;"></span>
+                </div>
             </footer>
         </main>
 
@@ -198,6 +203,23 @@
                             <input type="checkbox" id="line-wrap-toggle">
                             <span data-i18n="wordWrap">Word Wrap</span>
                         </label>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">
+                            <input type="checkbox" id="auto-save-toggle">
+                            <span data-i18n="autoSave">Auto Save</span>
+                        </label>
+
+                        <div class="settings-slider">
+
+                            <label for="auto-save-interval" style="font-size: 11px; flex: 0 0 auto;">Interval
+                                (sec):</label>
+                            <input type="range" id="auto-save-interval" min="1" max="30" value="3" style="flex: 1;">
+
+                            <span id="auto-save-value"
+                                style="font-size: 12px; color: var(--text-primary); min-width: 35px; text-align: right;">3s</span>
+                        </div>
                     </div>
 
                     <div class="settings-section">
@@ -325,9 +347,10 @@
     <script src="js/i18n.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/go-to-line.js"></script>
+    <script src="js/find-replace.js"></script>
+    <script src="js/auto-save.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>
-    <script src="js/find-replace.js"></script>
 </body>
 
 </html>

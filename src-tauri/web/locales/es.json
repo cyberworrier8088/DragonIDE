@@ -30,5 +30,18 @@
     "replaceAll": "Reemplazar Todo",
     "caseSensitive": "Sensible a mayúsculas",
     "wholeWord": "Palabra completa",
-    "regex": "Expresión regular"
+    "regex": "Expresión regular",
+    "unsaved": "Sin guardar",
+    "modified": "modificado",
+    "unsavedWarning": "Cambios sin guardar",
+    "unsavedMessage": "\"{fileName}\" tiene cambios sin guardar. ¿Guardar antes de cerrar?",
+    "save": "Guardar",
+    "discard": "Descartar",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "saved": "Guardado",
+    "autoSave": "Guardado automático",
+    "autoSaveEnabled": "Guardado automático activado",
+    "autoSaveDisabled": "Guardado automático desactivado",
+    "autoSaveInterval": "Intervalo de guardado automático (segundos)"
 }

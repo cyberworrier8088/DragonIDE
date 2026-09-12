@@ -425,3 +425,146 @@
     background: rgba(100, 181, 246, 0.6);
     border-bottom: 2px solid #fff;
 }
+
+
+.tab.unsaved .tab-name::after,
+.tab.unsaved > span:first-child::after {
+    content: " •";
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 16px;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+
+.tab.unsaved {
+    color: var(--text-primary);
+    border-left: 2px solid #ff6b6b;
+    padding-left: 10px;
+}
+
+.tab.unsaved:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+#saving-indicator {
+    font-size: 11px;
+    color: var(--accent-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: blink 1s ease-in-out infinite;
+    min-width: 60px;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+#saved-indicator {
+    font-size: 11px;
+    color: #4caf50;
+    font-weight: 600;
+    min-width: 50px;
+}
+
+.unsaved-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    z-index: 2000;
+    min-width: 350px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.unsaved-dialog h3 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.unsaved-dialog p {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.unsaved-dialog-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.unsaved-dialog-buttons button {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s ease;
+}
+
+.unsaved-dialog-buttons button:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-active);
+}
+
+.unsaved-dialog-buttons button.save-btn {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.unsaved-dialog-buttons button.save-btn:hover {
+    background: color-mix(in srgb, var(--accent-blue) 80%, black 20%);
+    border-color: var(--accent-blue);
+}
+
+.unsaved-dialog-buttons button.discard-btn {
+    background: #ff6b6b;
+    color: white;
+    border-color: #ff6b6b;
+}
+
+.unsaved-dialog-buttons button.discard-btn:hover {
+    background: #ff5252;
+    border-color: #ff5252;
+}
+
+
+.unsaved-dialog-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+}

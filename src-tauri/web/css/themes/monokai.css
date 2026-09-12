@@ -161,9 +161,7 @@ html, body {
 }
 
 /* ===== Highlight.js Syntax Theme (Monokai) ===== */
-pre code.hljs{display:block;overflow-x:auto;padding:1em}
-code.hljs{padding:3px 5px}
-.hljs{background:#272822;color:#ddd}
+.hljs{background:transparent;color:#ddd}
 .hljs-keyword,.hljs-literal,.hljs-name,.hljs-selector-tag,.hljs-strong,.hljs-tag{color:#f92672}
 .hljs-code{color:#66d9ef}
 .hljs-attribute,.hljs-link,.hljs-regexp,.hljs-symbol{color:#bf79db}

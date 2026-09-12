@@ -69,6 +69,10 @@ function updateSettingsUI() {
     if (lineWrapToggle) {
         lineWrapToggle.checked = !!settings.lineWrap;
     }
+
+    if (typeof syncAutoSaveUI === "function") {
+        syncAutoSaveUI();
+    }
 }
 
 function applyTheme(themeName) {
@@ -102,22 +106,29 @@ function applyTheme(themeName) {
 function applyFontSize(size) {
     const editor = document.getElementById("code-editor");
     const highlight = document.getElementById("code-highlight");
+    const highlightInner = document.getElementById("code-highlight-inner");
     const lineNumbers = document.getElementById("line-numbers");
 
     if (editor) editor.style.fontSize = size + "px";
     if (highlight) highlight.style.fontSize = size + "px";
+    if (highlightInner) highlightInner.style.fontSize = size + "px";
     if (lineNumbers) lineNumbers.style.fontSize = size + "px";
 
     settings.fontSize = size;
     saveSettings(settings);
+    if (typeof syncEditorScroll === "function") {
+        syncEditorScroll();
+    }
 }
 
 function applyTabSize(size) {
     const editor = document.getElementById("code-editor");
     const highlight = document.getElementById("code-highlight");
+    const highlightInner = document.getElementById("code-highlight-inner");
 
     if (editor) editor.style.tabSize = size;
     if (highlight) highlight.style.tabSize = size;
+    if (highlightInner) highlightInner.style.tabSize = size;
 
     settings.tabSize = size;
     saveSettings(settings);
@@ -126,15 +137,29 @@ function applyTabSize(size) {
 function applyLineWrap(enabled) {
     const editor = document.getElementById("code-editor");
     const highlight = document.getElementById("code-highlight");
+    const highlightInner = document.getElementById("code-highlight-inner");
+
+    const whiteSpaceVal = enabled ? "pre-wrap" : "pre";
+    const overflowXVal = enabled ? "hidden" : "auto";
 
     if (editor) {
         editor.wrap = enabled ? "soft" : "off";
-        editor.style.whiteSpace = enabled ? "pre-wrap" : "pre";
+        editor.style.whiteSpace = whiteSpaceVal;
+        editor.style.overflowX = overflowXVal;
     }
-    if (highlight) highlight.style.whiteSpace = enabled ? "pre-wrap" : "pre";
+    if (highlight) {
+        highlight.style.whiteSpace = whiteSpaceVal;
+        highlight.style.overflowX = overflowXVal;
+    }
+    if (highlightInner) {
+        highlightInner.style.whiteSpace = whiteSpaceVal;
+    }
 
     settings.lineWrap = enabled;
     saveSettings(settings);
+    if (typeof syncEditorScroll === "function") {
+        syncEditorScroll();
+    }
 }
 
 function applyAllSettings() {

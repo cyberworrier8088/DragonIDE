@@ -361,6 +361,10 @@ async function openFile(entry) {
         const fileName = entry.path.split(/[\\/]/).pop();
         window.dispatchEvent(new CustomEvent("file-opened", { detail: fileName }));
 
+        if (typeof initAutoSaveForFile === 'function') {
+            initAutoSaveForFile(entry.path);
+        }
+
         console.log("Opened: ", entry.name);
 
         const count = await invoke("document_count");
@@ -495,16 +499,23 @@ function renderTabs() {
 
         element.classList = "tab";
 
-
         if (
             currentFile && currentFile.path === tab.path
         ) {
             element.classList.add("active");
         }
 
-        const name = document.createElement("span");
+        const isUnsaved = (typeof autoSaveState !== "undefined" && autoSaveState.isEnabled)
+            ? autoSaveState.unsavedFiles?.get(tab.path)
+            : tab.modified;
 
-        name.textContent = tab.name + (tab.modified ? " *" : "");
+        if (isUnsaved) {
+            element.classList.add("unsaved");
+        }
+
+        const name = document.createElement("span");
+        name.className = "tab-name";
+        name.textContent = tab.name;
 
         const close = document.createElement("span");
 
@@ -574,6 +585,9 @@ async function activateTab(path) {
         }
 
         window.dispatchEvent(new CustomEvent("file-opened", { detail: tab.name }));
+        if (typeof initAutoSaveForFile === "function") {
+            initAutoSaveForFile(tab.path);
+        }
 
         const editorContainer = document.getElementById("editor-container");
         const editor = document.getElementById("code-editor");
@@ -615,36 +629,56 @@ async function closeTab(path, force = false) {
         tab => tab.path === path
     );
 
-
     if (index === -1) {
         return;
     }
 
     const tab = openTabs[index];
+    const isUnsaved = (typeof autoSaveState !== "undefined" && autoSaveState.unsavedFiles?.get(path)) || tab.modified;
 
-    if (tab.modified && !force) {
-        let confirmClose = false;
-
-        if (window.__TAURI__ && window.__TAURI__.dialog) {
-
-            confirmClose = await window.__TAURI__.dialog.confirm(
-                t("unsavedChangesMsg", { fileName: tab.name }),
-                { title: "DragonFoxIDE", kind: "warning" }
+    if (isUnsaved && !force) {
+        if (typeof showUnsavedDialog === "function") {
+            showUnsavedDialog(
+                path,
+                async () => {
+                    if (typeof autoSaveFile === "function") {
+                        await autoSaveFile(path);
+                    }
+                    await closeTab(path, true);
+                },
+                async () => {
+                    if (typeof autoSaveState !== "undefined") {
+                        autoSaveState.unsavedFiles.set(path, false);
+                    }
+                    tab.modified = false;
+                    await closeTab(path, true);
+                }
             );
-        } else {
-
-            confirmClose = confirm(`"${tab.name}" has unsaved changes. Do you want to close it without saving?`);
-        }
-
-        if (!confirmClose) {
             return;
+        } else {
+            let confirmClose = false;
+            if (window.__TAURI__ && window.__TAURI__.dialog) {
+                confirmClose = await window.__TAURI__.dialog.confirm(
+                    t("unsavedChangesMsg", { fileName: tab.name }),
+                    { title: "DragonFoxIDE", kind: "warning" }
+                );
+            } else {
+                confirmClose = confirm(`"${tab.name}" has unsaved changes. Do you want to close it without saving?`);
+            }
+
+            if (!confirmClose) {
+                return;
+            }
         }
     }
 
     const wasActive = currentFile && currentFile.path === path;
 
-
     openTabs.splice(index, 1);
+    if (typeof autoSaveState !== "undefined") {
+        autoSaveState.unsavedFiles.delete(path);
+        delete autoSaveState.lastSavedContent[path];
+    }
 
     if (wasActive) {
         if (openTabs.length === 0) {
@@ -896,7 +930,11 @@ document.addEventListener("keydown", async (event) => {
                 tab.modified = false;
             }
 
-            renderTabs();
+            if (typeof markAsSaved === "function") {
+                markAsSaved(path);
+            } else {
+                renderTabs();
+            }
 
             console.log("Saved:", currentFile.path);
 

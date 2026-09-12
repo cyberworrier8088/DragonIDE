@@ -150,9 +150,7 @@ html, body {
 }
 
 /* ===== Highlight.js Syntax Theme (Atom One Dark) ===== */
-pre code.hljs{display:block;overflow-x:auto;padding:1em}
-code.hljs{padding:3px 5px}
-.hljs{color:#abb2bf;background:#282c34}
+.hljs{color:#abb2bf;background:transparent}
 .hljs-comment,.hljs-quote{color:#5c6370;font-style:italic}
 .hljs-doctag,.hljs-formula,.hljs-keyword{color:#c678dd}
 .hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#e06c75}

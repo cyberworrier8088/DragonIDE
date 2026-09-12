@@ -372,18 +372,24 @@ button:focus-visible {
     padding-top: 16px;
     background: var(--editor-line-number-bg);
     color: var(--editor-line-number);
-    font-family: "Cascadia Code", "Consolas", monospace;
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace !important;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.6 !important;
     text-align: right;
     user-select: none;
     overflow: hidden;
+    letter-spacing: 0px !important;
+    word-spacing: 0px !important;
+    font-variant-ligatures: none !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
 }
 
 #line-numbers div {
     padding-right: 12px;
     height: 1.6em;
     line-height: 1.6;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 #code-editor-wrapper {
@@ -394,60 +400,97 @@ button:focus-visible {
     overflow: hidden;
 }
 
-#code-editor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 16px;
-    border: 0;
-    outline: 0;
-    resize: none;
-    background: transparent;
-    color: transparent;
-    caret-color: var(--editor-cursor);
-    font-family: "Cascadia Code", "Consolas", monospace;
-    font-size: 14px;
-    line-height: 1.6;
-    tab-size: 4;
-    white-space: pre;
-    overflow-wrap: normal;
-    word-break: normal;
-    overflow: auto;
-    scrollbar-gutter: stable;
-    z-index: 2;
-}
-
+#code-editor,
 #code-highlight {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    margin: 0;
-    padding: 16px;
-    background: var(--editor-bg);
-    color: var(--editor-text);
-    font-family: "Cascadia Code", "Consolas", monospace;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 0 !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace !important;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.6 !important;
+    letter-spacing: 0px !important;
+    word-spacing: 0px !important;
     tab-size: 4;
     white-space: pre;
     overflow-wrap: normal;
     word-break: normal;
     overflow: auto;
     scrollbar-gutter: stable;
-    pointer-events: none;
+    font-variant-ligatures: none !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeSpeed !important;
+}
+
+#code-editor {
+    resize: none !important;
+    background: transparent !important;
+    color: transparent !important;
+    caret-color: var(--editor-cursor, #528bff) !important;
+    z-index: 2;
+}
+
+#code-highlight {
+    background: var(--editor-bg) !important;
+    color: var(--editor-text) !important;
+    pointer-events: none !important;
     z-index: 1;
 }
 
-#code-highlight code {
-    display: block;
-    background: none;
-    padding: 0;
-    border-radius: 0;
+#code-highlight code,
+#code-highlight-inner,
+pre#code-highlight code,
+pre#code-highlight code.hljs,
+code.hljs {
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    letter-spacing: inherit !important;
+    word-spacing: inherit !important;
+    tab-size: inherit !important;
+    white-space: inherit !important;
+    font-variant-ligatures: none !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
+    box-sizing: border-box !important;
+}
+
+#code-editor::-webkit-scrollbar,
+#code-highlight::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+#code-editor::-webkit-scrollbar-track,
+#code-highlight::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#code-editor::-webkit-scrollbar-thumb {
+    background: var(--border, #3a3f4b);
+    border-radius: 5px;
+}
+
+#code-editor::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted, #5c6370);
+}
+
+#code-highlight::-webkit-scrollbar-thumb {
+    background: transparent;
 }
 
 

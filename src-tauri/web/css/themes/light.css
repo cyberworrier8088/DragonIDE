@@ -227,9 +227,7 @@ html, body {
 }
 
 /* ===== Highlight.js Syntax Theme (Atom One Light) ===== */
-pre code.hljs{display:block;overflow-x:auto;padding:1em}
-code.hljs{padding:3px 5px}
-.hljs{color:#383a42;background:#fafafa}
+.hljs{color:#383a42;background:transparent}
 .hljs-comment,.hljs-quote{color:#a0a1a7;font-style:italic}
 .hljs-doctag,.hljs-formula,.hljs-keyword{color:#a626a4}
 .hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#e45649}

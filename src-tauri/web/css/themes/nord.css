@@ -150,9 +150,7 @@ html, body {
 }
 
 /* ===== Highlight.js Syntax Theme (Nord) ===== */
-pre code.hljs{display:block;overflow-x:auto;padding:1em}
-code.hljs{padding:3px 5px}
-.hljs{background:#2e3440}
+.hljs{background:transparent}
 .hljs,.hljs-subst{color:#d8dee9}
 .hljs-selector-tag{color:#81a1c1}
 .hljs-selector-id{color:#8fbcbb;font-weight:700}
