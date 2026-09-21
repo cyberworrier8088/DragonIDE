@@ -43,5 +43,8 @@
     "autoSave": "Guardado automático",
     "autoSaveEnabled": "Guardado automático activado",
     "autoSaveDisabled": "Guardado automático desactivado",
-    "autoSaveInterval": "Intervalo de guardado automático (segundos)"
+    "autoSaveInterval": "Intervalo de guardado automático (segundos)",
+    "bracketMatching": "Coincidencia de corchetes",
+    "jumpToMatchingBracket": "Ir al corchete coincidente",
+    "autoBrackets": "Cerrar corchetes automáticamente"
 }

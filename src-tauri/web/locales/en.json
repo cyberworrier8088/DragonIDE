@@ -43,5 +43,8 @@
     "autoSave": "Auto-Save",
     "autoSaveEnabled": "Auto-Save Enabled",
     "autoSaveDisabled": "Auto-Save Disabled",
-    "autoSaveInterval": "Auto-Save Interval (seconds)"
+    "autoSaveInterval": "Auto-Save Interval (seconds)",
+    "bracketMatching": "Bracket Matching",
+    "jumpToMatchingBracket": "Jump to Matching Bracket",
+    "autoBrackets": "Auto Close Brackets"
 }

@@ -1003,6 +1003,11 @@ function syncHighlight() {
     delete highlightInner.dataset.highlighted;
 
     updateLineNumbers();
+
+    // Highlight matching brackets
+    if (typeof highlightMatchingBrackets === 'function') {
+        highlightMatchingBrackets(editor);
+    }
 }
 
 function detectLanguageFromPath(path) {
