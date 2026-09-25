@@ -1,7 +1,21 @@
 # DAY-12
 
-## What I Built today
-Added bracket matching and auto-closing to DragonIDE. this was a solid feature that took longer then expected but it was worth man!
+Today i was added brackets matching and auto closing to DragonIDE.
 
-## The Challenge
-When i started, i wasnt sure exactly
+## Features added:
+- Auto-close brackets: (), {}, [], "", '', ``
+- Auto-highlight matching brackets
+- Wrap selected text in brackets
+- Jump to matching bracket (Ctrl+Shift+\)
+- Scroll to bracket in view
+- Smart bracket detection
+- Toggle auto-close on/off (Ctrl+Shift+O)
+
+
+## Improvements:
+- Performance improvements
+- Bug fixes
+
+## Testing:
+- Tested all features
+- All features are working as expected
