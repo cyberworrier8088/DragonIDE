@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -137,4 +137,100 @@ fn save_document(
 
 
   documents.save(&path)
+}
+
+
+#[tauri::command]
+fn execute_code(file_path: String,language: String,code: String) -> serde_json::Value {
+
+
+  let (stdout, stderr, success) = match language.as_str() {
+    
+    "rust" => execute_rust(&file_path, &code),
+    "javascript" => execute_javascript(&file_path, &code),
+    "python" => execute_python(&file_path, &code),
+    _ => (
+      String::new(),
+      format!("Unsupported language: {}", language),
+      false
+    )
+  };
+
+  serde_json::json!({
+    "stdout": stdout,
+    "stderr": stderr,
+    "success": success
+  })
+}
+
+fn execute_rust(file_path: &str, _code: &str) -> (String, String, bool) {
+
+  use std::process::Command;
+
+  let compile_output = Command::new("rustc").arg(file_path).arg("-o").arg("./temp_rust_binary").output();
+
+
+  match compile_output {
+    Ok(output) => {
+      if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        return (String::new(), stderr, false);
+      }
+
+      let run_output = Command::new("./temp_rust_binary").output();
+
+
+      match run_output {
+        Ok(output) => {
+          let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+          let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+          let _ = std::fs::remove_file("./temp_rust_binary");
+
+          (stdout, stderr, output.status.success())
+        }
+        Err(e) => {
+          (String::new(), format!("Failed to run: {}", e), false)
+        }
+      }
+    }
+
+    Err(e) => {
+      (String::new(), format!("Compilation failed: {}", e), false)
+    }
+  }
+}
+
+
+fn execute_javascript(file_path: &str, _code: &str) -> (String, String, bool) {
+  use std::process::Command;
+
+  let output = Command::new("node").arg(file_path).output();
+
+  match output {
+    Ok(output) => {
+      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+      (stdout, stderr, output.status.success())
+    }
+    Err(e) => {
+      (String::new(), format!("Node.js not found or error: {}", e), false)
+    }
+  }
+}
+
+fn execute_python(file_path: &str, _code: &str) -> (String, String, bool) {
+  use std::process::Command;
+
+  let output = Command::new("python3").arg(file_path).output();
+
+  match output {
+    Ok(output) => {
+      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+      (stdout, stderr, output.status.success())
+    }
+    Err(e) => {
+      (String::new(), format!("Python3 not found or error: {}", e), false)
+    }
+  }
 }

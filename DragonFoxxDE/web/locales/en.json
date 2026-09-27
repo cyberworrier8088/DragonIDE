@@ -46,5 +46,18 @@
     "autoSaveInterval": "Auto-Save Interval (seconds)",
     "bracketMatching": "Bracket Matching",
     "jumpToMatchingBracket": "Jump to Matching Bracket",
-    "autoBrackets": "Auto Close Brackets"
+    "autoBrackets": "Auto Close Brackets",
+    "runCode": "Run Code",
+    "runCodeShortcut": "Run Code (Ctrl+Alt+R)",
+    "running": "Running...",
+    "executionTime": "Execution time",
+    "noOutput": "No output yet. Run code to see results.",
+    "output": "OUTPUT",
+    "terminal": "TERMINAL",
+    "clear": "Clear",
+    "copyOutput": "Copy Output",
+    "codeExecutionError": "Execution Error",
+    "selectLanguageError": "Please select a file to run (supported: .rs, .js, .py)",
+    "executionSuccess": "Execution completed successfully",
+    "timeSeconds": "ms"
 }

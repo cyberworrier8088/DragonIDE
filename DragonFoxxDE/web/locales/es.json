@@ -46,5 +46,18 @@
     "autoSaveInterval": "Intervalo de guardado automático (segundos)",
     "bracketMatching": "Coincidencia de corchetes",
     "jumpToMatchingBracket": "Ir al corchete coincidente",
-    "autoBrackets": "Cerrar corchetes automáticamente"
+    "autoBrackets": "Cerrar corchetes automáticamente",
+    "runCode": "Ejecutar código",
+    "runCodeShortcut": "Ejecutar código (Ctrl+Alt+R)",
+    "running": "Ejecutando...",
+    "executionTime": "Tiempo de ejecución",
+    "noOutput": "Sin salida. Ejecuta código para ver resultados.",
+    "output": "SALIDA",
+    "terminal": "TERMINAL",
+    "clear": "Limpiar",
+    "copyOutput": "Copiar salida",
+    "codeExecutionError": "Error de ejecución",
+    "selectLanguageError": "Selecciona un archivo para ejecutar (soportado: .rs, .js, .py)",
+    "executionSuccess": "Ejecución completada con éxito",
+    "timeSeconds": "ms"
 }
