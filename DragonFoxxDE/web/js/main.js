@@ -1150,3 +1150,79 @@ if (document.readyState === "loading") {
 } else {
     startDragonIDE();
 }
+
+
+// Panel tab swatching and terminal logic
+document.addEventListener("DOMContentLoaded", () => {
+    const panelTabs = document.querySelectorAll('.panel-tab');
+    const terminalContent = document.getElementById('terminal-content');
+
+
+    const outputContent = document.getElementById('output-content');
+    const noOutput = document.getElementById('no-output');
+
+    panelTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+
+            panelTabs.forEach(t => t.classList.remove('active'));
+
+            tab.classList.add('active');
+
+            const panelType = tab.getAttribute('data-panel');
+
+            if (panelType === 'terminal') {
+                if (outputContent) outputContent.style.display = 'none';
+                if (noOutput) noOutput.style.display = 'none';
+                terminalContent.style.display = 'flex';
+
+                document.getElementById('terminal-input').focus();
+            } else if (panelType === 'output') {
+                terminalContent.style.display = 'none';
+
+                if (executionState && executionState.output.length > 0) {
+                    outputContent.style.display = 'block';
+                } else {
+                    noOutput.style.display = 'block';
+                }
+            }
+        });
+    });
+
+    const terminalInput = document.getElementById('terminal-input');
+    const terminalOutput = document.getElementById("terminal-output");
+
+    if (terminalInput) {
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+
+                const command = terminalInput.value.trim();
+
+                terminalOutput.textContent += `$ ${command}\n`;
+
+                terminalInput.value = '';
+
+                if (command) {
+
+                    const currentDir = currentWorkspace ? currentWorkspace : ".";
+
+                    invoke("execute_terminal_command", {
+                        command: command,
+                        currentDir: currentDir
+                    }).then(response => {
+
+                        terminalOutput.textContent += response + "\n";
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    }).catch(error => {
+
+
+                        terminalOutput.textContent += `Error: ${error}\n`;
+
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    });
+                }
+
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+    }
+});

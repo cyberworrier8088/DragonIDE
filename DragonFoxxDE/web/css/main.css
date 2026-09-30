@@ -705,3 +705,47 @@ code.hljs {
 .panel-footer-btn:active {
     transform: scale(0.95);
 }
+
+
+/* Custom terminal style */
+#terminal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #1e1e1e;
+    color: #cccccc;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 14px;
+    padding: 10px;
+    box-sizing: border-box;
+
+}
+
+#terminal-output {
+    margin: 0;
+    white-space: pre-wrap;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.terminal-input-row {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.terminal-prompt {
+    color: #4CAF50;
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    color: #cccccc;
+    font-family: inherit;
+    font-size: inherit;
+    flex-grow: 1;
+    outline: none;
+}

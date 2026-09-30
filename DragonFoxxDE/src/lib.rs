@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -232,5 +232,42 @@ fn execute_python(file_path: &str, _code: &str) -> (String, String, bool) {
     Err(e) => {
       (String::new(), format!("Python3 not found or error: {}", e), false)
     }
+  }
+}
+
+
+#[tauri::command]
+fn execute_terminal_command(command: String, current_dir: String) -> Result<String, String> {
+
+  use std::process::Command;
+
+  let shell = if cfg!(target_os = "windows") { "cmd" } else { "sh" };
+  let arg = if cfg!(target_os = "windows") { "/c" } else { "-c" };
+
+  let output = Command::new(shell).arg(arg).arg(&command).current_dir(current_dir).output();
+
+  match output {
+    Ok(output) => {
+
+      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+      if !output.status.success() {
+
+        Ok(stderr)
+      } else {
+        let mut combined = stdout;
+
+        if !stderr.is_empty() {
+
+          combined.push_str("\n");
+          combined.push_str(&stderr);
+        }
+
+        Ok(combined)
+      }
+    }
+
+    Err(e) => Err(format!("Failed to run command: {}", e)),
   }
 }
