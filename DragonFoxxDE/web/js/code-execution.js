@@ -73,7 +73,7 @@ function showExecutionStatus(isRunning) {
         statusText.textContent = "RUNNING....";
         runBtn.classList.add("running");
     } else {
-        statusDiv.style.display = "none";
+        statusText.textContent = "DONE";
         runBtn.classList.remove("running");
     }
 }
@@ -110,6 +110,11 @@ async function runCode() {
 
     clearOutput();
     showOutputPanel();
+
+
+    // reset execution time
+    document.getElementById("execution-time").textContent = "";
+
     showExecutionStatus(true);
     executionState.isRunning = true;
     executionState.startTime = Date.now();
@@ -121,9 +126,9 @@ async function runCode() {
         const { invoke } = window.__TAURI__.core;
 
         try {
-            await invoke("update_document", { 
-                path: currentFile.path, 
-                text: code 
+            await invoke("update_document", {
+                path: currentFile.path,
+                text: code
             });
             await invoke("save_document", {
                 path: currentFile.path
@@ -167,7 +172,7 @@ async function runCode() {
     } catch (error) {
         const executionTime = Date.now() - executionState.startTime;
         console.error("Execution error:", error);
-        
+
         let errorMsg = typeof error === 'string' ? error : (error && error.message ? error.message : JSON.stringify(error));
         addOutputLine(`Error: ${errorMsg}`, 'error');
         addOutputLine(`Execution failed after ${executionTime}ms`, 'error');
