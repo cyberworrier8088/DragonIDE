@@ -549,7 +549,7 @@ code.hljs {
 .matching-bracket-indicator {
     position: absolute;
     border: 1px solid var(--accent-blue);
-    pointer-events: transparent;
+    pointer-events: none;
     border-radius: 2px;
 }
 
