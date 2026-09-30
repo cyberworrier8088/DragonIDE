@@ -603,7 +603,7 @@ code.hljs {
     }
 }
 
-.penel-header {
+.panel-header {
     padding: 8px 14px;
     border-bottom: 1px solid var(--border);
     background: var(--bg-primary);
@@ -635,7 +635,7 @@ code.hljs {
     flex: 1;
     overflow-y: auto;
     padding: 12px 14px;
-    font-family: "Cascadia Code" monospace;
+    font-family: "Cascadia Code", monospace;
     font-size: 13px;
     line-height: 1.6;
     color: var(--text-secondary);
