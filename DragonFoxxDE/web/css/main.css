@@ -712,8 +712,8 @@ code.hljs {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: #1e1e1e;
-    color: #cccccc;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
     font-family: Consolas, "Courier New", monospace;
     font-size: 14px;
     padding: 10px;
@@ -743,7 +743,7 @@ code.hljs {
 #terminal-input {
     background: transparent;
     border: none;
-    color: #cccccc;
+    color: var(--editor-text);
     font-family: inherit;
     font-size: inherit;
     flex-grow: 1;
