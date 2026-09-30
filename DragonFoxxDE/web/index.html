@@ -240,23 +240,19 @@
                             <input type="checkbox" id="auto-save-toggle">
                             <span data-i18n="autoSave">Auto Save</span>
                         </label>
-
-                        <div class="settings-section">
-                            <label class="settings-label">
-                                <input type="checkbox" id="auto-brackets-toggle" checked>
-                                <span data-i18n="autoBrackets">Auto Close Brackets</span>
-                            </label>
-                        </div>
-
+                        
                         <div class="settings-slider">
-
-                            <label for="auto-save-interval" style="font-size: 11px; flex: 0 0 auto;">Interval
-                                (sec):</label>
+                            <label for="auto-save-interval" style="font-size: 11px; flex: 0 0 auto;">Interval (sec):</label>
                             <input type="range" id="auto-save-interval" min="1" max="30" value="3" style="flex: 1;">
-
-                            <span id="auto-save-value"
-                                style="font-size: 12px; color: var(--text-primary); min-width: 35px; text-align: right;">3s</span>
+                            <span id="auto-save-value" style="font-size: 12px; color: var(--text-primary); min-width: 35px; text-align: right;">3s</span>
                         </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">
+                            <input type="checkbox" id="auto-brackets-toggle" checked>
+                            <span data-i18n="autoBrackets">Auto Close Brackets</span>
+                        </label>
                     </div>
 
                     <div class="settings-section">
