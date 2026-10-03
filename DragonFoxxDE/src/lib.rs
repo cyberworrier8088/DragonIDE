@@ -141,65 +141,59 @@ fn save_document(
 
 
 #[tauri::command]
-fn execute_code(file_path: String,language: String,code: String) -> serde_json::Value {
+async fn execute_code(file_path: String, language: String, code: String) -> serde_json::Value {
 
+  let result = tauri::async_runtime::spawn_blocking(
+    move || match language.as_str() {
+      "rust" => execute_rust(&file_path, &code),
+      "javascript" => execute_javascript(&file_path, &code),
+      "python" => execute_python(&file_path, &code),
+      _ => (String::new(), format!("Unsupported language: {}", language), false),
 
-  let (stdout, stderr, success) = match language.as_str() {
-    
-    "rust" => execute_rust(&file_path, &code),
-    "javascript" => execute_javascript(&file_path, &code),
-    "python" => execute_python(&file_path, &code),
-    _ => (
-      String::new(),
-      format!("Unsupported language: {}", language),
-      false
-    )
-  };
+    }).await;
 
-  serde_json::json!({
-    "stdout": stdout,
-    "stderr": stderr,
-    "success": success
-  })
+    let (stdout, stderr, success) = result.unwrap_or_else(|e| (String::new(), format!("Execution task failed: {}", e), false));
+
+    serde_json::json!({ "stdout": stdout, "stderr": stderr, "success": success })
 }
+
+
 
 fn execute_rust(file_path: &str, _code: &str) -> (String, String, bool) {
 
-  use std::process::Command;
+  let binary = std::env::temp_dir().join(format!(
+    "dragonide_run__{}{}",
+    std::process::id(),
+    std::env::consts::EXE_SUFFIX
+  ));
 
-  let compile_output = Command::new("rustc").arg(file_path).arg("-o").arg("./temp_rust_binary").output();
+  let compile = match command("rustc").arg(file_path).arg("-o").arg(&binary).output() {
 
+    Ok(output) => output,
+    Err(e) => return (String::new(), format!("Could not start rustc: {}", e), false),
 
-  match compile_output {
-    Ok(output) => {
-      if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        return (String::new(), stderr, false);
-      }
+  };
 
-      let run_output = Command::new("./temp_rust_binary").output();
-
-
-      match run_output {
-        Ok(output) => {
-          let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-          let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-          let _ = std::fs::remove_file("./temp_rust_binary");
-
-          (stdout, stderr, output.status.success())
-        }
-        Err(e) => {
-          (String::new(), format!("Failed to run: {}", e), false)
-        }
-      }
-    }
-
-    Err(e) => {
-      (String::new(), format!("Compilation failed: {}", e), false)
-    }
+  if !compile.status.success() {
+    return (String::new(), String::from_utf8_lossy(&compile.stderr).to_string(), false);
   }
-}
 
+  let result = match command(&binary).output() {
+
+    Ok(output) => (
+      String::from_utf8_lossy(&output.stdout).to_string(),
+      String::from_utf8_lossy(&output.stderr).to_string(),
+
+      output.status.success(),
+    ),
+
+    Err(e) => (String::new(), format!("Failed to run: {}", e), false),
+  };
+
+  let _ = std::fs::remove_file(&binary);
+
+  result
+}
 
 fn execute_javascript(file_path: &str, _code: &str) -> (String, String, bool) {
   use std::process::Command;
@@ -219,55 +213,56 @@ fn execute_javascript(file_path: &str, _code: &str) -> (String, String, bool) {
 }
 
 fn execute_python(file_path: &str, _code: &str) -> (String, String, bool) {
-  use std::process::Command;
 
-  let output = Command::new("python3").arg(file_path).output();
+  let python = if cfg!(target_os = "windows") { "python" } else { "python3" };
 
-  match output {
-    Ok(output) => {
-      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-      (stdout, stderr, output.status.success())
-    }
-    Err(e) => {
-      (String::new(), format!("Python3 not found or error: {}", e), false)
-    }
+  match command(python).arg(file_path).output() {
+
+    Ok(output) => (
+      String::from_utf8_lossy(&output.stdout).to_string(),
+      String::from_utf8_lossy(&output.stderr).to_string(),
+
+      output.status.success(),
+    ),
+    Err(e) => (String::new(), format!("{} not found or error: {}", python, e), false),
   }
+
+}
+
+#[tauri::command]
+async fn execute_terminal_command(command: String, current_dir: String) -> Result<String, String> {
+
+  tauri::async_runtime::spawn_blocking(move || run_terminal_command(&command, &current_dir)).await.map_err(|e| e.to_string())?
+}
+
+fn run_terminal_command(command_text: &str, current_dir: &str) -> Result<String, String> {
+
+  let (shell, flag) = if cfg!(target_os = "windows") { ("cmd", "/c") } else { ("sh", "-c") };
+
+  let output = command(shell).arg(flag).arg(command_text).current_dir(current_dir).output().map_err(|e| format!("Failed to run command: {}", e))?;
+
+  let mut combined = String::from_utf8_lossy(&output.stdout).to_string();
+  let stderr = String::from_utf8_lossy(&output.stderr);
+  if !stderr.is_empty() {
+    if !combined.is_empty() {
+      combined.push('\n');
+    }
+
+    combined.push_str(&stderr);
+  }
+
+  Ok(combined)
 }
 
 
-#[tauri::command]
-fn execute_terminal_command(command: String, current_dir: String) -> Result<String, String> {
+fn command<S: AsRef<std::ffi::OsStr>>(program: S) -> std::process::Command {
 
-  use std::process::Command;
+  let mut cmd = std::process::Command::new(program);
 
-  let shell = if cfg!(target_os = "windows") { "cmd" } else { "sh" };
-  let arg = if cfg!(target_os = "windows") { "/c" } else { "-c" };
-
-  let output = Command::new(shell).arg(arg).arg(&command).current_dir(current_dir).output();
-
-  match output {
-    Ok(output) => {
-
-      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-
-      if !output.status.success() {
-
-        Ok(stderr)
-      } else {
-        let mut combined = stdout;
-
-        if !stderr.is_empty() {
-
-          combined.push_str("\n");
-          combined.push_str(&stderr);
-        }
-
-        Ok(combined)
-      }
-    }
-
-    Err(e) => Err(format!("Failed to run command: {}", e)),
+  #[cfg(target_os = "windows")]
+  {
+    use std::os::windows::process::CommandExt;
+    cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
   }
+  cmd
 }
