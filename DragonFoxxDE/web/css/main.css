@@ -621,6 +621,27 @@ code.hljs {
     font-weight: 600;
 }
 
+#execution-status {
+    flex: 1;
+}
+
+
+.stop-btn {
+    margin-left: auto;
+    padding: 3px 10px;
+    border: 1px solid #ff6b6b;
+    background: transparent;
+    color: #ff6b6b;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.stop-btn:hover {
+    background: rgba(255, 107, 107, 0.15);
+}
+
 #status-text {
     text-transform: uppercase;
     letter-spacing: 0.5px;

@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         closeBtn.addEventListener("click", closeGoToline);
     }
 
-    const backdrop = document.querySelector(".modal-backdrop");
+    const backdrop = document.querySelector("#go-to-line-modal .modal-backdrop");
     if (backdrop) {
 
         backdrop.addEventListener("click", (e) => {

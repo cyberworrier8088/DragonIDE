@@ -1,5 +1,6 @@
 let executionState = {
     isRunning: false,
+    stopRequested: false,
     currentFile: null,
     output: [],
     startTime: null
@@ -64,17 +65,23 @@ function showExecutionStatus(isRunning) {
     const statusDiv = document.getElementById("execution-status");
     const statusText = document.getElementById("status-text");
     const runBtn = document.getElementById("run-btn");
+    const stopBtn = document.getElementById("stop-btn");
+
+
 
     if (!statusDiv || !statusText) return;
 
     if (isRunning) {
-
         statusDiv.style.display = "flex";
-        statusText.textContent = "RUNNING....";
+        statusText.textContent = "RUNNING...";
         runBtn.classList.add("running");
+
+        if (stopBtn) stopBtn.style.display = "inline-block";
     } else {
-        statusText.textContent = "DONE";
+
+        statusText.textContent = executionState.stopRequested ? "STOPPED" : "DONE";
         runBtn.classList.remove("running");
+        if (stopBtn) stopBtn.style.display = "none";
     }
 }
 
@@ -96,7 +103,7 @@ async function runCode() {
     }
 
     if (executionState.isRunning) {
-        console.warn("Already running");
+        stopCode();
         return;
     }
 
@@ -117,6 +124,7 @@ async function runCode() {
 
     showExecutionStatus(true);
     executionState.isRunning = true;
+    executionState.stopRequested = false;
     executionState.startTime = Date.now();
 
     const editor = document.getElementById("code-editor");
@@ -161,13 +169,17 @@ async function runCode() {
             });
         }
 
-        if (result.success) {
+
+        updateExecutionTime(executionTime);
+
+        if (executionState.stopRequested) {
+            addOutputLine(`\n■ Stopped after ${executionTime}ms`, "warning");
+        } else if (result.success) {
             addOutputLine(`\nExecution completed in ${executionTime}ms`, "success");
-            updateExecutionTime(executionTime);
         } else {
-            addOutputLine(`\n✗ Execution failed`, 'error');
-            updateExecutionTime(executionTime);
+            addOutputLine(`\n✗ Execution failed`, "error");
         }
+
 
     } catch (error) {
         const executionTime = Date.now() - executionState.startTime;
@@ -180,6 +192,20 @@ async function runCode() {
     } finally {
         executionState.isRunning = false;
         showExecutionStatus(false);
+    }
+}
+
+
+async function stopCode() {
+
+    if (!executionState.isRunning) return;
+    executionState.stopRequested = true;
+
+    try {
+        const { invoke } = window.__TAURI__.core;
+        await invoke("stop_code");
+    } catch (error) {
+        console.warn("Stop failed:", error);
     }
 }
 
@@ -205,6 +231,11 @@ document.addEventListener("DOMContentLoaded", () => {
         runBtn.addEventListener("click", runCode);
     }
 
+    const stopBtn = document.getElementById("stop-btn");
+    if (stopBtn) {
+        stopBtn.addEventListener("click", stopCode);
+    }
+
     const clearBtn = document.getElementById("clear-output-btn");
     if (clearBtn) {
         clearBtn.addEventListener("click", clearOutput);
@@ -226,3 +257,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.runCode = runCode;
 window.clearOutput = clearOutput;
+window.stopCode = stopCode; // code run stop

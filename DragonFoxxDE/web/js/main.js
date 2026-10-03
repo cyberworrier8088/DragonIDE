@@ -434,13 +434,6 @@ async function updateCurrentDocument(path = currentFile?.path, text = document.g
             currentFileContent = text;
         }
 
-        const tab = openTabs.find(
-            tab => tab.path === path
-        );
-
-        if (tab) {
-            tab.modified = true;
-        }
 
         renderTabs();
     } catch (error) {

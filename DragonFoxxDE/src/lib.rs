@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_code])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -161,72 +161,58 @@ async fn execute_code(file_path: String, language: String, code: String) -> serd
 
 fn execute_rust(file_path: &str, _code: &str) -> (String, String, bool) {
 
-  let binary = std::env::temp_dir().join(format!(
-    "dragonide_run__{}{}",
-    std::process::id(),
-    std::env::consts::EXE_SUFFIX
-  ));
 
-  let compile = match command("rustc").arg(file_path).arg("-o").arg(&binary).output() {
+  let binary = std::env::temp_dir().join(format!("dragonide_run_{}{}", std::process::id(), std::env::consts::EXE_SUFFIX));
 
-    Ok(output) => output,
-    Err(e) => return (String::new(), format!("Could not start rustc: {}", e), false),
+  let mut compile = command("rustc");
+  compile.arg(file_path).arg("-o").arg(&binary);
 
-  };
-
-  if !compile.status.success() {
-    return (String::new(), String::from_utf8_lossy(&compile.stderr).to_string(), false);
+  let (_, compile_err, compiled) = run_tracked(compile);
+  if !compiled {
+    return (String::new(), compile_err, false);
   }
 
-  let result = match command(&binary).output() {
-
-    Ok(output) => (
-      String::from_utf8_lossy(&output.stdout).to_string(),
-      String::from_utf8_lossy(&output.stderr).to_string(),
-
-      output.status.success(),
-    ),
-
-    Err(e) => (String::new(), format!("Failed to run: {}", e), false),
-  };
+  let result = run_tracked(command(&binary));
 
   let _ = std::fs::remove_file(&binary);
-
   result
 }
 
 fn execute_javascript(file_path: &str, _code: &str) -> (String, String, bool) {
-  use std::process::Command;
 
-  let output = Command::new("node").arg(file_path).output();
-
-  match output {
-    Ok(output) => {
-      let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-      let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-      (stdout, stderr, output.status.success())
-    }
-    Err(e) => {
-      (String::new(), format!("Node.js not found or error: {}", e), false)
-    }
-  }
+  let mut cmd = command("node");
+  cmd.arg(file_path);
+  run_tracked(cmd)
 }
+
 
 fn execute_python(file_path: &str, _code: &str) -> (String, String, bool) {
 
   let python = if cfg!(target_os = "windows") { "python" } else { "python3" };
+  let mut cmd = command(python);
+  cmd.arg(file_path);
+  run_tracked(cmd)
+}
 
-  match command(python).arg(file_path).output() {
+// stop runing command
+#[tauri::command]
+fn stop_code() -> Result<(), String> {
 
-    Ok(output) => (
-      String::from_utf8_lossy(&output.stdout).to_string(),
-      String::from_utf8_lossy(&output.stderr).to_string(),
+  let pid = RUNNING_PID.lock().unwrap().take();
 
-      output.status.success(),
-    ),
-    Err(e) => (String::new(), format!("{} not found or error: {}", python, e), false),
-  }
+  let Some(pid) = pid else {
 
+    return Err("Nothing is running".to_string());
+  };
+
+  let pid = pid.to_string();
+  let stutus = if cfg!(target_os = "windows") {
+    command("taskkill").args(["/PID", pid.as_str(), "/T", "/F"]).status()
+  } else {
+    command("kill").args(["-9", pid.as_str()]).status()
+  };
+
+  stutus.map(|_| ()).map_err(|e| format!("Failed to stop: {}", e))
 }
 
 #[tauri::command]
@@ -265,4 +251,33 @@ fn command<S: AsRef<std::ffi::OsStr>>(program: S) -> std::process::Command {
     cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
   }
   cmd
+}
+
+
+static RUNNING_PID: std::sync::Mutex<Option<u32>> = std::sync::Mutex::new(None);
+
+fn run_tracked(mut cmd: std::process::Command) -> (String, String, bool) {
+
+  use std::process::Stdio;
+
+  let program = cmd.get_program().to_string_lossy().to_string();
+
+  let child = match cmd.stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
+    Ok(child) => child,
+    Err(e) => return (String::new(), format!("Could not start {}: {}", program, e), false),
+  };
+
+  *RUNNING_PID.lock().unwrap() = Some(child.id());
+  let result = child.wait_with_output();
+  *RUNNING_PID.lock().unwrap() = None;
+
+  match result {
+    Ok(output) => (
+
+      String::from_utf8_lossy(&output.stdout).to_string(),
+      String::from_utf8_lossy(&output.stderr).to_string(),
+      output.status.success(),
+    ),
+    Err(e) => (String::new(), format!("Failed to run: {}", e), false),
+  }
 }

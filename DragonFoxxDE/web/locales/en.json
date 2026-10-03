@@ -59,5 +59,6 @@
     "codeExecutionError": "Execution Error",
     "selectLanguageError": "Please select a file to run (supported: .rs, .js, .py)",
     "executionSuccess": "Execution completed successfully",
-    "timeSeconds": "ms"
+    "timeSeconds": "ms",
+    "stop": "Stop"
 }
