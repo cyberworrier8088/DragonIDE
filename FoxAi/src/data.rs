@@ -1,5 +1,6 @@
 use std::process::Command;
 use std::fs;
+use std::collections::{HashMap, HashSet};
 
 pub fn get_data_set() {
     let url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt";
@@ -34,3 +35,55 @@ pub fn get_data_set() {
         println!("downlaod Failed");
     }
 }
+
+
+pub fn data_set_preparing() {
+
+    let text = fs::read_to_string("dataset/test-data.txt").unwrap();
+
+
+    // Craete a vocabularys
+    let mut chars: Vec<char> = text.chars().collect();
+
+    chars.sort();
+    chars.dedup();
+
+    let vocab_size = chars.len();
+
+    println!("{}", chars.iter().collect::<String>());
+    println!("{}", vocab_size);
+
+
+    // character -> integer
+    let mut stoi = HashMap::new();
+
+    // integer -> character
+    let mut itos = HashMap::new();
+
+
+    for (i, &ch) in chars.iter().enumerate() {
+        stoi.insert(ch, i);
+        itos.insert(i, ch);
+    }
+
+    // Encodee the entir dataset
+    let mut data = Vec::new();
+
+    for ch in text.chars() {
+        data.push(stoi[&ch]);
+    }
+
+    println!("Number of Tokens: {}", data.len());
+
+    /// first 1000 tokens
+    println!("{:?}", &data[..1000]);
+
+    let n = (0.9 * data.len() as f64) as usize;
+
+    let train_data = &data[..n];
+    let val_data = &data[n..];
+
+    println!("Train: {}", train_data.len());
+    println!("Validation: {}", val_data.len());
+}
+

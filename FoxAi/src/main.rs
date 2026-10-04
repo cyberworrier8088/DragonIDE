@@ -1,9 +1,15 @@
 
-
 mod data;
 
-
+use std::fs;
 
 fn main() {
-    data::get_data_set();
+
+    if fs::metadata("dataset").is_ok() {
+        println!("Already downloaded");
+    } else {
+        data::get_data_set();
+    }
+
+    data::data_set_preparing();
 }
