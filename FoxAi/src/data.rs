@@ -1,6 +1,7 @@
 use std::process::Command;
 use std::fs;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+use rand::RngExt;
 
 pub fn get_data_set() {
     let url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt";
@@ -85,5 +86,36 @@ pub fn data_set_preparing() {
 
     println!("Train: {}", train_data.len());
     println!("Validation: {}", val_data.len());
+
+    let (xb, yb) = get_batch(train_data, 4, 8);
+
+    println!("inputs:");
+    println!("{:?}", xb);
+
+    println!("targets:");
+    println!("{:?}", yb);
 }
 
+fn get_batch(
+    data: &[usize],
+    batch_size: usize,
+    block_size: usize,
+) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
+
+    let mut rng = rand::rng();
+
+    let mut x = Vec::new();
+    let mut y = Vec::new();
+
+    for _ in 0..batch_size {
+        let i = rng.random_range(0..data.len() - block_size);
+
+        let input = data[i..i + block_size].to_vec();
+        let target = data[i + 1..i + block_size + 1].to_vec();
+
+        x.push(input);
+        y.push(target);
+    }
+
+    (x, y)
+}
