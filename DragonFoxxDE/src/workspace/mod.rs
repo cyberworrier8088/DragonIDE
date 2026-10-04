@@ -1,4 +1,5 @@
 pub mod filesystem;
+pub mod search;
 
 use std::path::PathBuf;
 

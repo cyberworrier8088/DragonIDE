@@ -5,6 +5,7 @@ let currentFileContent = "";
 let editorChangeTimer = null;
 let openTabs = [];
 let currentWorkspace = null;
+window.currentWorkspace = null;
 
 let undoStack = [];
 let redoStack = [];
@@ -166,6 +167,7 @@ async function openFolder() {
         }
 
         currentWorkspace = folder;
+        window.currentWorkspace = folder;
 
         console.log("Selected workspace: ", folder);
 
@@ -1219,3 +1221,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+window.openFile = openFile;

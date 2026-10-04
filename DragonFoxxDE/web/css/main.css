@@ -51,6 +51,11 @@ button:focus-visible {
     padding: 0;
 }
 
+.activity-button img,
+.activity-button svg {
+    pointer-events: none;
+}
+
 .activity-button img {
     width: 22px;
     height: 22px;
@@ -769,4 +774,114 @@ code.hljs {
     font-size: inherit;
     flex-grow: 1;
     outline: none;
+}
+
+
+/* Search across files */
+#search-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 8px;
+    gap: 8px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+}
+
+#search-input:focus {
+    border-color: var(--accent-blue);
+}
+
+.search-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.search-option input {
+    accent-color: var(--accent-blue);
+}
+
+.search-summary {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+#search-results {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.search-file-group {
+    margin-bottom: 6px;
+}
+
+.search-file-name {
+    padding: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-file-count {
+    margin-left: 6px;
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.search-result {
+    display: flex;
+    gap: 8px;
+    padding: 3px 4px 3px 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.search-result:hover {
+    background: var(--accent-hover);
+    color: var(--text-primary);
+}
+
+.search-line-number {
+    min-width: 28px;
+    flex-shrink: 0;
+    text-align: right;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.search-line-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: "Cascadia Code", Consolas, monospace;
+}
+
+.search-match {
+    background: #ffe600;
+    color: #111111;
+    font-weight: bold;
+    border-radius: 2px;
+    padding: 0 1px;
 }

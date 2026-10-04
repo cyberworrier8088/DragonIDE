@@ -64,7 +64,13 @@
 
         <aside id="activity-bar">
             <button class="activity-button active"><img src="assets/icon/file.svg" alt="EX"></button>
-            <button class="activity-button">SR</button>
+            <button class="activity-button" id="search-activity-btn" title="Search (Ctrl+Shift+F)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                </svg>
+            </button>
             <button class="activity-button">GI</button>
             <button class="activity-button">DB</button>
 
@@ -88,6 +94,19 @@
 
                 <div id="file-tree"></div>
 
+            </div>
+
+            <div id="search-view" style="display: none;">
+                <input type="text" id="search-input" placeholder="Search in files..." autocomplete="off"
+                    spellcheck="false">
+
+                <label class="search-option">
+                    <input type="checkbox" id="search-case-check">
+                    <span data-i18n="caseSensitive">Case Sensitive</span>
+                </label>
+
+                <div id="search-summary" class="search-summary"></div>
+                <div id="search-results"></div>
             </div>
         </aside>
 
@@ -389,6 +408,7 @@
     <script src="js/auto-save.js"></script>
     <script src="js/bracket-matching.js"></script>
     <script src="js/code-execution.js"></script>
+    <script src="js/search.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>
 </body>

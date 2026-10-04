@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_code])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_code, search_workspace])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -36,6 +36,16 @@ fn read_workspace(path: String) -> Result<Vec<workspace::filesystem::FileEntry>,
     let path = PathBuf::from(path);
 
     workspace::filesystem::read_directory(&path)
+}
+
+// search workspace
+#[tauri::command]
+async fn search_workspace(root: String, query: String, case_sensitive: bool) -> Result<Vec<workspace::search::SearchResult>, String> {
+
+  tauri::async_runtime::spawn_blocking(move || {
+    workspace::search::search_workspace(&PathBuf::from(root), &query, case_sensitive)
+  }).await.map_err(|e| e.to_string())?
+
 }
 
 

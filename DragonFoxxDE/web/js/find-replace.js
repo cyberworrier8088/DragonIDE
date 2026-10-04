@@ -385,12 +385,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("keydown", (e) => {
 
-        if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "f") {
             e.preventDefault();
             openFindReplace();
         }
 
-        if ((e.ctrlKey || e.metaKey) && e.key === "h") {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "h") {
             e.preventDefault();
             openFindReplace();
         }

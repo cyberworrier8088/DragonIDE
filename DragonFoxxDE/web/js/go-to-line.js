@@ -70,6 +70,10 @@ function goToLineNumber(lineNum) {
 
     editor.focus();
 
+    if (typeof updateCursorPosition === "function") {
+        updateCursorPosition();
+    }
+
     closeGoToLine();
 
     console.log(`Jumped to line ${lineNum}`);
@@ -81,7 +85,7 @@ function scrollEditorToLine(lineNum) {
 
     if (!editor) return;
 
-    const lineHeight = parseFloat(window.getComputedStyle(editor).lineHeight);
+    const lineHeight = parseFloat(window.getComputedStyle(editor).lineHeight) || 22;
 
     const scrollTop = (lineNum - 1) * lineHeight;
 
@@ -161,3 +165,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+window.goToLineNumber = goToLineNumber;

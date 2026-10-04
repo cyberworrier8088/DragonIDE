@@ -60,5 +60,6 @@
     "selectLanguageError": "Selecciona un archivo para ejecutar (soportado: .rs, .js, .py)",
     "executionSuccess": "Ejecución completada con éxito",
     "timeSeconds": "ms",
-    "stop": "Detener"
+    "stop": "Detener",
+    "search": "BUSCAR"
 }
