@@ -1,5 +1,6 @@
 
 mod data;
+mod model;
 
 use std::fs;
 
