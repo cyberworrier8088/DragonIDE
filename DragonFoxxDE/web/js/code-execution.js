@@ -266,6 +266,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    const terminalContent = document.getElementById("terminal-content");
+    const terminalInput = document.getElementById("terminal-input");
+
+
     terminalContent?.addEventListener("click", () => {
         if (!window.getSelection().toString()) {
             terminalInput?.focus();

@@ -16,6 +16,17 @@ function initPanelResize() {
 
     let dragging = false;
 
+    function stopDragging() {
+
+        if (!dragging) return;
+
+        dragging = false;
+        resizer.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem(PANEL_HEIGHT_KEY, parseInt(panel.style.height, 10));
+    }
+
     resizer.addEventListener("mousedown", (e) => {
         e.preventDefault();
         dragging = true;
@@ -35,6 +46,14 @@ function initPanelResize() {
         newHeight = Math.max(100, Math.min(newHeight, maxHeight));
         panel.style.height = newHeight + "px";
     });
+
+
+    // Stop when the mouse button is released
+    document.addEventListener("mouseup", stopDragging);
+
+    // Also stop if the window loses focus 
+    window.addEventListener("blur", stopDragging);
+
 }
 
 if (document.readyState === "loading") {

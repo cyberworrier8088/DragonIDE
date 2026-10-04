@@ -239,7 +239,7 @@ button:focus-visible {
 }
 
 #panel-content {
-    padding: 14px;
+    padding: 0;
     min-height: 0;
     color: var(--text-secondary);
     font-size: 13px;
