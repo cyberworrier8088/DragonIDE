@@ -1,0 +1,1 @@
+C:\Users\Muhammad_Nabhan_nk\Downloads\DragonIDE\FoxAi\target\debug\FoxAi.exe: C:\Users\Muhammad_Nabhan_nk\Downloads\DragonIDE\FoxAi\src\data.rs C:\Users\Muhammad_Nabhan_nk\Downloads\DragonIDE\FoxAi\src\main.rs
