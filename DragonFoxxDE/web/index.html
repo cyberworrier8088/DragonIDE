@@ -153,28 +153,35 @@
             </section>
 
             <div id="bottom-panel">
+
+                <div id="panel-resizer" title="Drag to resize"></div>
+
                 <div class="panel-tabs">
+
                     <button class="panel-tab active" data-panel="output" data-i18n="output">OUTPUT</button>
                     <button class="panel-tab" data-panel="terminal" data-i18n="terminal">TERMINAL</button>
-                </div>
 
-                <div id="panel-header" class="panel-header">
                     <div id="execution-status" class="execution-status" style="display: none;">
 
-                        <span id="status-text">Running...</span>
+                        <span id="status-text">Running....</span>
                         <span id="execution-time"></span>
                         <button id="stop-btn" class="stop-btn" title="Stop (Ctrl+Alt+R)" style="display: none;">■ <span
-                                data-i18n="stop">Stop</span></button>
+                                data-i18n="stop">Stop</span>
+                        </button>
+                    </div>
+
+                    <div class="panel-actions">
+                        <button id="clear-output-btn" class="panel-action-btn" data-i18n="clear">Clear</button>
+                        <button id="copy-output-btn" class="panel-action-btn" data-i18n="copyOutput">Copy
+                            Output</button>
                     </div>
                 </div>
 
                 <div id="panel-content" class="panel-content-enhanced">
-                    <div id="output-content" style="display: none;">
-
-                    </div>
+                    <div id="output-content" style="display: none;"></div>
 
                     <div id="no-output" class="no-output-message">
-                        <p data-i18n="noOutput">No output yet. Run code to see results.</p>
+                        <p data-i18n="noOutput">No output yet. Run code to see results!</p>
                     </div>
 
                     <div id="terminal-content" style="display: none;">
@@ -185,14 +192,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="panel-footer">
-                    <button id="clear-output-btn" class="panel-footer-btn" data-i18n="clear">Clear</button>
-                    <button id="copy-output-btn" class="panel-footer-btn" data-i18n="copyOutput">Copy
-                        Output</button>
-                </div>
             </div>
-
             <footer id="status-bar">
                 <div id="status-left">
                     <span>DragonFoxIDE</span>
@@ -409,6 +409,7 @@
     <script src="js/bracket-matching.js"></script>
     <script src="js/code-execution.js"></script>
     <script src="js/search.js"></script>
+    <script src="js/panel-resize.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>
 </body>

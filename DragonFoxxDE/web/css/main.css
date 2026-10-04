@@ -205,7 +205,8 @@ button:focus-visible {
 }
 
 #bottom-panel {
-    height: 180px;
+    height: 260px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     background: var(--bg-secondary);
@@ -239,6 +240,7 @@ button:focus-visible {
 
 #panel-content {
     padding: 14px;
+    min-height: 0;
     color: var(--text-secondary);
     font-size: 13px;
 }
@@ -733,16 +735,69 @@ code.hljs {
 }
 
 
+#panel-resizer {
+    height: 4px;
+    flex-shrink: 0;
+    cursor: ns-resize;
+    background: transparent;
+    transition: background 0.15s ease;
+}
+
+#panel-resizer:hover,
+#panel-resizer.dragging {
+    background: var(--accent-blue);
+}
+
+.panel-tabs {
+
+    flex-shrink: 0;
+    padding-right: 8px;
+}
+
+.panel-tabs .execution-status {
+    align-self: center;
+    margin-left: 16px;
+    font-size: 11px;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    align-self: center;
+}
+
+.panel-action-btn {
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.panel-action-btn:hover {
+    background: var(--accent-hover);
+    color: var(--text-primary);
+}
+
+#output-content {
+    padding: 10px 14px;
+}
+
+
 /* Custom terminal style */
 #terminal-content {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
     background-color: var(--editor-bg);
     color: var(--editor-text);
     font-family: Consolas, "Courier New", monospace;
     font-size: 14px;
-    padding: 10px;
+    padding: 8px 12px;
     box-sizing: border-box;
 
 }
@@ -750,7 +805,8 @@ code.hljs {
 #terminal-output {
     margin: 0;
     white-space: pre-wrap;
-    flex-grow: 1;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
 

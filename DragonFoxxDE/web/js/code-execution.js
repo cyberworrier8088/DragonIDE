@@ -21,9 +21,13 @@ function detectExecutionLanguage(filePath) {
 }
 
 function showOutputPanel() {
-    const panel = document.getElementById("panel-content");
+    document.querySelector('.panel-tab[data-panel="output"]')?.click();
+
     const noOutput = document.getElementById("no-output");
     const outputContent = document.getElementById("output-content");
+
+    if (noOutput) noOutput.style.display = "none";
+    if (outputContent) outputContent.style.display = "block";
 
     if (noOutput) noOutput.style.display = "none";
     if (outputContent) outputContent.style.display = "block";
@@ -57,7 +61,8 @@ function addOutputLine(text, type = 'normal') {
     outputContent.appendChild(line);
 
     // auto-scroll to bottom
-    outputContent.scrollTop = outputContent.scrollHeight;
+    const panel = document.getElementById("panel-content");
+    if (panel) panel.scrollTop = panel.scrollHeight;
 }
 
 function showExecutionStatus(isRunning) {
@@ -238,7 +243,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const clearBtn = document.getElementById("clear-output-btn");
     if (clearBtn) {
-        clearBtn.addEventListener("click", clearOutput);
+        clearBtn.addEventListener("click", () => {
+            const terminal = document.getElementById("terminal-content");
+            if (terminal && terminal.style.display === "flex") {
+                document.getElementById("terminal-output").textContent = "";
+            } else {
+                clearOutput();
+            }
+        });
     }
 
     const copyBtn = document.getElementById("copy-output-btn");
@@ -251,6 +263,14 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             runCode();
         }
+    });
+
+
+    terminalContent?.addEventListener("click", () => {
+        if (!window.getSelection().toString()) {
+            terminalInput?.focus();
+        }
+
     });
 });
 
