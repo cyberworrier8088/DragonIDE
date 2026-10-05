@@ -89,8 +89,11 @@ pub fn data_set_preparing() {
 
     let (xb, yb) = get_batch(train_data, 4, 8);
 
-    crate::model::test_batch(&xb);
-    crate::model::test_batch(&yb);
+    println!("Input batch:");
+    println!("{:?}", xb);
+
+    println!("Target batch:");
+    println!("{:?}", yb);
 }
 
 fn get_batch(
