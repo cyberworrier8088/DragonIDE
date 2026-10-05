@@ -1,4 +1,9 @@
 
+pub mod config;
+
+pub use config::ModelConfig;
+
+
 use burn::backend::Wgpu;
 use burn::tensor::{Int, Tensor};
 

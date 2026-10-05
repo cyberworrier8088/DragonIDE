@@ -3,6 +3,7 @@ mod data;
 mod model;
 
 use std::fs;
+use model::ModelConfig;
 
 fn main() {
 
@@ -12,5 +13,9 @@ fn main() {
         data::get_data_set();
     }
 
-    data::data_set_preparing();
+    let config = ModelConfig::tiny(65);
+
+
+    println!("FoxAi configuration:");
+    println!("{:#?}", config);
 }
