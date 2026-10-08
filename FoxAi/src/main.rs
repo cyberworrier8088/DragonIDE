@@ -40,9 +40,21 @@ fn main() {
 
     let attention = CausalSelfAttention::<Wgpu>::new(&config, &device);
 
-    let (query, key, value) = attention.project(embeddings);
+    let (q, k, v) = attention.project(embeddings.clone());
 
-    println!("Q shape: {:?}", query.shape());
-    println!("K shape: {:?}", key.shape());
-    println!("V shape: {:?}", value.shape());
+    let q_heads = attention.split_heads(q);
+    let k_heads = attention.split_heads(k);
+    let v_heads = attention.split_heads(v);
+
+    println!("Q_heads shape: {:?}", q_heads.shape());
+    println!("K_heads shape: {:?}", k_heads.shape());
+    println!("V_heads shape: {:?}", v_heads.shape());
+
+    let scores = attention.attention_scores(
+        q_heads,
+        k_heads,
+    );
+
+    println!("attention scores shape: {:?}", scores.shape());
+
 }

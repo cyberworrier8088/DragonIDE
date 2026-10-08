@@ -49,4 +49,35 @@ impl<B: Backend> CausalSelfAttention<B> {
 
         (query, key, value)
     }
+
+    pub fn split_heads(
+        &self,
+        x: Tensor<B, 3>,
+    ) -> Tensor<B, 4> {
+
+        let [batch_size, sequence_length, _] = x.dims();
+
+        x.reshape([
+            batch_size,
+            sequence_length,
+            self.num_heads,
+            self.head_dim,
+        ]).swap_dims(1, 2)
+    }
+
+    pub fn attention_scores(
+        &self,
+        query: Tensor<B, 4>,
+        key: Tensor<B, 4>,
+    ) -> Tensor<B, 4> {
+
+        // [B, H, T, Dh] x [B, H, Dh, T]
+        let key_transposed = key.swap_dims(2, 3);
+
+        let scores = query.matmul(key_transposed);
+
+        let scale = (self.head_dim as f32).sqrt();
+
+        scores / scale
+    }
 }
