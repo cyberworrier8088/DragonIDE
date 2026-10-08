@@ -3,18 +3,17 @@ mod data;
 mod model;
 
 
-use burn::backend::Wgpu;
-use burn::tensor::{Int, Tensor};
+use burn::tensor::Tensor;
 
 use std::fs;
-use model::{ModelConfig, FoxAiModel, TransformerBlock};
+use model::{ModelConfig, FoxAiModel};
 
 fn main() {
 
     if fs::metadata("dataset").is_ok() {
         println!("Already downloaded");
     } else {
-        data::get_data_set();
+        let _ = data::get_data_set();
     }
 
     let config = ModelConfig::tiny(65);

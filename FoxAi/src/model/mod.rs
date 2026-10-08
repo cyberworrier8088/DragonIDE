@@ -12,5 +12,3 @@ pub use attention::CausalSelfAttention;
 pub use config::ModelConfig;
 pub use model::FoxAiModel;
 pub use feed_forward::FeedForward;
-pub use block::TransformerBlock;
-pub use lm_head::LmHead;

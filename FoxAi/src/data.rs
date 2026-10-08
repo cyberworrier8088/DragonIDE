@@ -1,9 +1,11 @@
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::fs;
-use std::process::Command;ss
+use std::process::Command;
 
 use burn::prelude::*;
-use burn::tensor::TensorDate;
+use burn::tensor::TensorData;
 use rand::RngExt;
 
 pub const DATASET_DIR: &str = "dataset";
@@ -20,7 +22,7 @@ pub fn get_data_set() -> Result<(), String> {
 
     println!("downloading...");
 
-    let status = Command::new("curl").arg("-L").arg("-f").arg("-o").arg(DATASET_FILE).arg(url).status().map_err(|e| format("Could not run curl: {}", e))?;
+    let status = Command::new("curl").arg("-L").arg("-f").arg("-o").arg(DATASET_FILE).arg(url).status().map_err(|e| format!("Could not run curl: {}", e))?;
 
     if status.success() {
         println!("Downloaded");
@@ -55,7 +57,7 @@ impl CharDataset {
         chars.sort();
         chars.dedup();
 
-        let mut stoi: HashMap::new();
+        let mut stoi: HashMap<char, i32> = HashMap::new();
 
         for (i, &ch) in chars.iter().enumerate() {
             stoi.insert(ch, i as i32);
@@ -80,7 +82,7 @@ impl CharDataset {
         )
     }
 
-    pub fn vocab_size() -> usize {
+    pub fn vocab_size(&self) -> usize {
         self.chars.len()
     }
 
@@ -110,7 +112,7 @@ pub fn get_batch<B: Backend>(
         block_size
     );
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let mut x = Vec::with_capacity(batch_size * block_size);
     let mut y = Vec::with_capacity(batch_size * block_size);
