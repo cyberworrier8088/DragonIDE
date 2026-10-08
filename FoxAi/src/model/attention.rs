@@ -1,6 +1,7 @@
 use burn::module::Module;
 use burn::nn::{Linear, LinearConfig};
 use burn::prelude::*;
+use burn::tensor::activation::softmax;
 
 use super::ModelConfig;
 
@@ -102,11 +103,53 @@ impl<B: Backend> CausalSelfAttention<B> {
             }
         }
 
-        let mask = Tensor::<B, 2>::from_floats(
+        let mask = Tensor::<B, 1>::from_floats(
             mask_data.as_slice(),
             &device,
         ).reshape([sequence_length, sequence_length]).unsqueeze::<3>().unsqueeze::<4>().repeat_dim(0, batch_size).repeat_dim(1, num_heads);
 
         scores + mask
+    }
+
+    pub fn attention_weights(
+        &self,
+        masked_scores: Tensor<B, 4>,
+    ) -> Tensor<B, 4> {
+        softmax(masked_scores, 3)
+    }
+
+    pub fn weighted_values(
+        &self,
+        attention_weights: Tensor<B, 4>,
+        value: Tensor<B, 4>,
+    ) -> Tensor<B, 4> {
+        attention_weights.matmul(value)
+    }
+
+
+    pub fn merge_heads(
+        &self,
+        x: Tensor<B, 4>,
+    ) -> Tensor<B, 3> {
+
+        let [batch_size, num_heads, sequence_length, head_dim] = x.dims();
+
+        assert_eq!(num_heads, self.num_heads);
+        assert_eq!(head_dim, self.head_dim);
+
+        x.swap_dims(1, 2).reshape(
+            [
+                batch_size,
+                sequence_length,
+                self.num_heads * self.head_dim,
+            ]
+        )
+    }
+
+    pub fn output_projection(
+        &self,
+        x: Tensor<B, 3>,
+    ) -> Tensor<B, 3> {
+        self.output.forward(x)
     }
 }

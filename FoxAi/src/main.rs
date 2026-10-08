@@ -61,4 +61,20 @@ fn main() {
 
     println!("Masked attention score shape: {:?}", masked_scores.shape());
 
+    let weights = attention.attention_weights(masked_scores);
+
+    println!("Attention weights shape: {:?}", weights.shape());
+
+    let output = attention.weighted_values(weights, v_heads);
+
+    println!("Attention output shape: {:?}", output.shape());
+
+    let merged = attention.merge_heads(output);
+
+    println!("Merged attention shape: {:?}", merged.shape());
+
+    let projected = attention.output_projection(merged);
+
+    println!("Projected attention shape: {:?}", projected.shape());
+
 }
