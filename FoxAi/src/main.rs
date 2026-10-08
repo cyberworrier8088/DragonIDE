@@ -27,26 +27,12 @@ fn main() {
         &device,
     );
 
-    let tokens: Tensor<Wgpu, 2, Int> = Tensor::from_ints(
-        [[1, 2, 3, 4, 5, 6, 7, 8]],
-        &device,
+    let output = model.forward(
+        Tensor::from_ints(
+            [[1, 2, 3, 4, 5, 6, 7, 8]],
+            &device,
+        )
     );
 
-    let embeddings = model.forward(tokens);
-
-    println!("Embeddings:");
-    println!("{:#?}", embeddings);
-
-    // attantion temprory test :)
-    let block = TransformerBlock::<Wgpu>::new(
-        &config,
-        &device,
-    );
-
-    let block_output = block.forward(embeddings);
-
-    println!(
-        "Transformer block output shapeL {:?}",
-        block_output.shape()
-    );
+    println!("Model output shape: {:?}", output.dims());
 }
