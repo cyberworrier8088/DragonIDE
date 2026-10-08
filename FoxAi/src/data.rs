@@ -76,7 +76,7 @@ pub fn data_set_preparing() {
 
     println!("Number of Tokens: {}", data.len());
 
-    /// first 1000 tokens
+    // first 1000 tokens
     println!("{:?}", &data[..1000]);
 
     let n = (0.9 * data.len() as f64) as usize;

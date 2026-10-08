@@ -35,14 +35,11 @@ impl<B: Backend> TokenAndPositionEmbeddings<B> {
 
         let positions: Vec<i64> = (0..sequence_length).map(|position| position as i64).collect();
 
-        let positions = Tensor::<B, 1, Int>::from_ints(
-            positions.as_slice(),
-            &token_embeddings.device(),
-        );
+        let positions = Tensor::<B, 1, Int>::from_ints(positions.as_slice(), &token_embeddings.device());
+
+        let positions = positions.unsqueeze::<2>().repeat_dim(0, batch_size);
 
         let position_embeddings = self.position_embedding.forward(positions);
-
-        let position_embeddings = position_embeddings.unsqueeze::<3>().repeat_dim(0, batch_size);
 
         token_embeddings + position_embeddings
     }
