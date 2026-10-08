@@ -80,4 +80,33 @@ impl<B: Backend> CausalSelfAttention<B> {
 
         scores / scale
     }
+
+    pub fn apply_causal_mask(
+        &self,
+        scores: Tensor<B, 4>,
+    ) -> Tensor<B, 4> {
+
+        let [batch_size, num_heads, sequence_length, _] = scores.dims();
+
+        let device = scores.device();
+
+        let mut mask_data = Vec::with_capacity(sequence_length * sequence_length);
+
+        for i in 0..sequence_length {
+            for j in 0..sequence_length {
+                if j <= i {
+                    mask_data.push(0.0f32);
+                } else {
+                    mask_data.push(f32::NEG_INFINITY);
+                }
+            }
+        }
+
+        let mask = Tensor::<B, 2>::from_floats(
+            mask_data.as_slice(),
+            &device,
+        ).reshape([sequence_length, sequence_length]).unsqueeze::<3>().unsqueeze::<4>().repeat_dim(0, batch_size).repeat_dim(1, num_heads);
+
+        scores + mask
+    }
 }

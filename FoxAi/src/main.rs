@@ -57,4 +57,8 @@ fn main() {
 
     println!("attention scores shape: {:?}", scores.shape());
 
+    let masked_scores = attention.apply_causal_mask(scores);
+
+    println!("Masked attention score shape: {:?}", masked_scores.shape());
+
 }
