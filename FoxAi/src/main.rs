@@ -7,8 +7,7 @@ use burn::backend::Wgpu;
 use burn::tensor::{Int, Tensor};
 
 use std::fs;
-use model::{ModelConfig, FoxAiModel};
-use model::CausalSelfAttention;
+use model::{ModelConfig, FoxAiModel, TransformerBlock};
 
 fn main() {
 
@@ -38,43 +37,16 @@ fn main() {
     println!("Embeddings:");
     println!("{:#?}", embeddings);
 
-    let attention = CausalSelfAttention::<Wgpu>::new(&config, &device);
-
-    let (q, k, v) = attention.project(embeddings.clone());
-
-    let q_heads = attention.split_heads(q);
-    let k_heads = attention.split_heads(k);
-    let v_heads = attention.split_heads(v);
-
-    println!("Q_heads shape: {:?}", q_heads.shape());
-    println!("K_heads shape: {:?}", k_heads.shape());
-    println!("V_heads shape: {:?}", v_heads.shape());
-
-    let scores = attention.attention_scores(
-        q_heads,
-        k_heads,
+    // attantion temprory test :)
+    let block = TransformerBlock::<Wgpu>::new(
+        &config,
+        &device,
     );
 
-    println!("attention scores shape: {:?}", scores.shape());
+    let block_output = block.forward(embeddings);
 
-    let masked_scores = attention.apply_causal_mask(scores);
-
-    println!("Masked attention score shape: {:?}", masked_scores.shape());
-
-    let weights = attention.attention_weights(masked_scores);
-
-    println!("Attention weights shape: {:?}", weights.shape());
-
-    let output = attention.weighted_values(weights, v_heads);
-
-    println!("Attention output shape: {:?}", output.shape());
-
-    let merged = attention.merge_heads(output);
-
-    println!("Merged attention shape: {:?}", merged.shape());
-
-    let projected = attention.output_projection(merged);
-
-    println!("Projected attention shape: {:?}", projected.shape());
-
+    println!(
+        "Transformer block output shapeL {:?}",
+        block_output.shape()
+    );
 }

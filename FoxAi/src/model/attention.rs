@@ -152,4 +152,29 @@ impl<B: Backend> CausalSelfAttention<B> {
     ) -> Tensor<B, 3> {
         self.output.forward(x)
     }
+
+    pub fn forward(
+        &self,
+        input: Tensor<B, 3>,
+    ) -> Tensor<B, 3> {
+
+
+        let (query, key, value) = self.project(input);
+
+        let query = self.split_heads(query);
+        let key = self.split_heads(key);
+        let value = self.split_heads(value);
+
+        let scores = self.attention_scores(query, key);
+
+        let scores = self.apply_causal_mask(scores);
+
+        let weights = self.attention_weights(scores);
+
+        let output = self.weighted_values(weights, value);
+
+        let output = self.merge_heads(output);
+
+        self.output_projection(output)
+    }
 }
