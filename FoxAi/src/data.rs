@@ -1,121 +1,132 @@
-use std::process::Command;
-use std::fs;
 use std::collections::HashMap;
+use std::fs;
+use std::process::Command;ss
+
+use burn::prelude::*;
+use burn::tensor::TensorDate;
 use rand::RngExt;
 
-pub fn get_data_set() {
+pub const DATASET_DIR: &str = "dataset";
+pub const DATASET_FILE: &str = "dataset/test-training-data.txt";
+
+/// download tiny shakesperare
+pub fn get_data_set() -> Result<(), String> {
+
     let url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt";
-    let output_dir = "dataset";
-    let output_file = format!("{}/test-data.txt", output_dir);
 
-    println!("Creating folder '{}'..", output_dir);
+    println!("Creating folder: {}", DATASET_DIR);
 
+    fs::create_dir_all(DATASET_DIR).map_err(|e| format!("Failed creating dir '{}': {}", DATASET_DIR, e))?;
 
-    if let Err(e) = fs::create_dir_all(output_dir) {
-        println!("Failed men creating dir: {}", e);
-        return;
-    } 
+    println!("downloading...");
 
-
-
-    println!("Downloading...");
-
-    // run the native 'curl' command built into your OS
-    let status = Command::new("curl")
-    .arg("-L")
-    .arg("-o")
-    .arg(&output_file)
-    .arg(url)
-    .status()
-    .expect("Bro sorry. i am...");
-
+    let status = Command::new("curl").arg("-L").arg("-f").arg("-o").arg(DATASET_FILE).arg(url).status().map_err(|e| format("Could not run curl: {}", e))?;
 
     if status.success() {
-        println!("Downloaded Your Wife!");
+        println!("Downloaded");
+        Ok(())
     } else {
-        println!("downlaod Failed");
+
+        // Remove a half - writern file so the next run download again
+        let _ = fs::remove_file(DATASET_FILE);
+        Err("Dowload failed".to_string())
+    }
+}
+
+// charcter-level dataset: evary charcter is on a token
+
+pub struct CharDataset {
+    pub chars: Vec<char>,
+    stoi: HashMap<char, i32>,
+
+    pub train: Vec<i32>,
+    pub val: Vec<i32>,
+}
+
+impl CharDataset {
+
+    pub fn load(path: &str) -> Result<Self, String> {
+
+        let text = fs::read_to_string(path).map_err(|e| format!("Coukd not read {}: {}", path, e))?;
+
+        // creaye the vacabulary
+        let mut chars: Vec<char> = text.chars().collect();
+
+        chars.sort();
+        chars.dedup();
+
+        let mut stoi: HashMap::new();
+
+        for (i, &ch) in chars.iter().enumerate() {
+            stoi.insert(ch, i as i32);
+
+        }
+
+        // encode the entire dataset
+        let data: Vec<i32> = text.chars().map(|ch| stoi[&ch]).collect();
+        // 90& train, 10% validation
+        let n = (0.9 * data.len() as f64) as usize;
+
+        let train = data[..n].to_vec();
+        let val = data[n..].to_vec();
+
+        Ok(
+            Self {
+                chars,
+                stoi,
+                train,
+                val,
+            }
+        )
+    }
+
+    pub fn vocab_size() -> usize {
+        self.chars.len()
+    }
+
+    // Text -> tokens
+    pub fn encode(&self, text: &str) -> Vec<i32> {
+        text.chars().filter_map(|ch| self.stoi.get(&ch).copied()).collect()
+    }
+
+    // Tokens -> text
+    pub fn decode(&self, tokens: &[i32]) -> String {
+
+        tokens.iter().map(|&t| self.chars.get(t as usize).copied().unwrap_or('?')).collect()
     }
 }
 
 
-pub fn data_set_preparing() {
-
-    let text = fs::read_to_string("dataset/test-data.txt").unwrap();
-
-
-    // Craete a vocabularys
-    let mut chars: Vec<char> = text.chars().collect();
-
-    chars.sort();
-    chars.dedup();
-
-    let vocab_size = chars.len();
-
-    println!("{}", chars.iter().collect::<String>());
-    println!("{}", vocab_size);
-
-
-    // character -> integer
-    let mut stoi = HashMap::new();
-
-    // integer -> character
-    let mut itos = HashMap::new();
-
-
-    for (i, &ch) in chars.iter().enumerate() {
-        stoi.insert(ch, i);
-        itos.insert(i, ch);
-    }
-
-    // Encodee the entir dataset
-    let mut data = Vec::new();
-
-    for ch in text.chars() {
-        data.push(stoi[&ch]);
-    }
-
-    println!("Number of Tokens: {}", data.len());
-
-    // first 1000 tokens
-    println!("{:?}", &data[..1000]);
-
-    let n = (0.9 * data.len() as f64) as usize;
-
-    let train_data = &data[..n];
-    let val_data = &data[n..];
-
-    println!("Train: {}", train_data.len());
-    println!("Validation: {}", val_data.len());
-
-    let (xb, yb) = get_batch(train_data, 4, 8);
-
-    println!("Input batch:");
-    println!("{:?}", xb);
-
-    println!("Target batch:");
-    println!("{:?}", yb);
-}
-
-fn get_batch(
-    data: &[usize],
+pub fn get_batch<B: Backend>(
+    data: &[i32],
     batch_size: usize,
     block_size: usize,
-) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
+    device: &B::Device,
+) -> (Tensor<B, 2, Int>, Tensor<B, 2, Int>) {
 
-    let mut rng = rand::rng();
+    assert!(
+        data.len() > block_size + 1,
+        "dataset is too small for block_size {}",
+        block_size
+    );
 
-    let mut x = Vec::new();
-    let mut y = Vec::new();
+    let mut rng = rand::thread_rng();
+
+    let mut x = Vec::with_capacity(batch_size * block_size);
+    let mut y = Vec::with_capacity(batch_size * block_size);
 
     for _ in 0..batch_size {
+
         let i = rng.random_range(0..data.len() - block_size);
 
-        let input = data[i..i + block_size].to_vec();
-        let target = data[i + 1..i + block_size + 1].to_vec();
-
-        x.push(input);
-        y.push(target);
+        x.extend_from_slice(&data[i..i + block_size]);
+        y.extend_from_slice(&data[i + 1..i + block_size + 1]);
     }
 
+    let x = Tensor::<B, 2, Int>::from_ints(TensorData::new(x, [batch_size, block_size]), device);
+
+    let y = Tensor::<B, 2, Int>::from_ints(TensorData::new(y, [batch_size, block_size]), device);
+
     (x, y)
+
 }
