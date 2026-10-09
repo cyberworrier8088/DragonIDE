@@ -9,7 +9,7 @@ use crate::model::{FoxAiModel, ModelConfig};
 
 pub type TrainBackend = Autodiff<Wgpu>;
 
-pub fn train(ds: &CharDataset, config: &ModelConfig) {
+pub fn train(ds: &CharDataset, config: &ModelConfig) -> FoxAiModel<TrainBackend>{
 
     let device = Default::default();
 
@@ -44,4 +44,6 @@ pub fn train(ds: &CharDataset, config: &ModelConfig) {
         let grads = GradientsParams::from_grads(grads, &model);
         model = optim.step(lr, model, grads);
     }
+
+    model
 }

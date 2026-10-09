@@ -1,13 +1,16 @@
 
 mod data;
+mod generate;
 mod model;
 mod train;
 
 
-use burn::tensor::Tensor;
 
+use burn::backend::Wgpu;
+use burn::module::AutodiffModule;
+use model::ModelConfig;
 use std::fs;
-use model::{ModelConfig, FoxAiModel};
+
 
 fn main() {
 
@@ -18,5 +21,20 @@ fn main() {
     let ds = data::CharDataset::load(data::DATASET_FILE).unwrap();
     let config = ModelConfig::tiny(ds.vocab_size());
 
-    train::train(&ds, &config);
+    // train, then drop the autodiff part <not needed for generating>
+    let model = train::train(&ds, &config).valid();
+
+    let device = Default::default();
+    let text = generate::generate::<Wgpu>(
+        &model,
+        &ds,
+        "ROMEO:",
+        300,
+        config.context_length,
+        0.8,
+        10,
+        &device,
+    );
+
+    println!("\n----- generated text -----\n{}", text);
 }
