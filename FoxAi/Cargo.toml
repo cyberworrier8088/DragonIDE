@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-burn = { version = "0.21.0", features = ["wgpu"] }
+burn = { version = "0.21.0", features = ["wgpu", "autodiff"] }
 rand = "0.10.3"
 rng = "0.1.0"
