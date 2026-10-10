@@ -4,6 +4,8 @@ mod generate;
 mod model;
 mod train;
 mod checkpoint;
+mod tokenizer;
+mod corpus;
 
 
 
@@ -25,6 +27,17 @@ fn main() {
 
     // useage: cargo run --release -- train  ||   cargo run --release -- gen
     let mode = std::env::args().nth(1).unwrap_or_else(|| "gen".to_string());
+
+    if mode == "corpus" {
+        corpus::build().expect("corpus failed");
+        return;
+    }
+
+    if mode == "tok" {
+        let tok = tokenizer::train_and_save(corpus::CODE_FILE, tokenizer::VOCAB_SIZE, 8_000_000).expect("tokenizer failed");
+        tokenizer::demo(&tok);
+        return;
+    }
 
     if mode == "train" {
         let model = train::train(&ds, &config).valid();

@@ -1,7 +1,6 @@
 use burn::backend::{Autodiff, Wgpu};
 use burn::nn::loss::CrossEntropyLossConfig;
 use burn::optim::{AdamConfig, GradientsParams, Optimizer};
-use burn::prelude::*;
 
 
 use crate::data::{get_batch, CharDataset};
@@ -17,7 +16,7 @@ pub fn train(ds: &CharDataset, config: &ModelConfig) -> FoxAiModel<TrainBackend>
     let mut optim = AdamConfig::new().init();
     let loss_fn = CrossEntropyLossConfig::new().init(&device);
     
-    let steps = 1000;
+    let steps = 5000;
     let batch_size = 32;
     let lr = 1e-3;
 

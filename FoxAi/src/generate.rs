@@ -44,7 +44,7 @@ pub fn generate<B: Backend>(
             *s /= temperature;
         }
 
-        /// top-k: keep only the l best candidates
+        // top-k: keep only the l best candidates
         let mut idx: Vec<usize> = (0..vocab).collect();
         idx.sort_by(|&a, &b|  scores[b].partial_cmp(&scores[a]).unwrap());
         idx.truncate(top_k.min(vocab));
@@ -54,7 +54,7 @@ pub fn generate<B: Backend>(
         let exps: Vec<f32> = idx.iter().map(|&i| (scores[i] - max).exp()).collect();
         let sum: f32 = exps.iter().sum();
 
-        /// sample
+        // sample
         let mut r = rng.random::<f32>() * sum;
         let mut chosen = idx[0];
         for (k, &i) in idx.iter().enumerate() {
