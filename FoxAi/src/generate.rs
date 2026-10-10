@@ -2,12 +2,12 @@ use burn::prelude::*;
 use burn::tensor::TensorData;
 use rand::RngExt;
 
-use crate::data::CharDataset;
+use crate::tokenizer::{Tokenizer, EOS};
 use crate::model::FoxAiModel;
 
 pub fn generate<B: Backend>(
     model: &FoxAiModel<B>,
-    ds: &CharDataset,
+    tok: &Tokenizer,
     prompt: &str,
     max_new_tokens: usize,
     context_length: usize,
@@ -16,9 +16,10 @@ pub fn generate<B: Backend>(
     device: &B::Device,
 ) -> String {
 
-    let mut tokens: Vec<i32> = ds.encode(prompt);
+    let mut tokens: Vec<i32> = tok.encode(prompt).into_iter().map(|t| t as i32).collect();
+
     if tokens.is_empty() {
-        tokens.push(0);
+        tokens.push(EOS as i32);
     }
 
     let mut rng = rand::rng();
@@ -66,7 +67,12 @@ pub fn generate<B: Backend>(
         }
 
         tokens.push(chosen as i32);
+
+        if chosen as u32 == EOS {
+            break; // the model decided the code is finished
+        }
     }
 
-    ds.decode(&tokens)
+    let ids: Vec<u32> = tokens.iter().map(|&t| t as u32).collect();
+    tok.decode(&ids)
 }

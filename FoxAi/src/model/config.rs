@@ -7,6 +7,7 @@ pub struct ModelConfig {
     pub num_layers: usize,
 }
 
+#[allow(dead_code)]
 impl ModelConfig {
     pub fn tiny(vocab_size: usize) -> Self {
 
@@ -16,6 +17,16 @@ impl ModelConfig {
             d_model: 64,
             num_heads: 4,
             num_layers: 2,
+        }
+    }
+
+    pub fn small(vocab_size: usize) -> Self {
+        Self {
+            vocab_size,
+            context_length: 128,
+            d_model: 128,
+            num_heads: 4,
+            num_layers: 4,
         }
     }
 }

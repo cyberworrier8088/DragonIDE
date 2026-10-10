@@ -157,31 +157,50 @@ impl Tokenizer {
         Self::from_merges(merges)
     }
 
-    // test -> token ids (no spicial tokens added)
-    pub fn encode(&self, text: &str) -> Vec<u32> {
-        let mut out = Vec::new();
+    fn encode_piece(&self, piece: &[u8]) -> Vec<u32> {
 
-        for piece in pre_tokenize(text.as_bytes()) {
+        let mut ids: Vec<u32> = piece.iter().map(|&b| b as u32).collect();
 
-            let mut ids: Vec<u32> = piece.iter().map(|&b| b as u32).collect();
+        loop {
 
-            loop {
-                // find the pair that was learned earliest
-                let mut best: Option<(u32, usize)> = None;
-                for i in 0..ids.len().saturating_sub(1) {
-                    if let Some(&new_id) = self.ranks.get(&(ids[i], ids[i + 1])) {
-                        if best.map_or(true, |(b, _)| new_id < b) {
-                            best = Some((new_id, i));
-                        }
+            let mut best: Option<(u32, usize)> = None;
+            for i in 0..ids.len().saturating_sub(1) {
+                if let Some(&new_id) = self.ranks.get(&(ids[i], ids[i + 1])) {
+
+                    if best.map_or(true, |(b, _)| new_id < b) {
+                        best = Some((new_id, i));
                     }
                 }
-
-                let Some((new_id, pos)) = best else { break };
-                let pair = (ids[pos], ids[pos + 1]);
-                merge_pair(&mut ids, pair, new_id);
             }
 
-            out.extend(ids);
+            let Some((new_id, pos)) = best else { break };
+            let pair = (ids[pos], ids[pos + 1]);
+            merge_pair(&mut ids, pair, new_id);
+
+        }
+        ids
+    }
+
+    pub fn encode(&self, text: &str) -> Vec<u32> {
+        let mut out = Vec::new();
+        for piece in pre_tokenize(text.as_bytes()) {
+            out.extend(self.encode_piece(piece));
+        }
+        out
+    }
+
+    pub fn encode_cached(&self, text: &str, cache: &mut HashMap<Vec<u8>, Vec<u32>>) -> Vec<u32> {
+        let mut out = Vec::new();
+        for piece in pre_tokenize(text.as_bytes()) {
+            if let Some(ids) = cache.get(piece) {
+                out.extend_from_slice(ids);
+                continue;
+            }
+
+            let ids = self.encode_piece(piece);
+            out.extend_from_slice(&ids);
+            cache.insert(piece.to_vec(), ids);
+
         }
         out
     }
