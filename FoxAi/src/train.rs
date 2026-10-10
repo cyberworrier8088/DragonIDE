@@ -17,7 +17,7 @@ pub fn train(ds: &CharDataset, config: &ModelConfig) -> FoxAiModel<TrainBackend>
     let mut optim = AdamConfig::new().init();
     let loss_fn = CrossEntropyLossConfig::new().init(&device);
     
-    let steps = 500;
+    let steps = 1000;
     let batch_size = 32;
     let lr = 1e-3;
 

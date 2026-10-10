@@ -3,6 +3,7 @@ mod data;
 mod generate;
 mod model;
 mod train;
+mod checkpoint;
 
 
 
@@ -20,21 +21,31 @@ fn main() {
 
     let ds = data::CharDataset::load(data::DATASET_FILE).unwrap();
     let config = ModelConfig::tiny(ds.vocab_size());
-
-    // train, then drop the autodiff part <not needed for generating>
-    let model = train::train(&ds, &config).valid();
-
     let device = Default::default();
-    let text = generate::generate::<Wgpu>(
-        &model,
-        &ds,
-        "ROMEO:",
-        300,
-        config.context_length,
-        0.8,
-        10,
-        &device,
-    );
 
-    println!("\n----- generated text -----\n{}", text);
+    // useage: cargo run --release -- train  ||   cargo run --release -- gen
+    let mode = std::env::args().nth(1).unwrap_or_else(|| "gen".to_string());
+
+    if mode == "train" {
+        let model = train::train(&ds, &config).valid();
+        checkpoint::save(&model).expect("save failed");
+        println!("saved to {}.mpk", checkpoint::MODEL_PATH);
+
+    } else {
+
+        let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoints found, run with 'train' first");
+
+        let text = generate::generate::<Wgpu>(
+            &model,
+            &ds,
+            "ROMEO:",
+            300,
+            config.context_length,
+            0.8,
+            10,
+            &device,
+        );
+
+        println!("{}", text);
+    }
 }
