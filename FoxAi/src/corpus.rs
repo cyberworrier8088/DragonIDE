@@ -7,13 +7,15 @@ use std::path::{Path, PathBuf};
 
 pub const CODE_FILE: &str = "dataset/code.txt";
 
-const VALID_EXTENSIONS: &[&str] = &[
-    "rs", "js", "ts", "py", "html", "css", "json", "toml", "c", "cpp", "h", "java", "md",
-];
+const VALID_EXTENSIONS: &[&str] = &["rs"];
 
 const IGNORE_DIRS: &[&str] = &[
     "target", ".git", "node_modules", "checkpoints", "dataset", "img",
 ];
+
+
+const MAX_FILE_BYTES: u64 = 200_000;
+const MAX_TOTAL_BYITES: usize = 150_000_000;
 
 /// Collect source files and assemble the training corpus into `dataset/code.txt`.
 pub fn build() -> Result<(), String> {
@@ -32,11 +34,14 @@ pub fn build() -> Result<(), String> {
     let mut visited: HashSet<PathBuf> = HashSet::new();
 
     // Look in current directory (FoxAi) and parent directory (DragonIDE)
-    let roots = ["src", "../DragonFoxxDE", ".."];
+    let mut roots: Vec<PathBuf> = vec![PathBuf::from("src"), PathBuf::from("..")];
 
-    for root in &roots {
-        let p = Path::new(root);
+    let home = std::env::var("USERPROFILE").or_else(|_| std::env::var("HOME")).unwrap_or_default();
+    roots.push(PathBuf::from(home).join(".cargo").join("registry").join("src"));
+
+    for p in &roots {
         if p.exists() {
+            println!("Scanning {}", p.display());
             collect_files(p, &mut out_file, &mut count, &mut total_bytes, &mut visited)?;
         }
     }
@@ -66,6 +71,10 @@ fn collect_files(
     total_bytes: &mut usize,
     visited: &mut HashSet<PathBuf>,
 ) -> Result<(), String> {
+
+    if *total_bytes >= MAX_TOTAL_BYITES {
+        return Ok(());
+    }
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.flatten() {
             let path = entry.path();
@@ -84,6 +93,13 @@ fn collect_files(
             } else if path.is_file() {
                 if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                     if VALID_EXTENSIONS.contains(&ext) {
+
+                        let too_big = entry.metadata().map(|m| m.len() > MAX_FILE_BYTES).unwrap_or(true);
+                        if too_big {
+                            continue;
+                        }
+
+                        
                         if let Ok(content) = fs::read(&path) {
                             if !content.is_empty() {
                                 let _ = out.write_all(&content);
