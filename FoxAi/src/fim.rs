@@ -25,8 +25,9 @@ pub fn get_fim_batch<B: Backend>(
 
         let seq: Vec<i32> = if rng.random::<f32>() < fim_rate {
 
-            let body = &raw[..n- 4];
-            let len = body.len();
+            // random total length, so <fim_middle> appears ate evary poss
+            let total = rng.random_range(24..=n);
+            let body = &raw[..total -1]
 
             let mid = rng.random_range(1..=48.min(len)); // 1 to 48 tokens, like a real completation
             let a = rng.random_range(0..=len - mid);
@@ -40,6 +41,10 @@ pub fn get_fim_batch<B: Backend>(
             s.push(FIM_MIDDLE as i32);
             s.extend_from_slice(&body[a..b]);
             s.push(EOS as i32);
+
+            while s.len() < n {
+                s.push(PAD as i32); // padding, ignored by the loss
+            }
             s
         } else {
             raw.to_vec()

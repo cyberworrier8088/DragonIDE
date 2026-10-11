@@ -40,14 +40,14 @@ pub fn train(
     train_data: &[i32],
     val_data: &[i32],
     config: &ModelConfig,
-    steps: usize,
+    steps: usize, // how many training steps to run
 ) -> FoxAiModel<TrainBackend> {
 
     let device = crate::backend::device();
 
     let mut model = FoxAiModel::<TrainBackend>::new(config, &device);
     let mut optim = AdamConfig::new().init();
-    let loss_fn = CrossEntropyLossConfig::new().init(&device);
+    let loss_fn = CrossEntroyLossConfig::new().with_pad_tokens(Some(vec![crate::tokenizer::PAD as usize])).init(&device)
 
     let batch_size = 32;
     let base_lr = 4e-4_f64;
