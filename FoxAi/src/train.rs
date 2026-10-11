@@ -11,6 +11,9 @@ use crate::model::{FoxAiModel, ModelConfig};
 pub type TrainBackend = Autodiff<Wgpu>;
 
 fn val_loss(model: &FoxAiModel<TrainBackend>, data: &[i32], config: &ModelConfig) -> f32 {
+    if data.len() <= config.context_length + 1 {
+        return 0.0;
+    }
 
     let device = Default::default();
     let m = model.valid(); // no gradients needed
@@ -47,7 +50,7 @@ pub fn train(
     let started = Instant::now();
 
     for step in 0..=steps {
-        let (x, y) = get_batch::<TrainBackend>(train_data, batch_size, config.context_length, &device);
+        let (x, y) = crate::fim::get_fim_batch::<TrainBackend>(train_data, batch_size, config.context_length, 0.5, &device);
 
         let logits = model.forward(x);
         let [b, t, v] = logits.dims();

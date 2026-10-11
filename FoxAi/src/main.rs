@@ -7,6 +7,7 @@ mod checkpoint;
 mod tokenizer;
 mod corpus;
 mod token_data;
+mod fim;
 
 
 
@@ -43,6 +44,27 @@ fn main() {
             let model = train::train(&train_ids, &val_ids, &config, 3000).valid();
             checkpoint::save(&model).expect("save failed");
             println!("saved to {}.mpk", checkpoint::MODEL_PATH);
+        }
+        "fim" => {
+            let device = Default::default();
+            let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
+            let config = ModelConfig::small(tok.vocab_size());
+            let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
+            
+            let out = generate::complete::<Wgpu>(
+                &model,
+                &tok,
+                "fn add(a: i32, b: i32) ->  i32 {\n    ",
+                "\n}",
+                40,
+                config.context_length,
+                0.4,
+                5,
+                &device,
+            );
+            println!("[{}]", out);
+
+            
         }
 
         _ => {

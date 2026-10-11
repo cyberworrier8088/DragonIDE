@@ -84,5 +84,11 @@ pub fn load() -> Result<(Vec<i32>, Vec<i32>), String> {
         }
     }
 
+    if val.is_empty() && data.len() > 10 {
+        let split = (data.len() as f64 * 0.9) as usize;
+        train = data[..split].to_vec();
+        val = data[split..].to_vec();
+    }
+
     Ok((train, val))
 }
