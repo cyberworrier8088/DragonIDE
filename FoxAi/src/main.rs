@@ -41,12 +41,12 @@ fn main() {
             let (train_ids, val_ids) = token_data::load().expect("run `tok` first");
             println!("train tokens: {} | val tokens: {}", train_ids.len(), val_ids.len());
 
-            let model = train::train(&train_ids, &val_ids, &config, 3000).valid();
+            let model = train::train(&train_ids, &val_ids, &config, 20000).valid();
             checkpoint::save(&model).expect("save failed");
             println!("saved to {}.mpk", checkpoint::MODEL_PATH);
         }
         "fim" => {
-            let device = Default::default();
+            let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
             let config = ModelConfig::small(tok.vocab_size());
             let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
@@ -68,7 +68,7 @@ fn main() {
         }
 
         _ => {
-            let device = Default::default();
+            let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
             let config = ModelConfig::small(tok.vocab_size());
             let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
