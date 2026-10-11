@@ -29,4 +29,14 @@ impl ModelConfig {
             num_layers: 4,
         }
     }
+
+    pub fn medium(vocab_size: usize) -> Self {
+        Self {
+            vocab_size,
+            context_length: 256,
+            d_model: 256,
+            num_heads: 8,
+            num_layers: 6,
+        }
+    }
 }

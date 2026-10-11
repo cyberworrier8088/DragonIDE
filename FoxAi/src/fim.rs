@@ -27,8 +27,10 @@ pub fn get_fim_batch<B: Backend>(
 
             let body = &raw[..n- 4];
             let len = body.len();
-            let a = rng.random_range(0..len);
-            let b = rng.random_range(a + 1..=len);
+
+            let mid = rng.random_range(1..=48.min(len)); // 1 to 48 tokens, like a real completation
+            let a = rng.random_range(0..=len - mid);
+            let b = a + mid;
 
             let mut s = Vec::with_capacity(n);
             s.push(FIM_PREFIX as i32);

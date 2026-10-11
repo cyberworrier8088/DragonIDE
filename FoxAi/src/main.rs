@@ -33,22 +33,22 @@ fn main() {
         }
         "data" => {
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            token_data::build(&tok, corpus::CODE_FILE, 40_000_000).expect("data failed");
+            token_data::build(&tok, corpus::CODE_FILE, 150_000_000).expect("data failed");
         }
         "train" => {
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::small(tok.vocab_size());
+            let config = ModelConfig::medium(tok.vocab_size());
             let (train_ids, val_ids) = token_data::load().expect("run `tok` first");
             println!("train tokens: {} | val tokens: {}", train_ids.len(), val_ids.len());
 
-            let model = train::train(&train_ids, &val_ids, &config, 20000).valid();
+            let model = train::train(&train_ids, &val_ids, &config, 30000).valid();
             checkpoint::save(&model).expect("save failed");
             println!("saved to {}.mpk", checkpoint::MODEL_PATH);
         }
         "fim" => {
             let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::small(tok.vocab_size());
+            let config = ModelConfig::medium(tok.vocab_size());
             let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
             
             let out = generate::complete::<Wgpu>(
@@ -70,7 +70,7 @@ fn main() {
         _ => {
             let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::small(tok.vocab_size());
+            let config = ModelConfig::medium(tok.vocab_size());
             let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
 
             let text = generate::generate::<Wgpu>(
