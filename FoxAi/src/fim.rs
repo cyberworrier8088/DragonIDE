@@ -2,7 +2,7 @@ use burn::prelude::*;
 use burn::tensor::TensorData;
 use rand::RngExt;
 
-use crate::tokenizer::{EOS, FIM_MIDDLE, FIM_PREFIX, FIM_SUFFIX};
+use crate::tokenizer::{EOS, FIM_MIDDLE, FIM_PREFIX, FIM_SUFFIX, PAD};
 
 
 pub fn get_fim_batch<B: Backend>(
@@ -25,26 +25,46 @@ pub fn get_fim_batch<B: Backend>(
 
         let seq: Vec<i32> = if rng.random::<f32>() < fim_rate {
 
-            // random total length, so <fim_middle> appears ate evary poss
+            // random total length, so <fim_middle> appears at various positions
             let total = rng.random_range(24..=n);
-            let body = &raw[..total -1]
+            let body = &raw[..total - 4];
+            let len = body.len().max(1);
 
-            let mid = rng.random_range(1..=48.min(len)); // 1 to 48 tokens, like a real completation
+            // Realistic code completion distribution:
+            // 60% short inline (1..16 tokens) for line/arg autocompletion
+            // 40% block level (16..48 tokens) for loop/fn body completion
+            let max_mid = if rng.random::<f32>() < 0.6 {
+                16.min(len)
+            } else {
+                48.min(len)
+            }.max(1);
+
+            let mid = rng.random_range(1..=max_mid);
             let a = rng.random_range(0..=len - mid);
             let b = a + mid;
 
             let mut s = Vec::with_capacity(n);
-            s.push(FIM_PREFIX as i32);
-            s.extend_from_slice(&body[..a]);
-            s.push(FIM_SUFFIX as i32);
-            s.extend_from_slice(&body[b..]);
-            s.push(FIM_MIDDLE as i32);
-            s.extend_from_slice(&body[a..b]);
-            s.push(EOS as i32);
-
-            while s.len() < n {
-                s.push(PAD as i32); // padding, ignored by the loss
+            if rng.random::<f32>() < 0.5 {
+                // PSM (Prefix-Suffix-Middle) mode - canonical IDE completion
+                s.push(FIM_PREFIX as i32);
+                s.extend_from_slice(&body[..a]);
+                s.push(FIM_SUFFIX as i32);
+                s.extend_from_slice(&body[b..]);
+                s.push(FIM_MIDDLE as i32);
+                s.extend_from_slice(&body[a..b]);
+                s.push(EOS as i32);
+            } else {
+                // SPM (Suffix-Prefix-Middle) mode - improves bidirectional attention
+                s.push(FIM_SUFFIX as i32);
+                s.extend_from_slice(&body[b..]);
+                s.push(FIM_PREFIX as i32);
+                s.extend_from_slice(&body[..a]);
+                s.push(FIM_MIDDLE as i32);
+                s.extend_from_slice(&body[a..b]);
+                s.push(EOS as i32);
             }
+
+            s.resize(n, PAD as i32);
             s
         } else {
             raw.to_vec()

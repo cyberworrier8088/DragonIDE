@@ -87,7 +87,7 @@ impl<B: Backend> CausalSelfAttention<B> {
         scores: Tensor<B, 4>,
     ) -> Tensor<B, 4> {
 
-        let [batch_size, num_heads, sequence_length, _] = scores.dims();
+        let [_, _, sequence_length, _] = scores.dims();
 
         let device = scores.device();
 
@@ -106,7 +106,7 @@ impl<B: Backend> CausalSelfAttention<B> {
         let mask = Tensor::<B, 1>::from_floats(
             mask_data.as_slice(),
             &device,
-        ).reshape([sequence_length, sequence_length]).unsqueeze::<3>().unsqueeze::<4>().repeat_dim(0, batch_size).repeat_dim(1, num_heads);
+        ).reshape([sequence_length, sequence_length]).unsqueeze::<3>().unsqueeze::<4>();
 
         scores + mask
     }

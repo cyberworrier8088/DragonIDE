@@ -82,7 +82,13 @@ pub fn generate<B: Backend>(
         tokens.push(EOS as i32);
     }
 
+    let start_time = std::time::Instant::now();
     let new = generate_ids(model, tokens.clone(), max_new_tokens, context_length, temperature, top_k, device);
+    let elapsed = start_time.elapsed().as_secs_f64();
+    let count = new.len();
+    let tok_per_sec = count as f64 / elapsed.max(1e-4);
+    eprintln!("[Generate] {} tokens in {:.3}s ({:.1} tok/s)", count, elapsed, tok_per_sec);
+
     tokens.extend(new);
 
     let ids: Vec<u32> = tokens.iter().map(|&t| t as u32).collect();
@@ -110,7 +116,12 @@ pub fn complete<B: Backend>(
     ids.extend(tok.encode(suffix).into_iter().map(|t| t as i32));
     ids.push(FIM_MIDDLE as i32);
 
+    let start_time = std::time::Instant::now();
     let new = generate_ids(model, ids, max_new_tokens, context_length, temperature, top_k, device);
+    let elapsed = start_time.elapsed().as_secs_f64();
+    let count = new.len();
+    let tok_per_sec = count as f64 / elapsed.max(1e-4);
+    eprintln!("[FIM Complete] {} tokens in {:.3}s ({:.1} tok/s)", count, elapsed, tok_per_sec);
 
     let out: Vec<u32> = new
         .into_iter()
