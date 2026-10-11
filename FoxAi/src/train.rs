@@ -1,20 +1,21 @@
-use burn::backend::{Autodiff, Wgpu};
+use burn::backend::Autodiff;
 use burn::module::AutodiffModule;
 use burn::nn::loss::CrossEntropyLossConfig;
 use burn::optim::{AdamConfig, GradientsParams, Optimizer};
 use std::time::Instant;
 
+use crate::backend::{Device, Gpu};
 use crate::checkpoint;
 use crate::data::get_batch;
 use crate::model::{FoxAiModel, ModelConfig};
 
-pub type TrainBackend = Autodiff<Wgpu>;
+pub type TrainBackend = Autodiff<Gpu>;
 
 fn val_loss(
     model: &FoxAiModel<TrainBackend>,
     data: &[i32],
     config: &ModelConfig,
-    device: &burn::backend::wgpu::WgpuDevice,
+    device: &Device,
 ) -> f32 {
     if data.len() <= config.context_length + 1 {
         return 0.0;
@@ -26,7 +27,7 @@ fn val_loss(
     let batches = 10;
     let mut total = 0.0f32;
     for _ in 0..batches {
-        let (x, y) = get_batch::<Wgpu>(data, 16, config.context_length, device);
+        let (x, y) = get_batch::<Gpu>(data, 16, config.context_length, device);
         let logits = m.forward(x);
         let [b, t, v] = logits.dims();
         let loss = loss_fn.forward(logits.reshape([b * t, v]), y.reshape([b * t]));
@@ -42,7 +43,7 @@ pub fn train(
     steps: usize,
 ) -> FoxAiModel<TrainBackend> {
 
-    let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
+    let device = crate::backend::device();
 
     let mut model = FoxAiModel::<TrainBackend>::new(config, &device);
     let mut optim = AdamConfig::new().init();

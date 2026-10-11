@@ -8,10 +8,11 @@ mod tokenizer;
 mod corpus;
 mod token_data;
 mod fim;
+mod backend;
 
 
 
-use burn::backend::Wgpu;
+
 use burn::module::AutodiffModule;
 use model::ModelConfig;
 use tokenizer::Tokenizer;
@@ -46,12 +47,12 @@ fn main() {
             println!("saved to {}.mpk", checkpoint::MODEL_PATH);
         }
         "fim" => {
-            let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
+            let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
             let config = ModelConfig::medium(tok.vocab_size());
-            let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
+            let model = checkpoint::load::<backend::Gpu>(&config, &device).expect("no checkpoint, run `train` first");
             
-            let out = generate::complete::<Wgpu>(
+            let out = generate::complete::<backend::Gpu>(
                 &model,
                 &tok,
                 "fn add(a: i32, b: i32) ->  i32 {\n    ",
@@ -68,12 +69,12 @@ fn main() {
         }
 
         _ => {
-            let device = burn::backend::wgpu::WgpuDevice::DiscreteGpu(0);
+            let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
             let config = ModelConfig::medium(tok.vocab_size());
-            let model = checkpoint::load::<Wgpu>(&config, &device).expect("no checkpoint, run `train` first");
+            let model = checkpoint::load::<backend::Gpu>(&config, &device).expect("no checkpoint, run `train` first");
 
-            let text = generate::generate::<Wgpu>(
+            let text = generate::generate::<backend::Gpu>(
                 &model,
                 &tok,
                 "fn main() {\n    let ",

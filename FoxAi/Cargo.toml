@@ -7,3 +7,7 @@ edition = "2024"
 burn = { version = "0.21.0", features = ["wgpu", "autodiff"] }
 rand = "0.10.3"
 rng = "0.1.0"
+
+
+[features]
+cuda = ["burn/cuda"]
