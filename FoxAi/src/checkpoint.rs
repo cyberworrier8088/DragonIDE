@@ -18,5 +18,16 @@ pub fn load<B: Backend>(
     config: &ModelConfig,
     device: &B::Device,
 ) -> Result<FoxAiModel<B>, String> {
-    FoxAiModel::<B>::new(config, device).load_file(MODEL_PATH, &CompactRecorder::new(), device).map_err(|e| format!("Could not load Model: {}", e))
+    load_from(MODEL_PATH, config, device)
+}
+
+pub fn load_from<B: Backend>(
+    path: &str,
+    config: &ModelConfig,
+    device: &B::Device,
+) -> Result<FoxAiModel<B>, String> {
+    let clean = path.strip_suffix(".mpk").unwrap_or(path);
+    FoxAiModel::<B>::new(config, device)
+        .load_file(clean, &CompactRecorder::new(), device)
+        .map_err(|e| format!("Could not load model from '{}': {}", clean, e))
 }
