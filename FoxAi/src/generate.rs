@@ -3,7 +3,7 @@ use burn::tensor::TensorData;
 use rand::RngExt;
 
 use crate::model::FoxAiModel;
-use crate::tokenizer::{Tokenizer, EOS, FIM_MIDDLE, FIM_PREFIX, FIM_SUFFIX};
+use crate::tokenizer::{Tokenizer, EOS, FIM_MIDDLE, FIM_PREFIX, FIM_SUFFIX, PAD};
 
 
 pub fn generate_ids<B: Backend>(
@@ -25,11 +25,13 @@ pub fn generate_ids<B: Backend>(
         let window = tokens[start..].to_vec();
         let len = window.len();
 
-        let input = Tensor::<B, 2, Int>::from_ints(TensorData::new(window, [1, len]), device);
+        let mut padded = window;
+        padded.resize(context_length, PAD as i32);
+        let input = Tensor::<B, 2, Int>::from_ints(TensorData::new(padded, [1, context_length]), device);
         let logits = model.forward(input);
         let [_, _, vocab] = logits.dims();
 
-        let last = logits.slice([0..1, len -1..len, 0..vocab]).reshape([vocab]);
+        let last = logits.slice([0..1, len - 1..len, 0..vocab]).reshape([vocab]);
         let mut scores: Vec<f32> = last.into_data().to_vec::<f32>().unwrap();
 
         for s in scores.iter_mut() {
