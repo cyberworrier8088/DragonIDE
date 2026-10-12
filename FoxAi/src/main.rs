@@ -9,6 +9,7 @@ mod corpus;
 mod token_data;
 mod fim;
 mod backend;
+mod benchmarks;
 
 
 
@@ -78,9 +79,10 @@ fn main() {
                 args.get(2).map(|s| s.as_str()).unwrap_or(checkpoint::MODEL_PATH)
             };
 
-            let clean_path = model_path.strip_suffix(".mpk").unwrap_or(model_path);
+            let clean_path = checkpoint::resolve_path(model_path);
             let file_path = format!("{}.mpk", clean_path);
             let file_size_mb = std::fs::metadata(&file_path)
+                .or_else(|_| std::fs::metadata(&clean_path))
                 .or_else(|_| std::fs::metadata(model_path))
                 .map(|m| m.len() as f64 / 1_048_576.0)
                 .unwrap_or(0.0);
@@ -94,24 +96,13 @@ fn main() {
             println!("Device:       {}", backend::device_name());
             println!("==================================================\n");
 
-            let model = checkpoint::load_from::<backend::Gpu>(clean_path, &config, &device)
+            let model = checkpoint::load_from::<backend::Gpu>(&clean_path, &config, &device)
                 .expect("Failed to load model. Check path or run `train` first");
 
-            let prompts = [
-                ("Function Body (Addition)", "fn add(a: i32, b: i32) -> i32 {\n    ", "\n}"),
-                ("Struct Definition", "pub struct Point {\n    pub x: f32,\n    ", "\n}"),
-                ("Result Pattern Match", "match fs::read_to_string(path) {\n    Ok(content) => ", ",\n    Err(e) => return Err(e.to_string()),\n}"),
-                ("Iterator Mapping", "let numbers = vec![1, 2, 3, 4, 5];\nlet doubled: Vec<i32> = numbers.iter().map(|", ").collect();"),
-                ("Constructor Implementation", "impl Config {\n    pub fn new(name: &str) -> Self {\n        Self {\n            name: ", ",\n        }\n    }\n}"),
-                ("Boolean Condition Check", "fn is_even(n: i32) -> bool {\n    ", "\n}"),
-                ("String Formatting", "let msg = format!(\"User: {}, Status: {}\", ", ");"),
-                ("Vector Filter Condition", "for item in &items {\n    if item.", " {\n        continue;\n    }\n}"),
-                ("Getter Method", "pub fn get_id(&self) -> u64 {\n    ", "\n}"),
-                ("File Write Helper", "pub fn save_file(path: &str, data: &[u8]) -> std::io::Result<()> {\n    ", "\n}"),
-            ];
+            let prompts = benchmarks::get_prompts();
 
             for (i, (name, prefix, suffix)) in prompts.iter().enumerate() {
-                println!("--- [Test {}/10] {} ---", i + 1, name);
+                println!("--- [Test {}/{}] {} ---", i + 1, prompts.len(), name);
                 println!("Prefix:\n{}", prefix);
                 println!("Suffix:\n{}", suffix);
                 let out = generate::complete::<backend::Gpu>(
