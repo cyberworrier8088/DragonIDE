@@ -51,3 +51,11 @@ pub fn load_from<B: Backend>(
         .load_file(&clean, &CompactRecorder::new(), device)
         .map_err(|e| format!("Could not load model from '{}': {}", clean, e))
 }
+
+
+pub fn save_to<B: Backend>(model: &FoxAiModel<B>, path: &str) -> Result<(), String> {
+    if let Some(dir) = std::path::Path::new(path).parent() {
+        let _ = std::fs::create_dir_all(dir);
+    }
+    model.clone().save_file(path, &CompactRecorder::new()).map_err(|e| format!("Could not save model: {} :)", e))
+}

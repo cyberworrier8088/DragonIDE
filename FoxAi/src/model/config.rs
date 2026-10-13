@@ -50,6 +50,20 @@ impl ModelConfig {
         }
     }
 
+    pub fn xl(vocab_size: usize) -> Self {
+        Self {
+            vocab_size,
+            context_length: 512,
+            d_model: 384,
+            num_heads: 6,
+            num_layers: 10,
+        }
+    }
+
+    pub fn current(vocab_size: usize) -> Self {
+        Self::xl(vocab_size)
+    }
+
     /// Calculate approximate total trainable parameters
     pub fn param_count(&self) -> usize {
         let embeddings = (self.vocab_size + self.context_length) * self.d_model;

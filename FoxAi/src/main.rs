@@ -10,6 +10,7 @@ mod token_data;
 mod fim;
 mod backend;
 mod benchmarks;
+mod fimdata;
 
 
 
@@ -39,18 +40,19 @@ fn main() {
         }
         "train" => {
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::medium(tok.vocab_size());
-            let (train_ids, val_ids) = token_data::load().expect("run `tok` first");
-            println!("train tokens: {} | val tokens: {}", train_ids.len(), val_ids.len());
-
-            let model = train::train(&train_ids, &val_ids, &config, 30000).valid();
-            checkpoint::save(&model).expect("save failed");
-            println!("saved to {}.mpk", checkpoint::MODEL_PATH);
+            let config = ModelConfig::current(tok.vocab_size());
+            let (rows, n_train, n_total) = fimdata::load().expect("run 'fimdata' first");
+            train::train(&rows, n_train, n_total, &config);
+        }
+        "fimdata" => {
+            let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run 'tok' first");
+            let n: usize = std::env::args().nth(2).and_then(|s| s.parse().ok()).unwrap_or(300_000);
+            fimdata::build(&tok, corpus::CODE_FILE, n).expect("fimdata failed");
         }
         "fim" => {
             let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::medium(tok.vocab_size());
+            let config = ModelConfig::current(tok.vocab_size());
             let model = checkpoint::load::<backend::Gpu>(&config, &device).expect("no checkpoint, run `train` first");
             
             let out = generate::complete::<backend::Gpu>(
@@ -70,7 +72,7 @@ fn main() {
         "fimtest" => {
             let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::medium(tok.vocab_size());
+            let config = ModelConfig::current(tok.vocab_size());
 
             let args: Vec<String> = std::env::args().collect();
             let model_path = if let Some(pos) = args.iter().position(|a| a == "-path" || a == "--path") {
@@ -123,7 +125,7 @@ fn main() {
         _ => {
             let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
-            let config = ModelConfig::medium(tok.vocab_size());
+            let config = ModelConfig::current(tok.vocab_size());
             let model = checkpoint::load::<backend::Gpu>(&config, &device).expect("no checkpoint, run `train` first");
 
             let text = generate::generate::<backend::Gpu>(
