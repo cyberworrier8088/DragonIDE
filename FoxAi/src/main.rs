@@ -122,6 +122,34 @@ fn main() {
             }
         }
 
+        "fimeval" => {
+            let device = backend::device();
+            let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run 'tok' first");
+            let config = ModelConfig::current(tok.vocab_size());
+            let path = std::env::args().nth(2).unwrap_or_else(|| checkpoint::MODEL_PATH.to_string());
+            let model = checkpoint::load_from::<backend::Gpu>(&path, &config, &device).expect("load failed");
+            let (rows, n_train, n_total) = fimdata::load().expect("run 'fimdata' first");
+
+
+            let (mut exact, mut total) = (0, 0);
+            for r in n_train..n_total.min(n_train + 60) {
+                let row = &rows[r * fimdata::ROW..(r + 1) * fimdata::ROW];
+                let Some(p) = row.iter().position(|&t| t as u32 == tokenizer::FIM_MIDDLE) else { continue; };
+                let prompt: Vec<i32> = row[..=p].iter().map(|&t| t as i32).collect();
+                let truth: Vec<u32> = row[p + 1..].iter().map(|&t| t as u32).take_while(|&t| t != tokenizer::PAD && t != tokenizer::EOS).collect();
+                let out = generate::generate_ids::<backend::Gpu>(&model, prompt, 60, config.context_length, 0.05, 1, &device);
+                let got: Vec<u32> = out.iter().map(|&t| t as u32).take_while(|&t| t != tokenizer::EOS).collect();
+                total += 1;
+
+                if got == truth { exact += 1; }
+                if total <= 8 {
+                    println!("TRUTH: {:?}\nGOT:   {:?}\n", tok.decode(&truth), tok.decode(&got));
+                }
+            }
+
+            println!("exact match: {}/{}", exact, total);
+        }
+
         _ => {
             let device = backend::device();
             let tok = Tokenizer::load(tokenizer::TOKENIZER_FILE).expect("run `tok` first");
