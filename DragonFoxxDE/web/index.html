@@ -389,6 +389,18 @@
     </div>
 
 
+    <div id="quick-open-modal" class="modal hidden">
+
+        <div class="modal-backdrop"></div>
+        <div class="modal-content quick-open-content">
+            <input type="text" id="quick-open-input" placeholder="Search files by name..." autocomplete="off"
+                spellcheck="false">
+            <div id="quick-open-results"></div>
+        </div>
+    </div>
+
+
+
     <div id="file-context-menu" class="context-menu hidden">
         <div class="menu-item" id="ctx-new-file" data-i18n="newFile">New File</div>
         <div class="menu-item" id="ctx-new-folder" data-i18n="newFolder">New Folder</div>
@@ -409,6 +421,7 @@
     <script src="js/bracket-matching.js"></script>
     <script src="js/code-execution.js"></script>
     <script src="js/search.js"></script>
+    <script src="js/quick-open.js"></script>
     <script src="js/panel-resize.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>

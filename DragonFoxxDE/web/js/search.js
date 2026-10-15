@@ -9,7 +9,7 @@ function getWorkspace() {
         if (typeof currentWorkspace !== "undefined" && currentWorkspace) {
             return currentWorkspace;
         }
-    } catch (_) {}
+    } catch (_) { }
     return null;
 }
 
@@ -70,28 +70,37 @@ async function runSearch() {
 
     try {
         const { invoke } = window.__TAURI__.core;
-        const results = await invoke("search_workspace", {
-            root: workspace,
-            query: query,
-            caseSensitive: caseSensitive
-        });
+
+        const [files, results] = await Promise.all([
+            invoke("find_files", { root: workspace, query: query }),
+
+            invoke("search_workspace", {
+                root: workspace,
+                query: query,
+                caseSensitive: caseSensitive,
+            })
+        ]);
 
         if (requestId !== searchRequestId) return;
-        renderSearchResults(results, query, caseSensitive);
+        renderSearchResults(results, query, caseSensitive, files);
     } catch (error) {
         if (requestId !== searchRequestId) return;
         summary.textContent = `Search failed: ${error}`;
     }
 }
 
-function renderSearchResults(results, query, caseSensitive) {
+function renderSearchResults(results, query, caseSensitive, files = []) {
     const summary = document.getElementById("search-summary");
     const resultsBox = document.getElementById("search-results");
     resultsBox.innerHTML = "";
 
-    if (results.length === 0) {
+    if (results.length === 0 && files.length === 0) {
         summary.textContent = "No results found";
         return;
+    }
+
+    if (files.length > 0) {
+        resultsBox.appendChild(renderFileNameMatches(files, query));
     }
 
     const groups = new Map();
@@ -101,7 +110,8 @@ function renderSearchResults(results, query, caseSensitive) {
     }
 
     const limitNote = results.length >= 1000 ? " (showing first 1000)" : "";
-    summary.textContent = `${results.length} results in ${groups.size} files${limitNote}`;
+    summary.textContent = `${files.length} file names, ${results.length} results in ${groups.size} files${limitNote}`;
+
 
     for (const [path, matches] of groups) {
         const group = document.createElement("div");
@@ -138,6 +148,40 @@ function renderSearchResults(results, query, caseSensitive) {
 
         resultsBox.appendChild(group);
     }
+}
+
+
+function renderFileNameMatches(files, query) {
+    const group = document.createElement("div");
+    group.className = "search-file-group";
+
+    const header = document.createElement("div");
+    header.className = "search-file-name";
+    header.textContent = "Files";
+
+    const count = document.createElement("span");
+    count.className = "search-file-count";
+    count.textContent = files.length;
+    header.appendChild(count);
+    group.appendChild(header);
+
+    for (const file of files) {
+        const row = document.createElement("div");
+        row.className = "search-result";
+        row.title = file.path;
+
+        const text = document.createElement("span");
+        text.className = "search-line-text";
+        appendHighlightedText(text, file.relative, query.trim(), false);
+
+        row.appendChild(text);
+        row.addEventListener("click", () => {
+            window.openFile({ name: file.name, path: file.path, is_directory: false });
+        });
+        group.appendChild(row);
+
+    }
+    return group;
 }
 
 function appendHighlightedText(container, text, query, caseSensitive) {
