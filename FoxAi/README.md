@@ -42,6 +42,18 @@ For Cuda add '--features cuda'. Model and tokenizer are a pair: a checkpoint is 
 - The causal mask is rebuilt on the CPU in evary layer on every forward pass. 
 - Absolute position embeddings, fixed 512 context.
 
+## Sponsor / support
+
+This is a solo project with no budget. Training so far ran on a free/Pro Colab T4 and a laptop GPU, and that is the main limit: every experiment is about 5H on a T4, and the model and corpus can't grow without more compute.
+
+Looking for a sponsor for training compute (GPU time or credits). It wauld go to:
+
+- longer runs with a bigger model and a larger, license-clean corpus
+- re-running the middle-only loss fix and proper eval
+- getting FoxAi good enough to replace the external APIs is DragonIDE
+
+If you can help, open an issue on the DragonIDE repo.
+
 ## Next
 
 1. Middle-only loss, then fine-tune from the letest checkpoint
