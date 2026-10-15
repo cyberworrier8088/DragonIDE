@@ -4,6 +4,16 @@ A small decoder-only transformer for code auto-completion, written from scratch 
 
 **Status: Not completed yet. work in progress. it does not produce useable completion yet.** The pipeline works to end (data, tokenizer, training, resume, inference). Model quality is the open Probm
 
+## Contents
+
+- [What's in here](#what-in-here)
+- [Usage](#usage)
+- [Where it stands](#where-it-stands)
+- [Known problems](#known-probms)
+- [Sponsor / support](#sponsor--support)
+- [Next](#next)
+- [Notes](#notes)
+
 ## What in here
 
 - Decoder-only transformer: 10 layers, d_model 384, 6 heads, context 512, ~21M params (learned positional embeddings, pre-norm, GELU FFn)
