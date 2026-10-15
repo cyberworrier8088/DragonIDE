@@ -43,6 +43,7 @@ For Cuda add '--features cuda'. Model and tokenizer are a pair: a checkpoint is 
 - Training loss falls normally. Early checkpoints (a few thousand steps) score 0/30 on `fimtest` and 1-2/60 exact match on held-out rows.
 - Output is plausible RUst but mostly ignores the code after the cursor.
 - Inference is about 25/40 tok/s. No KV cache yet.
+- Becasue of this, DragonIDE does not use FoxAi right now. it uses other models through their APIs.
 
 ## known probms
 
@@ -51,6 +52,7 @@ For Cuda add '--features cuda'. Model and tokenizer are a pair: a checkpoint is 
 - Traning data is ~47 MB of Rust from the local cargo registry. Small, and licenses are mixed. Fine for experiments, not for a release.
 - The causal mask is rebuilt on the CPU in evary layer on every forward pass. 
 - Absolute position embeddings, fixed 512 context.
+
 
 ## Sponsor / support
 
