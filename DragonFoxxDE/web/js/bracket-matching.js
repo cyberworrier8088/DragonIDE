@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "\\") {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "Backslash") {
             e.preventDefault();
             jumpToMatchingBracket();
         }

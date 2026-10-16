@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "r") {
+        if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === "r") {
             e.preventDefault();
             runCode();
         }
