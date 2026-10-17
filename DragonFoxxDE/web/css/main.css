@@ -53,31 +53,20 @@ button:focus-visible {
 
 .activity-button img,
 .activity-button svg {
-    pointer-events: none;
-}
-
-.activity-button img {
     width: 22px;
     height: 22px;
-    filter: invert(0.7);
-    transition: filter 0.15s ease;
+    pointer-events: none;
+    color: inherit;
+    transition: color 0.15s ease, opacity 0.15s ease;
 }
 
 .activity-button:hover {
     color: var(--text-primary);
 }
 
-.activity-button:hover img {
-    filter: invert(1);
-}
-
 .activity-button.active {
     color: var(--text-primary);
-    border-left: 2px solid var(--text-primary);
-}
-
-.activity-button.active img {
-    filter: invert(1);
+    border-left: 2px solid var(--accent-blue);
 }
 
 .activity-spacer {
