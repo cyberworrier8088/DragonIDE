@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_code, search_workspace, find_files])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_terminal_command, terminal_change_dir, stop_code, search_workspace, find_files])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -234,29 +234,120 @@ fn stop_code() -> Result<(), String> {
   stutus.map(|_| ()).map_err(|e| format!("Failed to stop: {}", e))
 }
 
-#[tauri::command]
-async fn execute_terminal_command(command: String, current_dir: String) -> Result<String, String> {
+static TERMINAL_PID: std::sync::Mutex<Option<u32>> = std::sync::Mutex::new(None);
 
-  tauri::async_runtime::spawn_blocking(move || run_terminal_command(&command, &current_dir)).await.map_err(|e| e.to_string())?
+#[derive(Clone, serde::Serialize)]
+#[serde(tag = "kind", rename_all = "lowercase")]
+enum TerminalEvent {
+  Line { text: String, error: bool },
+  Done { code: i32 },
 }
 
-fn run_terminal_command(command_text: &str, current_dir: &str) -> Result<String, String> {
+#[tauri::command]
+async fn execute_terminal_command(command: String, current_dir: String, on_event: tauri::ipc::Channel<TerminalEvent>) -> Result<(), String> {
+
+    tauri::async_runtime::spawn_blocking(move || run_terminal_command(&command, &current_dir, on_event)).await.map_err(|e| e.to_string())?
+}
+
+fn run_terminal_command(command_text: &str, current_dir: &str, on_event: tauri::ipc::Channel<TerminalEvent>) -> Result<(), String> {
+
+  use std::process::Stdio;
 
   let (shell, flag) = if cfg!(target_os = "windows") { ("cmd", "/c") } else { ("sh", "-c") };
 
-  let output = command(shell).arg(flag).arg(command_text).current_dir(current_dir).output().map_err(|e| format!("Failed to run command: {}", e))?;
+  let mut cmd = command(shell);
+  cmd.arg(flag).arg(command_text).env("PYTHONUNBUFFERED", "1").stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
 
-  let mut combined = String::from_utf8_lossy(&output.stdout).to_string();
-  let stderr = String::from_utf8_lossy(&output.stderr);
-  if !stderr.is_empty() {
-    if !combined.is_empty() {
-      combined.push('\n');
-    }
-
-    combined.push_str(&stderr);
+  // own process group, so stop kills the shell and everthing it started
+  #[cfg(unix)]
+  {
+    use std::os::unix::process::CommandExt;
+    cmd.process_group();
   }
 
-  Ok(combined)
+  let mut child = cmd.spawn().map_err(|e| format!("Failed to run command: {}", e))?;
+  *TERMINAL_PID.lock().unwrap() = Some(child.id());
+
+  let stdout = child.stdout.take().unwrap();
+  let stderr = child.stderr.take().unwrap();
+
+  // read stderr on its own thread, so a full pipe can't block the other one
+  let err_channel = on_event.clone();
+  let err_thread = std::thread::spawn(move || send_lines(stderr, true, &err_channel));
+  send_lines(stdout, false, &on_event);
+  let _ = err_thread.join();
+
+  let status = child.wait();
+  *TERMINAL_PID.lock().unwrap() = None;
+
+  let code = status.ok().and_then(|s| s.code()).unwrap_or(-1);
+  let _ = on_event.send(TerminalEvent::Done { code });
+  Ok(())
+}
+
+fn send_lines<R: std::io::Read>(reader: R, error: bool, channel: &tauri::ipc::Channel<TerminalEvent>) {
+
+  use std::io::BufRead;
+
+  let mut reader = std::io::BufReader::new(reader);
+  let mut buf = Vec::new();
+
+  loop {
+    buf.clear();
+    match reader.read_until(b'\n', &mut buf) {
+      Ok(0) | Err(_) => break,
+      Ok(_) => {
+        let text = String::from_utf8_lossy(&buf).trim_end_matches(|c| c == '\r' || c == '\n').to_string();
+        let _ = channel.send(TerminalEvent::Line { text, error });
+      }
+    }
+  }
+}
+
+#[tauri::command]
+fn stop_terminal_command() -> Result<(), String> {
+  let Some(pid) = *TERMINAL_PID.lock().unwrap() else {
+    return Err("Nothing is running".to_string());
+
+  };
+
+  let status = if cfg!(target_os = "windows") {
+    command("taskkill").args(["/PID", &pid.to_string(), "/T", "/F"]).status()
+  } else {
+    // "-PID" means the whole process group
+    command("kill").args(["-9", "--", &format!("-{}", pid)]).status()
+  };
+
+  status.map(|_| ()).map_err(|e| format!("Failed to stop: {}", e))
+}
+
+#[tauri::command]
+fn terminal_change_dir(current_dir: String, target: String) -> Result<String, String> {
+  let target = target.trim().trim_matches('"');
+
+  let next = if target == "-" {
+    let home = if cfg!(target_os = "windows") { "USERPROFILE" } else { "HOME" };
+
+    std::env::var(home).map(PathBuf::from).map_err(|_| "cd: home folder not found".to_string())?
+  } else {
+    PathBuf::from(&current_dir).join(target)
+  };
+
+  // remove "." and ".." so the path stays clean
+  let mut clean = PathBuf::new();
+  for part in next.components() {
+    match part {
+      std::path::Component::CurDir => {}
+      std::path::Component::ParentDir => { clean.pop(); }
+      other => clean.push(other.as_os_str()),
+    }
+  }
+
+  if !clean.is_dir() {
+    return Err(format!("cd: no suck folder: {}", target));
+  }
+
+  Ok(clean.to_string_lossy().to_string())
 }
 
 

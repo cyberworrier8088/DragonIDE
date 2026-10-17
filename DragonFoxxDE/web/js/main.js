@@ -1182,44 +1182,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-
-    const terminalInput = document.getElementById('terminal-input');
-    const terminalOutput = document.getElementById("terminal-output");
-
-    if (terminalInput) {
-        terminalInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-
-                const command = terminalInput.value.trim();
-
-                terminalOutput.textContent += `$ ${command}\n`;
-
-                terminalInput.value = '';
-
-                if (command) {
-
-                    const currentDir = currentWorkspace ? currentWorkspace : ".";
-
-                    invoke("execute_terminal_command", {
-                        command: command,
-                        currentDir: currentDir
-                    }).then(response => {
-
-                        terminalOutput.textContent += response + "\n";
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                    }).catch(error => {
-
-
-                        terminalOutput.textContent += `Error: ${error}\n`;
-
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                    });
-                }
-
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-        });
-    }
 });
 
 window.openFile = openFile;
