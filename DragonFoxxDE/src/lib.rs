@@ -27,7 +27,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_terminal_command, terminal_change_dir, stop_code, search_workspace, find_files])
+        .invoke_handler(tauri::generate_handler![get_ide_name, read_workspace, read_file, create_file, create_directory, rename_entry, delete_entry, document_count, open_document, save_document, update_document, execute_code, execute_terminal_command, stop_terminal_command, terminal_change_dir, stop_code, search_workspace, find_files, read_image])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -46,6 +46,21 @@ async fn search_workspace(root: String, query: String, case_sensitive: bool) -> 
     workspace::search::search_workspace(&PathBuf::from(root), &query, case_sensitive)
   }).await.map_err(|e| e.to_string())?
 
+}
+
+#[tauri::command]
+async fn read_image(path: String) -> Result<tauri::ipc::Response, String> {
+  tauri::async_runtime::spawn_blocking(move || {
+    let size = std::fs::metadata(&path).map_err(|e| e.to_string())?.len();
+
+    if size > 50 * 1024 * 1024 {
+      return Err("Image is too big to preview (over 50MB)".to_string());
+    }
+
+    let bytes = std::fs::read(&path).map_err(|e| e.to_string())?;
+
+    Ok(tauri::ipc::Response::new(bytes))
+  }).await.map_err(|e| e.to_string())?;
 }
 
 // find files by name (quick open)
