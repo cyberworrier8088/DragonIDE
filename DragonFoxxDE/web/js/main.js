@@ -4,6 +4,7 @@ let currentFile = null;
 let currentFileContent = "";
 let editorChangeTimer = null;
 let openTabs = [];
+window.openTabs = openTabs;
 let currentWorkspace = null;
 window.currentWorkspace = null;
 const WORKSPACE_STORAGE_KEY = "dragonide_current_workspace";
@@ -579,7 +580,8 @@ function renderTabs() {
     for (const tab of openTabs) {
         const element = document.createElement("div");
 
-        element.classList = "tab";
+        element.className = "tab";
+        element.dataset.path = tab.path;
 
         if (
             currentFile && currentFile.path === tab.path
@@ -1274,3 +1276,4 @@ document.addEventListener("DOMContentLoaded", () => {
 window.openFile = openFile;
 window.openFolder = openFolder;
 window.refreshWorkspace = refreshWorkspace;
+window.renderTabs = renderTabs;

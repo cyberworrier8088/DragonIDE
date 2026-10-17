@@ -21,6 +21,9 @@ function detectExecutionLanguage(filePath) {
 }
 
 function showOutputPanel() {
+
+    if (typeof setBottomPanelVisible === "function") setBottomPanelVisible(true);
+
     document.querySelector('.panel-tab[data-panel="output"]')?.click();
 
     const noOutput = document.getElementById("no-output");

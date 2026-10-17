@@ -986,3 +986,28 @@ code.hljs {
     border-radius: 2px;
     padding: 0 1px;
 }
+
+#sidebar-resizer {
+    width: 4px;
+    flex-shrink: 0;
+    cursor: ew-resize;
+    background: transparent;
+    transition: background 0.15s ease;
+}
+
+#sidebar-resizer:hover,
+#sidebar-resizer.dragging {
+    background: var(--accent-blue);
+}
+
+.tab.drop-before {
+    box-shadow: inset 3px 0 0 var(--accent-blue);
+}
+
+.tab.drop-after {
+    box-shadow: inset -3px 0 0 var(--accent-blue);
+}
+
+.tab.dragging {
+    opacity: 0.5;
+}
