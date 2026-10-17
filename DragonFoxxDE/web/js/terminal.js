@@ -199,7 +199,7 @@ function initTerminal() {
                 input.value = terminalHistory[terminalHistoryIndex];
             } else {
                 terminalHistoryIndex = terminalHistory.length;
-                input.value;
+                input.value = "";
             }
         } else if (e.ctrlKey && e.key.toLocaleLowerCase() === "c" && terminalRunning && input.selectionStart === input.selectionEnd) {
             // Ctr+C with nothing selected = stop, like a real terminal

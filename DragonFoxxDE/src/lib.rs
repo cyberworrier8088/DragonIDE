@@ -256,13 +256,13 @@ fn run_terminal_command(command_text: &str, current_dir: &str, on_event: tauri::
   let (shell, flag) = if cfg!(target_os = "windows") { ("cmd", "/c") } else { ("sh", "-c") };
 
   let mut cmd = command(shell);
-  cmd.arg(flag).arg(command_text).env("PYTHONUNBUFFERED", "1").stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+  cmd.arg(flag).arg(command_text).current_dir(current_dir).env("PYTHONUNBUFFERED", "1").stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
 
   // own process group, so stop kills the shell and everthing it started
   #[cfg(unix)]
   {
     use std::os::unix::process::CommandExt;
-    cmd.process_group();
+    cmd.process_group(0);
   }
 
   let mut child = cmd.spawn().map_err(|e| format!("Failed to run command: {}", e))?;
@@ -325,7 +325,7 @@ fn stop_terminal_command() -> Result<(), String> {
 fn terminal_change_dir(current_dir: String, target: String) -> Result<String, String> {
   let target = target.trim().trim_matches('"');
 
-  let next = if target == "-" {
+  let next = if target == "'~'" {
     let home = if cfg!(target_os = "windows") { "USERPROFILE" } else { "HOME" };
 
     std::env::var(home).map(PathBuf::from).map_err(|_| "cd: home folder not found".to_string())?
@@ -344,7 +344,7 @@ fn terminal_change_dir(current_dir: String, target: String) -> Result<String, St
   }
 
   if !clean.is_dir() {
-    return Err(format!("cd: no suck folder: {}", target));
+    return Err(format!("cd: no such folder: {}", target));
   }
 
   Ok(clean.to_string_lossy().to_string())
