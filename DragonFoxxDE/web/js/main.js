@@ -65,7 +65,7 @@ async function startDragonIDE() {
                 explorerName.textContent = savedWorkspace.split(/[\\/]/).pop() || savedWorkspace;
             }
         }
-    } catch (_) {}
+    } catch (_) { }
 
     document.getElementById("workspace-name")?.addEventListener("click", openFolder);
     document.getElementById("explorer-open-btn-icon")?.addEventListener("click", openFolder);
@@ -188,7 +188,7 @@ async function openFolder() {
         window.currentWorkspace = folder;
         try {
             localStorage.setItem(WORKSPACE_STORAGE_KEY, folder);
-        } catch (_) {}
+        } catch (_) { }
 
         console.log("Selected workspace: ", folder);
 
@@ -244,6 +244,16 @@ async function refreshWorkspace() {
         tree.replaceChildren(...fresh.childNodes);
     } catch (error) {
         console.error("Failed to read workspace: ", error);
+
+        currentWorkspace = null;
+        window.currentWorkspace = null;
+        try {
+            localStorage.removeItem(WORKSPACE_STORAGE_KEY);
+        } catch (_) { }
+
+        const explorerName = document.getElementById("workspace-name");
+        if (explorerName) explorerName.textContent = "DragonIDE";
+
         tree.innerHTML = `
             <div class="explorer-empty">
                 <div style="margin-bottom: 8px; font-size: 13px; color: var(--text-muted);">Could not open folder</div>
