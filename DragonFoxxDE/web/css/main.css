@@ -987,6 +987,7 @@ code.hljs {
     padding: 0 1px;
 }
 
+/* drag the explorer edge */
 #sidebar-resizer {
     width: 4px;
     flex-shrink: 0;
@@ -1000,6 +1001,8 @@ code.hljs {
     background: var(--accent-blue);
 }
 
+
+/* drag tab*/
 .tab.drop-before {
     box-shadow: inset 3px 0 0 var(--accent-blue);
 }
