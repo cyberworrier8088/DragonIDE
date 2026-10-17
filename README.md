@@ -1,6 +1,2 @@
 # DragonIDE
-a Powerfull IDE
-
-{4
-
-}
+a Powerfull IDE in progress
