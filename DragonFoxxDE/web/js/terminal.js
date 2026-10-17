@@ -142,6 +142,9 @@ async function runTerminalCommand(commandText) {
                 writeTerminal(`Exit code ${message.code}`, "error");
             }
             setTerminalRunning(false);
+
+            // the command may have made, rename or deleted file
+            refreshWorkspace().catch(error => console.warn("Explorer refresh failed:", error));
         }
     };
 

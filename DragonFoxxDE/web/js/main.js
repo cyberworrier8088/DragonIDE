@@ -6,6 +6,7 @@ let editorChangeTimer = null;
 let openTabs = [];
 let currentWorkspace = null;
 window.currentWorkspace = null;
+const WORKSPACE_STORAGE_KEY = "dragonide_current_workspace";
 
 let undoStack = [];
 let redoStack = [];
@@ -52,6 +53,24 @@ async function startDragonIDE() {
     } catch (error) {
         console.error("Error during startup:", error);
     }
+
+    // Restore saved workspace if any
+    try {
+        const savedWorkspace = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+        if (savedWorkspace) {
+            currentWorkspace = savedWorkspace;
+            window.currentWorkspace = savedWorkspace;
+            const explorerName = document.getElementById("workspace-name");
+            if (explorerName) {
+                explorerName.textContent = savedWorkspace.split(/[\\/]/).pop() || savedWorkspace;
+            }
+        }
+    } catch (_) {}
+
+    document.getElementById("workspace-name")?.addEventListener("click", openFolder);
+    document.getElementById("explorer-open-btn-icon")?.addEventListener("click", openFolder);
+
+    await refreshWorkspace();
 
     // --- CONTEXT MENU ACTION LISTENERS ---
 
@@ -155,7 +174,6 @@ async function startDragonIDE() {
 
 async function openFolder() {
     try {
-
         const folder = await window.__TAURI__.dialog.open({
             directory: true,
             multiple: false
@@ -168,29 +186,87 @@ async function openFolder() {
 
         currentWorkspace = folder;
         window.currentWorkspace = folder;
+        try {
+            localStorage.setItem(WORKSPACE_STORAGE_KEY, folder);
+        } catch (_) {}
 
         console.log("Selected workspace: ", folder);
 
-        const explorerName =
-            document.getElementById("workspace-name");
-
+        const explorerName = document.getElementById("workspace-name");
         if (explorerName) {
-            explorerName.textContent =
-                folder.split(/[\\/]/).pop();
+            explorerName.textContent = folder.split(/[\\/]/).pop() || folder;
         }
 
         await refreshWorkspace();
-
     } catch (error) {
         console.error("Failed to open folder: ", error);
     }
 }
 
 async function refreshWorkspace() {
-    if (!currentWorkspace) return;
+    const tree = document.getElementById("file-tree");
+    if (!tree) return;
 
-    const files = await invoke("read_workspace", { path: currentWorkspace });
-    renderFileTree(files);
+    if (!currentWorkspace) {
+        tree.innerHTML = `
+            <div class="explorer-empty">
+                <div style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted);">No folder opened</div>
+                <button id="explorer-empty-open-btn" style="padding: 7px 14px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 12px; width: 100%; transition: background 0.15s ease;">Open Folder</button>
+            </div>
+        `;
+        document.getElementById("explorer-empty-open-btn")?.addEventListener("click", openFolder);
+        return;
+    }
+
+    const openFolders = new Set(
+        [...tree.querySelectorAll(".file-entry.directory")].filter(el => el.nextElementSibling?.classList.contains("file-children")).map(el => el.dataset.path)
+    );
+
+    try {
+        const files = await invoke("read_workspace", { path: currentWorkspace });
+
+        if (!files || files.length === 0) {
+            tree.innerHTML = `
+                <div class="explorer-empty">
+                    <div style="font-size: 13px; color: var(--text-muted);">This folder is empty</div>
+                </div>
+            `;
+            return;
+        }
+
+        const fresh = document.createElement("div");
+        for (const file of files) {
+            fresh.appendChild(createFileEntry(file));
+        }
+
+        await reopenFolder(fresh, openFolders);
+
+        tree.replaceChildren(...fresh.childNodes);
+    } catch (error) {
+        console.error("Failed to read workspace: ", error);
+        tree.innerHTML = `
+            <div class="explorer-empty">
+                <div style="margin-bottom: 8px; font-size: 13px; color: var(--text-muted);">Could not open folder</div>
+                <button id="explorer-retry-btn" style="padding: 6px 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 12px; width: 100%;">Select Folder</button>
+            </div>
+        `;
+        document.getElementById("explorer-retry-btn")?.addEventListener("click", openFolder);
+    }
+}
+
+async function reopenFolder(container, openFolders) {
+    for (const element of [...container.children]) {
+        if (!element.classList.contains("directory") || !openFolders.has(element.dataset.path)) {
+            continue;
+        }
+
+        await toggleDirectory(element, { path: element.dataset.path }, element.querySelector(".file-arrow"));
+
+        const children = element.nextElementSibling;
+        if (children?.classList.contains("file-children")) {
+            await reopenFolder(children, openFolders);
+        }
+    }
 }
 
 
@@ -199,6 +275,7 @@ function createFileEntry(entry) {
     const element = document.createElement("div");
 
     element.classList.add("file-entry");
+    element.dataset.path = entry.path;
 
     if (entry.is_directory) {
         element.classList.add("directory");
@@ -889,7 +966,7 @@ function saveUndoState() {
     };
 }
 
-document.getElementById("open-folder-button").addEventListener("click", openFolder);
+document.getElementById("open-folder-button")?.addEventListener("click", openFolder);
 
 
 
@@ -1185,3 +1262,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.openFile = openFile;
+window.openFolder = openFolder;
+window.refreshWorkspace = refreshWorkspace;
