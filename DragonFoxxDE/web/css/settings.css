@@ -115,7 +115,8 @@
 }
 
 .theme-option,
-.tab-option {
+.tab-option,
+.lang-option {
     padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -128,13 +129,15 @@
 }
 
 .theme-option:hover,
-.tab-option:hover {
+.tab-option:hover,
+.lang-option:hover {
     background: var(--accent-hover);
     border-color: var(--accent-active);
 }
 
 .theme-option.active,
-.tab-option.active {
+.tab-option.active,
+.lang-option.active {
     background: var(--accent-blue);
     border-color: var(--accent-blue);
     color: white;
