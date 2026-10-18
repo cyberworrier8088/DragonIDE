@@ -47,6 +47,10 @@
     justify-content: flex-end;
 }
 
+.titlebar-modified {
+    color: var(--text-muted);
+}
+
 .titlebar-button {
     width: 46px;
     height: 32px;

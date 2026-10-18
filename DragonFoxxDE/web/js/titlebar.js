@@ -53,15 +53,26 @@ function updateTitlebarFileName(fileName) {
     const center = document.getElementById("titlebar-center");
     if (!center) return;
 
-    if (fileName) {
-        if (typeof autoSaveState !== "undefined" && typeof currentFile !== "undefined" && currentFile && autoSaveState.unsavedFiles?.get(currentFile.path)) {
-            center.innerHTML = `<span>${fileName} <span style="color: var(--text-muted);">(modified)</span></span>`;
-        } else {
-            center.innerHTML = `<span>${fileName}</span>`;
-        }
-    } else {
-        center.innerHTML = "";
+    const modified = typeof autoSaveState !== "undefined" && typeof currentFile !== "undefined" && currentFile && autoSaveState.unsavedFiles?.get(currentFile.path);
+    setTitlebarText(center, fileName, modified);
+}
+
+// file names come from disk, so build text nodes instead of HTML
+function setTitlebarText(center, fileName, modified) {
+    center.replaceChildren();
+    if (!fileName) return;
+
+    const name = document.createElement("span");
+    name.textContent = fileName;
+
+    if (modified) {
+        const tag = document.createElement("span");
+        tag.className = "titlebar-modified";
+        tag.textContent = " (modified)";
+        name.appendChild(tag);
     }
+
+    center.appendChild(name);
 }
 
 window.addEventListener("file-opened", (e) => {

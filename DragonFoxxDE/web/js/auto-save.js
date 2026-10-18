@@ -128,18 +128,8 @@ function updateTitlebarModified(path, isModified) {
     const titlebarCenter = document.getElementById("titlebar-center");
     if (!titlebarCenter) return;
 
-    if (!path) {
-        titlebarCenter.innerHTML = "";
-        return;
-    }
-
-    const fileName = path.split(/[\\/]/).pop();
-
-    if (isModified) {
-        titlebarCenter.innerHTML = `<span>${fileName} <span style="color: var(--text-muted);">(modified)</span></span>`;
-    } else {
-        titlebarCenter.innerHTML = `<span>${fileName}</span>`;
-    }
+    const fileName = path ? path.split(/[\\/]/).pop() : "";
+    setTitlebarText(titlebarCenter, fileName, isModified);
 }
 
 // Show saving indicator
