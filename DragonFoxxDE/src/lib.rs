@@ -340,7 +340,7 @@ fn stop_terminal_command() -> Result<(), String> {
 fn terminal_change_dir(current_dir: String, target: String) -> Result<String, String> {
   let target = target.trim().trim_matches('"');
 
-  let next = if target == "'~'" {
+  let next = if target == "~" {
     let home = if cfg!(target_os = "windows") { "USERPROFILE" } else { "HOME" };
 
     std::env::var(home).map(PathBuf::from).map_err(|_| "cd: home folder not found".to_string())?
