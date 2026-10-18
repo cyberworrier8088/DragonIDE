@@ -1082,6 +1082,62 @@ function handleEnterKey(event) {
     handleEditorChange();
 }
 
+// Tab: indent, Shift+Tab: unindent (every selected line, like VS CODE)
+function handleTabKey(event) {
+    event.preventDefault();
+
+    const text = codeEditor.value;
+    const start = codeEditor.selectionStart;
+    const end = codeEditor.selectionEnd;
+    const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
+    const indent = " ".repeat(tabWidth);
+    const selectedText = text.slice(start, end);
+
+    // plain tab with nothing (or part of one line) selected: insert spaccess
+    if (!event.shiftKey && !selectedText.includes("\n")) {
+        codeEditor.setRangeText(indent, start, end, "end");
+        handleEditorChange();
+        return;
+    }
+
+    const blockStart = text.lastIndexOf("\n", start - 1) + 1;
+    const lastChar = end > start && text[end - 1] === "\n" ? end -1 : end;
+    const lineEnd = text.indexOf("\n", lastChar);
+    const blockEnd = lineEnd === -1 ? text.length : lineEnd;
+
+    const lines = text.slice(blockStart, blockEnd).split("\n");
+    let removedOnFirstLine = 0;
+
+    const changed = lines.map((line, i) => {
+        if (!event.shiftKey) {
+            return line.length > 0 ? indent + line : line; /// leave empty lines empty
+        }
+
+        let remove = 0;
+        if (line.startsWith("\t")) {
+            remove = 1;
+        } else {
+            while (remove < tabWidth && line[remove] === " ") remove++;
+        }
+
+        if (i === 0) removedOnFirstLine = remove;
+        return line.slice(remove);
+    });
+
+    const newBlock = changed.join("\n");
+    if (newBlock === text.slice(blockStart, blockEnd)) return; // nothing to change
+
+    codeEditor.setRangeText(newBlock, blockStart, blockEnd, "select");
+
+    if (start === end) {
+        const cursor = Math.max(blockStart, start - removedOnFirstLine);
+        codeEditor.setSelectionRange(cursor, cursor);
+    }
+
+    handleEditorChange(); // fha
+}
+
+
 
 function syncHighlight() {
     const editor = document.getElementById("code-editor");
@@ -1239,13 +1295,9 @@ codeEditor.addEventListener("click", updateCursorPosition);
 codeEditor.addEventListener("select", updateCursorPosition);
 
 codeEditor.addEventListener("keydown", (event) => {
+    
     if (event.key === "Tab") {
-        event.preventDefault();
-        const start = codeEditor.selectionStart;
-        const end = codeEditor.selectionEnd;
-        const tabWidth = (typeof settings !== "undefined" && settings.tabSize) ? settings.tabSize : 4;
-        codeEditor.setRangeText(" ".repeat(tabWidth), start, end, "end");
-        handleEditorChange();
+        handleTabKey(event);
         return;
     }
 
