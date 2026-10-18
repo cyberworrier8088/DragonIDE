@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "journels/**"
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "journels/**"
+      - "**.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# a new push stops the older run that is still going
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ide:
+    name: IDE (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: DragonFoxxDE
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux libraries for Tauri
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: DragonFoxxDE
+
+      - name: Build and run tests
+        run: cargo test --locked
+
+  web:
+    name: JavaScript syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check every JS file
+        run: |
+          for f in DragonFoxxDE/web/js/*.js; do
+            echo "checking $f"
+            node --check "$f"
+          done
+
+  foxai:
+    name: FoxAi
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FoxAi
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: FoxAi
+
+      - name: Check that it compiles
+        run: cargo check --locked
