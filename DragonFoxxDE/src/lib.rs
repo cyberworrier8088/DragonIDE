@@ -60,7 +60,7 @@ async fn read_image(path: String) -> Result<tauri::ipc::Response, String> {
     let bytes = std::fs::read(&path).map_err(|e| e.to_string())?;
 
     Ok(tauri::ipc::Response::new(bytes))
-  }).await.map_err(|e| e.to_string())?;
+  }).await.map_err(|e| e.to_string())?
 }
 
 // find files by name (quick open)

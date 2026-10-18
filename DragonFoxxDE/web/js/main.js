@@ -385,6 +385,10 @@ async function toggleDirectory(element, entry, arrow) {
 
 async function openFile(entry) {
 
+    if (typeof isImageFile === "function" && isImageFile(entry.path)) {
+        return openImage(entry);
+    }
+
     try {
 
         if (currentFile?.path === entry.path) {
@@ -433,6 +437,8 @@ async function openFile(entry) {
         if (editorContainer) {
             editorContainer.style.display = "flex";
         }
+
+        if (typeof hideImagePreview === "function") hideImagePreview();
 
         if (editor) {
             editor.value = content;
@@ -511,6 +517,11 @@ function renderFileTree(files) {
 async function updateCurrentDocument(path = currentFile?.path, text = document.getElementById("code-editor")?.value) {
 
     if (!path || text === undefined) {
+        return;
+    }
+
+    // image have no text to keep
+    if (typeof isImagePath === "function" && isImagePath(path)) {
         return;
     }
 
@@ -639,6 +650,10 @@ async function activateTab(path) {
         return;
     }
 
+    if (typeof isImagePath === "function" && isImagePath(path)) {
+        return openImage(tab);
+    }
+
     if (currentFile && currentFile.path !== path) {
         clearTimeout(editorChangeTimer);
         await updateCurrentDocument();
@@ -684,6 +699,8 @@ async function activateTab(path) {
         if (editorContainer) {
             editorContainer.style.display = "flex";
         }
+
+        if (typeof hideImagePreview === "function") hideImagePreview();
 
         if (editor) {
             editor.value = content;
@@ -789,6 +806,8 @@ async function closeTab(path, force = false) {
             if (welcome) {
                 welcome.style.display = "block";
             }
+
+            if (typeof hideImagePreview === "function") hideImagePreview();
 
             window.dispatchEvent(new CustomEvent("file-opened", { detail: null }));
 
@@ -991,6 +1010,11 @@ document.addEventListener("keydown", async (event) => {
         event.preventDefault();
 
         if (!currentFile) {
+            return;
+        }
+
+        // images have no text to save
+        if (currentFile.isImage) {
             return;
         }
 
