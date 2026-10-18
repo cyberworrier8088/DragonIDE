@@ -103,7 +103,42 @@ function applyTheme(themeName) {
     themeLink.href = themeMap[themeName];
     settings.theme = themeName;
     saveSettings(settings);
+    setNativeGlass(themeName);
     console.log("Theme applied:", themeName);
+}
+
+// Glass themes show the real desktop: the window is transparent
+// (tauri.conf.json) and Windows blurs whatever sits behind it.
+// Other systems keep the CSS-only glass.
+const GLASS_THEMES = { glassmorphism: "dark", frost: "light" };
+let glassQueue = Promise.resolve();
+
+function setNativeGlass(themeName) {
+    // one change at a time, so quick theme clicks end on the last one
+    glassQueue = glassQueue.then(() => applyNativeGlass(themeName));
+}
+
+async function applyNativeGlass(themeName) {
+    const appWindow = window.__TAURI__?.window?.getCurrentWindow?.();
+    if (!appWindow || !navigator.userAgent.includes("Windows")) return;
+
+    const tone = GLASS_THEMES[themeName];
+
+    try {
+        // the blur is tinted by the window theme, so match the glass tone
+        await appWindow.setTheme(tone || null);
+
+        if (tone) {
+            await appWindow.setEffects({ effects: ["acrylic"] });
+        } else {
+            await appWindow.clearEffects();
+        }
+
+        document.documentElement.classList.toggle("native-glass", !!tone);
+    } catch (e) {
+        console.warn("Native glass unavailable:", e);
+        document.documentElement.classList.remove("native-glass");
+    }
 }
 
 function applyFontSize(size) {

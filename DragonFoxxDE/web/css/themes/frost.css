@@ -29,6 +29,8 @@
   --orb-2: rgba(100, 215, 205, 0.5);
   --orb-3: rgba(175, 145, 255, 0.55);
   --orb-4: rgba(255, 135, 185, 0.45);
+  --native-tint: rgba(255, 255, 255, 0.18);
+  --native-tint-deep: rgba(255, 255, 255, 0.42);
 }
 
 #bottom-panel {

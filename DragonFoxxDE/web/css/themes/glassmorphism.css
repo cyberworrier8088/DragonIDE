@@ -33,6 +33,10 @@
   --orb-2: rgba(34, 193, 195, 0.42);
   --orb-3: rgba(150, 92, 255, 0.45);
   --orb-4: rgba(232, 69, 155, 0.35);
+
+  /* lighter tints for when the OS does the blur */
+  --native-tint: rgba(16, 14, 20, 0.14);
+  --native-tint-deep: rgba(10, 9, 13, 0.34);
 }
 
 html,
@@ -54,6 +58,34 @@ body::before {
     radial-gradient(36% 40% at 70% 82%, var(--orb-3), transparent 70%),
     radial-gradient(26% 30% at 28% 86%, var(--orb-4), transparent 70%);
   animation: glass-drift 40s ease-in-out infinite alternate;
+}
+
+/* native glass (settings.js): the window is see-through and the OS
+   blurs the real desktop, so drop the fake scene and our own blur */
+html.native-glass {
+  --scene-base: transparent;
+  --glass-blur: none;
+  --glass-tint: var(--native-tint);
+  --glass-tint-deep: var(--native-tint-deep);
+  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+html.native-glass body::before {
+  display: none;
+}
+
+html.native-glass #titlebar {
+  background: transparent;
+}
+
+/* things that float over code still need a solid enough frost */
+html.native-glass .modal-content,
+html.native-glass .context-menu,
+html.native-glass .unsaved-dialog,
+html.native-glass #zoom-toast {
+  background: var(--glass-sheen), var(--bg-tertiary);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
 }
 
 #titlebar,
