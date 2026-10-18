@@ -237,3 +237,72 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// ------- zoom: Ctrl+= / Ctrl+- / Ctrl+0 and Ctrl+mouse wheel ----
+
+const FONT_SIZE_MIN = 10; // same limits as the font size slider
+const FONT_SIZE_MAX = 34;
+
+let zoomToastTimer = null;
+let wheelZoomDelta = 0;
+
+function zoomEditor(step) {
+
+    const size = step === 0 ? defaultSettings.fontSize : Math.max(FONT_SIZE_MIN, Math.min(FONT_SIZE_MAX, settings.fontSize + step));
+    
+    applyFontSize(size);
+    updateSettingsUI();
+    showZoomToast(size);
+}
+
+function showZoomToast(size) {
+    let toast = document.getElementById("zoom-toast");
+
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "zoom-toast";
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = `Font size: ${size}px`;
+    toast.classList.add("visible");
+
+    clearTimeout(zoomToastTimer);
+    zoomToastTimer = setTimeout(() => toast.classList.remove("visible"), 1200);
+}
+
+function initEditorZoom() {
+    document.addEventListener("keydown", (e) => {
+        if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+
+        if (e.key === "=" || e.key === "+") {
+            e.preventDefault();
+            zoomEditor(1);
+        } else if (e.key === "-" || e.key === "_") {
+            e.preventDefault();
+            zoomEditor(-1);
+        } else if (e.key === "0") {
+            e.preventDefault();
+            zoomEditor(0);
+        }
+    });
+
+    // Ctrl + mouse wheel over the editor
+    document.getElementById("editor")?.addEventListener("wheel", (e) => {
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+
+        // add up the wheel distance: one mouse wheel click is about 100,
+        // a touchpad sends many tiny steps, so zoom once every 50
+        wheelZoomDelta += e.deltaY;
+        if (Math.abs(wheelZoomDelta) < 50) return;
+
+        zoomEditor(wheelZoomDelta < 0 ? 1 : -1);
+        wheelZoomDelta = 0;
+    }, { passive: false });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initEditorZoom);
+} else {
+    initEditorZoom();
+}

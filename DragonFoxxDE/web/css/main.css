@@ -1045,3 +1045,27 @@ code.hljs {
     border-top: 1px solid var(--border);
     background: var(--bg-secondary);
 }
+
+
+/* zoom msg */
+#zoom-toast {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 13px;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+
+}
+
+#zoom-toast.visible {
+    opacity: 1;
+}
