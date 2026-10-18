@@ -140,7 +140,7 @@
 .lang-option.active {
     background: var(--accent-blue);
     border-color: var(--accent-blue);
-    color: white;
+    color: var(--accent-ink, #fff);
     font-weight: 500;
 }
 
@@ -238,7 +238,7 @@
     padding: 8px 16px;
     border: 1px solid var(--accent-blue);
     background: var(--accent-blue);
-    color: white;
+    color: var(--accent-ink, #fff);
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
@@ -371,7 +371,7 @@
     padding: 6px 12px;
     border: 1px solid var(--border);
     background: var(--accent-blue);
-    color: white;
+    color: var(--accent-ink, #fff);
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
@@ -541,7 +541,7 @@
 
 .unsaved-dialog-buttons button.save-btn {
     background: var(--accent-blue);
-    color: white;
+    color: var(--accent-ink, #fff);
     border-color: var(--accent-blue);
 }
 
