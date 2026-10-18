@@ -184,6 +184,7 @@ button:focus-visible {
 
 #editor {
     flex: 1;
+    min-height: 120px;
     position: relative;
     overflow: hidden;
     background: var(--bg-primary);
@@ -228,7 +229,7 @@ button:focus-visible {
 
 #bottom-panel {
     height: 260px;
-    flex-shrink: 0;
+    min-height: 37px; /* the panel tabs stay visible */
     display: flex;
     flex-direction: column;
     background: var(--bg-secondary);
