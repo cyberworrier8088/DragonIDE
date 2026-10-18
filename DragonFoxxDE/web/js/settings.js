@@ -81,7 +81,10 @@ function applyTheme(themeName) {
         "light": "css/themes/light.css",
         "nord": "css/themes/nord.css",
         "monokai": "css/themes/monokai.css",
-        "glassmorphism": "css/themes/glassmorphism.css"
+        "glassmorphism": "css/themes/glassmorphism.css",
+        "frost": "css/themes/frost.css",
+        "ember": "css/themes/ember.css",
+        "midnight": "css/themes/midnight.css"
     };
 
     if (!themeMap[themeName]) {

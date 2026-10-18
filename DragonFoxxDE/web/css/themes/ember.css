@@ -1,0 +1,33 @@
+/* Ember: warm charcoal with a fox-orange accent */
+:root {
+  --titlebar-bg: #16110e;
+  --editor-bg: #1b1512;
+  --editor-text: #f0e2d4;
+  --editor-line-number: #6c5a4d;
+  --editor-line-number-bg: #1b1512;
+  --editor-cursor: #ff8a3d;
+  --bg-primary: #1b1512;
+  --bg-secondary: #16110e;
+  --bg-tertiary: #271f1a;
+  --text-primary: #f0e2d4;
+  --text-secondary: #c2ab98;
+  --text-muted: #8a7565;
+  --border: #31271f;
+  --accent-blue: #ff8a3d;
+  --accent-ink: #1f1206;
+  --accent-hover: #2a201a;
+  --accent-active: #3a2b21;
+}
+
+.hljs { color: #f0e2d4; background: transparent; }
+.hljs-comment, .hljs-quote { color: #7d6a5c; font-style: italic; }
+.hljs-doctag, .hljs-formula, .hljs-keyword { color: #ff7a59; }
+.hljs-deletion, .hljs-name, .hljs-section, .hljs-selector-tag, .hljs-subst { color: #ff6b6b; }
+.hljs-literal { color: #7fd1c4; }
+.hljs-addition, .hljs-attribute, .hljs-meta .hljs-string, .hljs-regexp, .hljs-string { color: #c3d88a; }
+.hljs-attr, .hljs-number, .hljs-selector-attr, .hljs-selector-class, .hljs-selector-pseudo, .hljs-template-variable, .hljs-type, .hljs-variable { color: #ffb86b; }
+.hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-symbol, .hljs-title { color: #f6c177; }
+.hljs-built_in, .hljs-class .hljs-title, .hljs-title.class_ { color: #e8a0bf; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+.hljs-link { text-decoration: underline; }
