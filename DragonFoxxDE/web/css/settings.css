@@ -14,6 +14,23 @@
     display: none;
 }
 
+.modal-content {
+    animation: modal-in 0.16s ease-out;
+}
+
+@keyframes modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.985);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-content {
+        animation: none;
+    }
+}
+
 .modal-backdrop {
     position: absolute;
     top: 0;
