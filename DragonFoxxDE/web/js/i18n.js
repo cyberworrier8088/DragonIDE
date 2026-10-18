@@ -3,6 +3,11 @@ let currentTranslations = {};
 
 async function loadLanguage(lang) {
 
+    if (!/^[a-zA-Z]{2}(-[a-zA-Z]{2})?$/.test(lang)) {
+        console.error("i18n load Error: invalid language code", lang);
+        lang = "en";
+    }
+
     try {
         const response = await fetch(`./locales/${lang}.json`);
 
