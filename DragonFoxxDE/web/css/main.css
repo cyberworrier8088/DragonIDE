@@ -123,10 +123,11 @@ button:focus-visible {
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 2px 6px;
+    display: grid;
+    place-items: center;
+    padding: 4px;
     border-radius: 4px;
     color: var(--text-muted);
-    font-size: 13px;
     line-height: 1;
     transition: background-color 0.15s ease, color 0.15s ease;
 }

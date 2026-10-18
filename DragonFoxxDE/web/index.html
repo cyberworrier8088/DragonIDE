@@ -63,7 +63,7 @@
     <div id="app">
 
         <aside id="activity-bar">
-            <button class="activity-button active"><img src="assets/icon/file.svg" alt="EX"></button>
+            <button class="activity-button active" title="Explorer"><img src="assets/icon/file.svg" alt="Explorer"></button>
             <button class="activity-button" id="search-activity-btn" title="Search (Ctrl+Shift+F)">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round">
@@ -71,12 +71,25 @@
                     <line x1="16.5" y1="16.5" x2="21" y2="21" />
                 </svg>
             </button>
-            <button class="activity-button">GI</button>
-            <button class="activity-button">DB</button>
+            <button class="activity-button" title="Source Control (coming soon)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <circle cx="6" cy="5" r="2" />
+                    <circle cx="6" cy="19" r="2" />
+                    <circle cx="18" cy="8" r="2" />
+                    <path d="M6 7v10M18 10c0 4-6 3-11.5 7.5" />
+                </svg>
+            </button>
+            <button class="activity-button" title="Database (coming soon)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="8" ry="3" />
+                    <path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" />
+                </svg>
+            </button>
 
             <div class="activity-spacer"></div>
 
-            <button class="activity-button" id="settings-button"><img src="assets/icon/setting.svg"
+            <button class="activity-button" id="settings-button" title="Settings"><img src="assets/icon/setting.svg"
                     alt="setting"></button>
         </aside>
 
@@ -90,7 +103,12 @@
 
                 <div class="explorer-section">
                     <span id="workspace-name" title="Click to open folder">DragonIDE</span>
-                    <button id="explorer-open-btn-icon" class="explorer-header-btn" title="Open Folder">📁</button>
+                    <button id="explorer-open-btn-icon" class="explorer-header-btn" title="Open Folder">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linejoin="round">
+                            <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" />
+                        </svg>
+                    </button>
                 </div>
 
                 <div id="file-tree"></div>
