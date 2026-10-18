@@ -998,6 +998,8 @@ function saveUndoState() {
 }
 
 document.getElementById("open-folder-button")?.addEventListener("click", openFolder);
+// the folder picker can make a new folder, so this starts a project too
+document.getElementById("create-project-button")?.addEventListener("click", openFolder);
 
 
 
