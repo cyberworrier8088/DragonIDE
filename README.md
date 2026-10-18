@@ -10,7 +10,7 @@ A lightweight Code editor built with **Rust** and **Tauri 2**, with a plain HTML
 
 > **Work in progress.** DragonIDE is not ready for daily use yet. Things chnage every day and there are no installers yet. You can build it from source and try it.
 
-![DragonIDE ScreenShot](docs/screenshot.png)
+![DragonIDE ScreenShot](journels/img/full-desktop.png)
 
 ## Contents
 
