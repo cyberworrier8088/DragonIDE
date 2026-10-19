@@ -9,15 +9,11 @@ pub struct Document {
     pub modified: bool,
 }
 
-
 impl Document {
-
     pub fn new(path: PathBuf, text: String) -> Self {
-
         let language = detect_language(&path);
 
         Self {
-
             path,
             text,
             language,
@@ -25,7 +21,6 @@ impl Document {
             modified: false,
         }
     }
-
 
     pub fn set_text(&mut self, text: String) {
         self.text = text;
@@ -39,7 +34,6 @@ impl Document {
 }
 
 fn detect_language(path: &PathBuf) -> String {
-
     match path.extension().and_then(|ext| ext.to_str()) {
         Some("rs") => "rust".to_string(),
         Some("js") => "javascript".to_string(),
@@ -56,7 +50,5 @@ fn detect_language(path: &PathBuf) -> String {
         Some("json") => "json".to_string(),
         Some("md") => "markdown".to_string(),
         _ => "text".to_string(),
-
-        
     }
 }

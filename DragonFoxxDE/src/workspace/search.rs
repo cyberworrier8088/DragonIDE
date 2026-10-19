@@ -13,7 +13,11 @@ const SKIP_DIRS: &[&str] = &[".git", "target", "node_modules", "dist", "build"];
 const MAX_FILE_SIZE: u64 = 1024 * 1024; // skip files bigger than 1MB
 const MAX_RESULTS: usize = 1000;
 
-pub fn search_workspace(root: &Path, query: &str, case_sensitive: bool) -> Result<Vec<SearchResult>, String> {
+pub fn search_workspace(
+    root: &Path,
+    query: &str,
+    case_sensitive: bool,
+) -> Result<Vec<SearchResult>, String> {
     if !root.is_dir() {
         return Err("Folder not found".to_string());
     }
@@ -21,7 +25,11 @@ pub fn search_workspace(root: &Path, query: &str, case_sensitive: bool) -> Resul
         return Ok(Vec::new());
     }
 
-    let needle = if case_sensitive { query.to_string() } else { query.to_lowercase() };
+    let needle = if case_sensitive {
+        query.to_string()
+    } else {
+        query.to_lowercase()
+    };
     let mut results = Vec::new();
     let mut stack: Vec<PathBuf> = vec![root.to_path_buf()];
 
@@ -51,18 +59,20 @@ pub fn search_workspace(root: &Path, query: &str, case_sensitive: bool) -> Resul
                 continue; // skip symlinks and special files
             }
 
-            if entry.metadata().map(|m| m.len() > MAX_FILE_SIZE).unwrap_or(true) {
+            if entry
+                .metadata()
+                .map(|m| m.len() > MAX_FILE_SIZE)
+                .unwrap_or(true)
+            {
                 continue;
             }
 
             let content = match fs::read_to_string(&path) {
-
                 Ok(c) => c,
                 Err(_) => continue, // binary or unreadable file
             };
 
             for (index, line) in content.lines().enumerate() {
-
                 let found = if case_sensitive {
                     line.contains(needle.as_str())
                 } else {
@@ -70,14 +80,12 @@ pub fn search_workspace(root: &Path, query: &str, case_sensitive: bool) -> Resul
                 };
 
                 if found {
-                    results.push(
-                        SearchResult {
-                            path: path.to_string_lossy().to_string(),
-                            name: name.clone(),
-                            line: index + 1,
-                            text: line.trim().chars().take(200).collect(),
-                        }
-                    );
+                    results.push(SearchResult {
+                        path: path.to_string_lossy().to_string(),
+                        name: name.clone(),
+                        line: index + 1,
+                        text: line.trim().chars().take(200).collect(),
+                    });
 
                     if results.len() >= MAX_RESULTS {
                         break 'walk;
@@ -136,7 +144,11 @@ pub fn find_files(root: &Path, query: &str) -> Result<Vec<FileMatch>, String> {
             }
 
             // show "src/main.rs" style paths, also on windows
-            let relative = path.strip_prefix(root).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+            let relative = path
+                .strip_prefix(root)
+                .unwrap_or(&path)
+                .to_string_lossy()
+                .replace('\\', "/");
 
             let score = if needle.is_empty() || name_lower == needle {
                 0
@@ -150,17 +162,26 @@ pub fn find_files(root: &Path, query: &str) -> Result<Vec<FileMatch>, String> {
                 continue;
             };
 
-            found.push((score, FileMatch {
-                path: path.to_string_lossy().to_string(),
-                name,
-                relative,
-            }));
+            found.push((
+                score,
+                FileMatch {
+                    path: path.to_string_lossy().to_string(),
+                    name,
+                    relative,
+                },
+            ));
         }
     }
 
     found.sort_by(|a, b| {
-        a.0.cmp(&b.0).then(a.1.relative.len().cmp(&b.1.relative.len())).then(a.1.relative.cmp(&b.1.relative))
+        a.0.cmp(&b.0)
+            .then(a.1.relative.len().cmp(&b.1.relative.len()))
+            .then(a.1.relative.cmp(&b.1.relative))
     });
 
-    Ok(found.into_iter().take(MAX_FILE_MATCHES).map(|(_, file)| file).collect())
+    Ok(found
+        .into_iter()
+        .take(MAX_FILE_MATCHES)
+        .map(|(_, file)| file)
+        .collect())
 }

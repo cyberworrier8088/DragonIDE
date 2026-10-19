@@ -3,10 +3,8 @@ use std::path::PathBuf;
 
 use super::document::Document;
 
-
 #[derive(Debug, Default)]
 pub struct DocumentManager {
-
     documents: HashMap<PathBuf, Document>,
 }
 
@@ -17,13 +15,10 @@ impl DocumentManager {
         }
     }
 
-    pub fn open (
-        &mut self,
-        path: PathBuf,
-        text: String,
-    ) -> &Document {
-
-        self.documents.entry(path.clone()).or_insert_with(|| Document::new(path, text))
+    pub fn open(&mut self, path: PathBuf, text: String) -> &Document {
+        self.documents
+            .entry(path.clone())
+            .or_insert_with(|| Document::new(path, text))
     }
 
     pub fn get(&self, path: &PathBuf) -> Option<&Document> {
@@ -43,8 +38,10 @@ impl DocumentManager {
     }
 
     pub fn save(&mut self, path: &PathBuf) -> Result<(), String> {
-
-        let document = self.documents.get_mut(path).ok_or_else(|| "Document is not open".to_string())?;
+        let document = self
+            .documents
+            .get_mut(path)
+            .ok_or_else(|| "Document is not open".to_string())?;
 
         std::fs::write(&document.path, &document.text).map_err(|error| error.to_string())?;
 
@@ -52,8 +49,6 @@ impl DocumentManager {
 
         Ok(())
     }
-
-
 }
 
 #[cfg(test)]
@@ -61,20 +56,14 @@ mod tests {
 
     use super::*;
 
-
     #[test]
 
     fn opens_document() {
-
         let mut manager = DocumentManager::new();
 
         let path = PathBuf::from("main.rs");
 
-        manager.open(
-            path.clone(),
-            "fn main() {}".to_string(),
-
-        );
+        manager.open(path.clone(), "fn main() {}".to_string());
 
         assert_eq!(manager.count(), 1);
         assert!(manager.get(&path).is_some());
