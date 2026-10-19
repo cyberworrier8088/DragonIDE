@@ -39,13 +39,6 @@ My clients said the terminal had some problems, so i fixed them all:
 - **the warning messages were not yellow.** I typed `waring` instead of `warning` in the class name. typo againnn!!
 - **now i can click anywhere in the output to type.** Selecting text to copy still works. (first i wrote `input()` instead of `input.focus()`... fixed it after hahaha)
 
-### images:
-
-Terminal with quotes image:
-![Terminal-quotes](img/day-27v3.png)
-
-Terminal clear image:
-![Terminal-clear](img/day-27v4.png)
 
 ## Things i learned today
 
@@ -53,10 +46,10 @@ Terminal clear image:
 - `ls` doesn't work in Windows cmd, it is `dir`. Not a bug in my IDE. i was confused first hahaha
 - type commands one by one, or join them with `&&`. I put 3 git commands on one line and git got confuesd.
 
-## Why i spent [X]h
+## Why i spent 3h
 
 Becuase the terminal bugs were really hard to find. The "r" bug and the quotes bug only show up with some commands, so i had to test so many commands to see them. The quote problem on Windows was totaly new for me. Also clippy and cargo fmt were new, so i had to reserch and understand every warning before fixing it.
 
 Next i will add tests and make my CI bigger, so these typos can't reach main again 🦊
 
-Please consider my Valuble [X]h :)
+Please consider my Valuble 3h :)
