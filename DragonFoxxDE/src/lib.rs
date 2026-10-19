@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 mod core;
 mod editor;
+mod git;
 mod workspace;
 
 use core::state::IdeState;
@@ -45,7 +46,14 @@ pub fn run() {
             stop_code,
             search_workspace,
             find_files,
-            read_image
+            read_image,
+            git::git_status,
+            git::git_stage,
+            git::git_unstage,
+            git::git_commit,
+            git::git_push,
+            git::git_pull,
+            git::git_init
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
