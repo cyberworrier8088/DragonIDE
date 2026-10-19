@@ -78,7 +78,7 @@
                     <line x1="16.5" y1="16.5" x2="21" y2="21" />
                 </svg>
             </button>
-            <button class="activity-button" title="Source Control (coming soon)">
+            <button class="activity-button" id="git-activity-btn" title="Source Control (Ctrl+Shift+G)">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round">
                     <circle cx="6" cy="5" r="2" />
@@ -86,6 +86,7 @@
                     <circle cx="18" cy="8" r="2" />
                     <path d="M6 7v10M18 10c0 4-6 3-11.5 7.5" />
                 </svg>
+                <span id="git-badge" class="activity-badge" style="display: none;"></span>
             </button>
             <button class="activity-button" title="Database (coming soon)">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -133,6 +134,50 @@
 
                 <div id="search-summary" class="search-summary"></div>
                 <div id="search-results"></div>
+            </div>
+
+            <div id="git-view" style="display: none;">
+                <div id="git-no-repo" style="display: none;">
+                    <p class="git-hint">This folder is not a Git repository.</p>
+
+                    <button id="git-init-btn" class="git-button primary">Initialize Repository</button>
+                </div>
+
+                <div id="git-repo">
+                    <div class="git-top">
+                        <span id="git-branch" class="git-branch"></span>
+
+                        <button id="git-refresh-btn" class="git-icon-btn" title="Refresh">↻</button>
+                    </div>
+
+                    <textarea id="git-message" rows="3" placeholder="Message (Ctrl+Enter to commit)" spellcheck="false"></textarea>
+
+                    <div class="git-actions">
+                        <button id="git-commit-btn" class="git-button primary">Commit</button>
+                        <button id="git-pull-btn" class="git-button" title="git pull">Pull</button>
+                        <button id="git-push-btn" class="git-button" title="git push">Push</button>
+                    </div>
+
+                    <div id="git-note" class="git-note"></div>
+
+                    <div class="git-lists">
+                        <div class="git-section-title">
+                            <span>Staged changes <span id="git-staged-count" class="git-count"></span></span>
+
+                            <button id="git-unstage-all-btn" class="git-icon-btn" title="Unstage all">-</button>
+                        </div>
+
+                        <div id="git-staged-list"></div>
+
+                        <div class="git-section-title">
+                            <span>Changes <span id="git-changes-count" class="git-count"></span></span>
+
+                            <button id="git-stage-all-btn" class="git-icon-btn" title="Stage All">+</button>
+                        </div>
+
+                        <div id="git-changes-list"></div>
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -471,6 +516,7 @@
     <script src="js/code-execution.js"></script>
     <script src="js/search.js"></script>
     <script src="js/quick-open.js"></script>
+    <script src="js/source-control.js"></script>
     <script src="js/terminal.js"></script>
     <script src="js/panel-resize.js"></script>
     <script src="js/layout.js"></script>
