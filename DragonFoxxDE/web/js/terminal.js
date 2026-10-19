@@ -229,7 +229,7 @@ function initTerminal() {
     document.getElementById("terminal-stop-btn")?.addEventListener("click", stopTerminalCommand);
 
     document.getElementById("terminal-output")?.addEventListener("click", () => {
-        if (!window.getSelection().toString()) input();
+        if (!window.getSelection().toString()) input.focus();
     });
 
     document.querySelector('.panel-tab[data-panel="terminal"]')?.addEventListener("click", updateTerminalPrompt);
