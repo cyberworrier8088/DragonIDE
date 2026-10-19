@@ -21,6 +21,7 @@ impl DocumentManager {
             .or_insert_with(|| Document::new(path, text))
     }
 
+    #[allow(dead_code)] // used by tests; not called by the app yet
     pub fn get(&self, path: &PathBuf) -> Option<&Document> {
         self.documents.get(path)
     }
@@ -29,6 +30,7 @@ impl DocumentManager {
         self.documents.get_mut(path)
     }
 
+    #[allow(dead_code)]
     pub fn close(&mut self, path: &PathBuf) -> Option<Document> {
         self.documents.remove(path)
     }

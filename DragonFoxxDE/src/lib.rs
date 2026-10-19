@@ -360,7 +360,7 @@ fn send_lines<R: std::io::Read>(
             Ok(0) | Err(_) => break,
             Ok(_) => {
                 let text = String::from_utf8_lossy(&buf)
-                    .trim_end_matches(|c| c == '\r' || c == '\n')
+                    .trim_end_matches(['r', '\n'])
                     .to_string();
                 let _ = channel.send(TerminalEvent::Line { text, error });
             }
@@ -428,6 +428,7 @@ fn terminal_change_dir(current_dir: String, target: String) -> Result<String, St
 }
 
 fn command<S: AsRef<std::ffi::OsStr>>(program: S) -> std::process::Command {
+    #[allow(unused_mut)] // only changed on windows
     let mut cmd = std::process::Command::new(program);
 
     #[cfg(target_os = "windows")]
