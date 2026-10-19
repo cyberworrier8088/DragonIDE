@@ -1,4 +1,4 @@
-const { act } = require("react");
+
 
 let gitStatus = null;
 let gitBusy = false;
@@ -61,9 +61,9 @@ function refreshGitIfVisible() {
 function renderGit(status, hint) {
     const noRepo = document.getElementById("git-no-repo");
     const repo = document.getElementById("git-repo");
-    const bedge = document.getElementById("git-badge");
+    const badge = document.getElementById("git-badge");
     if (!status) {
-        if (repo) repo.style.style.display = "none";
+        if (repo) repo.style.display = "none";
         if (noRepo) {
             noRepo.style.display = "block";
             noRepo.querySelector(".git-hint").textContent = hint || "This folder is not a Git repository";
@@ -74,7 +74,7 @@ function renderGit(status, hint) {
         return;
     }
 
-    if (noRepo) badge.style.display = "none";
+    if (noRepo) noRepo.style.display = "none";
     if (repo) repo.style.display = "flex";
 
     let branch = `⎇ ${status.branch}`;
@@ -83,9 +83,9 @@ function renderGit(status, hint) {
     document.getElementById("git-branch").textContent = branch;
 
     const staged = status.files.filter(file => file.staged);
-    const changes = status.filter(file => !file.staged);
+    const changes = status.files.filter(file => !file.staged);
 
-    fillGitList("git-staged-list", staged, "unstaged");
+    fillGitList("git-staged-list", staged, "unstage");
     fillGitList("git-changes-list", changes, "stage");
 
     document.getElementById("git-staged-count").textContent = staged.length ? staged.length : "";
@@ -127,7 +127,7 @@ function fillGitList(listId, files, action) {
 
         const folder = document.createElement("span");
         folder.className = "git-file-folder";
-        folder.textContent = parts.join("/n");
+        folder.textContent = parts.join("/");
 
         const button = document.createElement("button");
         button.className = "git-icon-btn";
@@ -135,7 +135,7 @@ function fillGitList(listId, files, action) {
         button.title = action === "stage" ? "Stage" : "Unstage";
         button.addEventListener("click", (e) => {
             e.stopPropagation();
-            runGitAction(() => getInvoke(action === "stage" ? "git_stage" : "git_unstage", { paths: [file.path] }));
+            runGitAction(() => gitInvoke(action === "stage" ? "git_stage" : "git_unstage", { paths: [file.path] }));
         });
 
         const letter = document.createElement("span");
@@ -160,7 +160,7 @@ async function runGitAction(action, startNote = "") {
     if (gitBusy) return;
 
     gitBusy = true;
-    showGitNote(startNode); // clear the last message
+    showGitNote(startNote); // clear the last message
     document.querySelectorAll("#git-view button").forEach(button => button.disabled = true);
 
     try {
@@ -195,7 +195,7 @@ function commitGit() {
             await gitInvoke("git_stage", { paths: [] });
         }
 
-        const result = await getInvoke("git_commit", { message: message });
+        const result = await gitInvoke("git_commit", { message: message });
 
         box.value = "";
         showGitNote(result.split("\n")[0]);
@@ -204,12 +204,12 @@ function commitGit() {
 
 
 function pushOrPullGit(command, doneText) {
-    const startNote = command === "git_push" ? "pushing..." : "Pulling...";
+    const startNote = command === "git_push" ? "Pushing..." : "Pulling...";
 
     runGitAction(async () => {
         const result = await gitInvoke(command);
         showGitNote(result.split("\n").pop() || doneText);
-    }, startNode);
+    }, startNote);
 }
 
 
