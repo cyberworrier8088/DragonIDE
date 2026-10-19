@@ -71,6 +71,13 @@ function flushTerminal() {
 
 }
 
+function clearTerminal() {
+    terminalQueue = [];
+
+    const output = document.getElementById("terminal-output");
+    if (output) output.textContent = "";
+}
+
 function setTerminalRunning(running) {
     terminalRunning = running;
 
@@ -114,6 +121,11 @@ async function runTerminalCommand(commandText) {
     }
     terminalHistoryIndex = terminalHistory.length;
 
+    if (/^(clear|cls)$/i.test(commandText)) {
+        clearTerminal();
+        return;
+    }
+
     // the shell forgets "cd" after each command, so we keep the folder ourselves
     const cd = commandText.match(/^cd(?:\s+(.*))?$/i);
 
@@ -137,7 +149,7 @@ async function runTerminalCommand(commandText) {
             const ms = Date.now() - startTime;
 
             if (terminalStopRequested) {
-                writeTerminal(`■ Stopped after ${ms}ms`, "waring");
+                writeTerminal(`■ Stopped after ${ms}ms`, "warning");
             } else if (message.code !== 0) {
                 writeTerminal(`Exit code ${message.code}`, "error");
             }
@@ -180,7 +192,7 @@ function initTerminal() {
             e.preventDefault();
 
             if (terminalRunning) {
-                writeTerminal("A command is still running. Press Ctrl+c or Stop first", "waring");
+                writeTerminal("A command is still running. Press Ctrl+c or Stop first", "warning");
                 return;
             }
 
@@ -204,6 +216,9 @@ function initTerminal() {
                 terminalHistoryIndex = terminalHistory.length;
                 input.value = "";
             }
+        } else if (e.ctrlKey && e.key.toLowerCase() === "l") {
+            e.preventDefault();
+            clearTerminal();
         } else if (e.ctrlKey && e.key.toLocaleLowerCase() === "c" && terminalRunning && input.selectionStart === input.selectionEnd) {
             // Ctr+C with nothing selected = stop, like a real terminal
             e.preventDefault();
@@ -212,6 +227,10 @@ function initTerminal() {
     });
 
     document.getElementById("terminal-stop-btn")?.addEventListener("click", stopTerminalCommand);
+
+    document.getElementById("terminal-output")?.addEventListener("click", () => {
+        if (!window.getSelection().toString()) input();
+    });
 
     document.querySelector('.panel-tab[data-panel="terminal"]')?.addEventListener("click", updateTerminalPrompt);
 }

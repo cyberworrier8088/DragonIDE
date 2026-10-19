@@ -300,16 +300,24 @@ fn run_terminal_command(
 ) -> Result<(), String> {
     use std::process::Stdio;
 
-    let (shell, flag) = if cfg!(target_os = "windows") {
-        ("cmd", "/c")
-    } else {
-        ("sh", "-c")
+    // give cmd the command exactly as typed, so quotes like git commit -m "fix bug" work
+    #[cfg(target_os = "windows")]
+    let mut cmd = {
+        use std::os::windows::process::CommandExt;
+        let mut cmd = command("cmd");
+        cmd.args(["/d", "/s", "/c"])
+            .raw_arg(format!("\"{}\"", command_text));
+        cmd
     };
 
-    let mut cmd = command(shell);
-    cmd.arg(flag)
-        .arg(command_text)
-        .current_dir(current_dir)
+    #[cfg(not(target_os = "windows"))]
+    let mut cmd = {
+        let mut cmd = command("sh");
+        cmd.arg("-c").arg(command_text);
+        cmd
+    };
+
+    cmd.current_dir(current_dir)
         .env("PYTHONUNBUFFERED", "1")
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
@@ -360,7 +368,7 @@ fn send_lines<R: std::io::Read>(
             Ok(0) | Err(_) => break,
             Ok(_) => {
                 let text = String::from_utf8_lossy(&buf)
-                    .trim_end_matches(['r', '\n'])
+                    .trim_end_matches(['\r', '\n'])
                     .to_string();
                 let _ = channel.send(TerminalEvent::Line { text, error });
             }
