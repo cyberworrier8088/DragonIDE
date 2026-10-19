@@ -46,7 +46,7 @@ function saveAutoSettings() {
     saveAutoSaveSettings();
 }
 
-// Sync UI controls with current autoSaveState
+// sync UI controls with current autoSaveState
 function syncAutoSaveUI() {
     const autoSaveToggle = document.getElementById("auto-save-toggle");
     const intervalSlider = document.getElementById("auto-save-interval");
@@ -65,7 +65,7 @@ function syncAutoSaveUI() {
     }
 }
 
-// Mark file as unsaved
+// mark file as unsaved
 function markAsUnsaved(path) {
     if (!autoSaveState.isEnabled) return;
     if (!path) return;
@@ -79,18 +79,18 @@ function markAsUnsaved(path) {
     updateTabIndicator(path);
     updateTitlebarModified(path, true);
 
-    // Clear existing timer
+    // clear existing timer
     if (autoSaveState.currentSaveTimer) {
         clearTimeout(autoSaveState.currentSaveTimer);
     }
 
-    // Set new timer for auto-save
+    // set new timer for auto-save
     autoSaveState.currentSaveTimer = setTimeout(() => {
         autoSaveFile(path);
     }, autoSaveState.interval);
 }
 
-// Mark file as saved
+// mark file as saved
 function markAsSaved(path) {
     if (!path) return;
 
@@ -105,7 +105,7 @@ function markAsSaved(path) {
     showSavedIndicator();
 }
 
-// Update tab indicator (red dot)
+// 8pdate tab indicator (red dot)
 function updateTabIndicator(path) {
     if (!path) return;
     const fileName = path.split(/[\\/]/).pop();
@@ -123,7 +123,7 @@ function updateTabIndicator(path) {
     });
 }
 
-// Update titlebar with modified indicator
+// update titlebar with modified indicator
 function updateTitlebarModified(path, isModified) {
     const titlebarCenter = document.getElementById("titlebar-center");
     if (!titlebarCenter) return;
@@ -132,7 +132,7 @@ function updateTitlebarModified(path, isModified) {
     setTitlebarText(titlebarCenter, fileName, isModified);
 }
 
-// Show saving indicator
+// show saving indicator
 function showSavingIndicator() {
     const indicator = document.getElementById("saving-indicator");
     const savedIndicator = document.getElementById("saved-indicator");
@@ -146,7 +146,7 @@ function showSavingIndicator() {
     }
 }
 
-// Show saved indicator
+// show saved indicator
 function showSavedIndicator() {
     const indicator = document.getElementById("saved-indicator");
     const savingIndicator = document.getElementById("saving-indicator");
@@ -172,7 +172,7 @@ function showSavedIndicator() {
     }, 2000);
 }
 
-// Show error indicator
+// show error indicator
 function showErrorIndicator(message) {
     const indicator = document.getElementById("saved-indicator");
     const savingIndicator = document.getElementById("saving-indicator");

@@ -1105,3 +1105,30 @@ code.hljs {
 #zoom-toast.visible {
     opacity: 1;
 }
+
+
+/* file type icons */
+.file-icon.has-icon {
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.file-icon.file.has-icon::before {
+    content: none;
+}
+
+.tab-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tab-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}

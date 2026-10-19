@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// ------- zoom: Ctrl+= / Ctrl+- / Ctrl+0 and Ctrl+mouse wheel ----
+// zoom: Ctrl+= / Ctrl+- / Ctrl+0 and Ctrl+mouse wheel
 
 const FONT_SIZE_MIN = 10; // same limits as the font size slider
 const FONT_SIZE_MAX = 34;
@@ -286,7 +286,7 @@ let wheelZoomDelta = 0;
 function zoomEditor(step) {
 
     const size = step === 0 ? defaultSettings.fontSize : Math.max(FONT_SIZE_MIN, Math.min(FONT_SIZE_MAX, settings.fontSize + step));
-    
+
     applyFontSize(size);
     updateSettingsUI();
     showZoomToast(size);

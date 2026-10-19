@@ -73,7 +73,7 @@ async function startDragonIDE() {
 
     await refreshWorkspace();
 
-    // --- CONTEXT MENU ACTION LISTENERS ---
+    // context menu
 
     // New File
     document.getElementById("ctx-new-file")?.addEventListener("click", async () => {
@@ -292,7 +292,7 @@ function createFileEntry(entry) {
         element.classList.add("directory");
     }
 
-    // RIGHT-CLICK CONTEXT MENU EVENT
+    // right-click menu
     element.addEventListener("contextmenu", (event) => {
         showContextMenu(event, entry);
     });
@@ -318,6 +318,8 @@ function createFileEntry(entry) {
         });
     } else {
         icon.classList.add("file");
+
+        if (typeof applyFileIcon === "function") applyFileIcon(icon, entry.name);
 
         element.addEventListener("click", () => {
             openFile(entry);
@@ -611,6 +613,13 @@ function renderTabs() {
         const name = document.createElement("span");
         name.className = "tab-name";
         name.textContent = tab.name;
+
+        if (typeof applyFileIcon === "function") {
+            const tabIcon = document.createElement("span");
+            tabIcon.className = "tab-icon";
+            applyFileIcon(tabIcon, tab.name);
+            if (tabIcon.classList.contains("has-icon")) name.prepend(tabIcon);
+        }
 
         const close = document.createElement("span");
 
@@ -1101,7 +1110,7 @@ function handleTabKey(event) {
     }
 
     const blockStart = text.lastIndexOf("\n", start - 1) + 1;
-    const lastChar = end > start && text[end - 1] === "\n" ? end -1 : end;
+    const lastChar = end > start && text[end - 1] === "\n" ? end - 1 : end;
     const lineEnd = text.indexOf("\n", lastChar);
     const blockEnd = lineEnd === -1 ? text.length : lineEnd;
 
@@ -1295,7 +1304,7 @@ codeEditor.addEventListener("click", updateCursorPosition);
 codeEditor.addEventListener("select", updateCursorPosition);
 
 codeEditor.addEventListener("keydown", (event) => {
-    
+
     if (event.key === "Tab") {
         handleTabKey(event);
         return;
