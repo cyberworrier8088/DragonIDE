@@ -49,7 +49,7 @@ const FILE_EXTENSION_ICONS = {
 function fileIconUrl(fileName) {
     const name = fileName.toLowerCase();
 
-    if (FILE_EXTENSION_ICONS.hasOwnProperty(name)) {
+    if (FILE_NAME_ICONS.hasOwnProperty(name)) {
         return FILE_ICON_FOLDER + FILE_NAME_ICONS[name];
     }
 
