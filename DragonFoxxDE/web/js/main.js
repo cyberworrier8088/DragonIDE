@@ -1056,6 +1056,7 @@ document.addEventListener("keydown", async (event) => {
             }
 
             console.log("Saved:", currentFile.path);
+            window.refreshGitIfVisible?.();
 
         } catch (error) {
             console.error(

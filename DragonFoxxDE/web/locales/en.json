@@ -61,5 +61,6 @@
     "executionSuccess": "Execution completed successfully",
     "timeSeconds": "ms",
     "stop": "Stop",
-    "search": "SEARCH"
+    "search": "SEARCH",
+    "sourceControl": "SOURCE CONTROL"
 }

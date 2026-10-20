@@ -61,5 +61,6 @@
     "executionSuccess": "Ejecución completada con éxito",
     "timeSeconds": "ms",
     "stop": "Detener",
-    "search": "BUSCAR"
+    "search": "BUSCAR",
+    "sourceControl": "CONTROL DE CÓDIGO"
 }

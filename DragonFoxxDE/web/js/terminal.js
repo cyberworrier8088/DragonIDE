@@ -157,6 +157,7 @@ async function runTerminalCommand(commandText) {
 
             // the command may have made, rename or deleted file
             refreshWorkspace().catch(error => console.warn("Explorer refresh failed:", error));
+            window.refreshGitIfVisible?.();
         }
     };
 
