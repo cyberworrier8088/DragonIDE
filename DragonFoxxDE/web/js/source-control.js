@@ -179,7 +179,7 @@ function commitGit() {
     const message = box.value.trim();
 
     if (!message) {
-        showGitNode("Write a commit message first.", true);
+        showGitNote("Write a commit message first.", true);
         box.focus();
         return;
     }
@@ -233,6 +233,10 @@ function initSourceControl() {
     });
 
     document.getElementById("git-init-btn")?.addEventListener("click", () => {
+        runGitAction(() => gitInvoke("git_init"));
+    });
+
+    document.getElementById("git-message")?.addEventListener("keydown", (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
             e.preventDefault();
             commitGit();
