@@ -24,3 +24,11 @@ log = "0.4"
 tauri = { version = "2.11.3", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
+
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"  # Use "z" to optimize even more aggressively for size
+strip = true     # Remove debug symbols
