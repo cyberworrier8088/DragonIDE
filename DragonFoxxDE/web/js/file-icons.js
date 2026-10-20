@@ -42,7 +42,11 @@ const FILE_EXTENSION_ICONS = {
     cmd: "terminal.svg",
     ps1: "terminal.svg",
     txt: "text.svg",
-    log: "text.svg"
+    log: "text.svg",
+    c: "c.svg",
+    h: "c.svg",
+    cpp: "cpp.svg",
+    hpp: "cpp.svg",
 };
 
 
