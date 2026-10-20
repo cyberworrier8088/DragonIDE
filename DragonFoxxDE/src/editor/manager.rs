@@ -30,7 +30,6 @@ impl DocumentManager {
         self.documents.get_mut(path)
     }
 
-    #[allow(dead_code)]
     pub fn close(&mut self, path: &PathBuf) -> Option<Document> {
         self.documents.remove(path)
     }
@@ -69,5 +68,16 @@ mod tests {
 
         assert_eq!(manager.count(), 1);
         assert!(manager.get(&path).is_some());
+    }
+
+    #[test]
+    fn reopening_after_close_uses_the_new_text() {
+        let mut manager = DocumentManager::new();
+        let path = PathBuf::from("main.rs");
+
+        manager.open(path.clone(), "old".to_string());
+        manager.close(&path);
+
+        assert_eq!(manager.open(path, "new".to_string()).text, "new");
     }
 }

@@ -1256,6 +1256,7 @@ code.hljs {
     color: var(--text-muted);
     white-space: pre-wrap;
     word-break: break-word;
+    animation: git-fade-in 0.2s ease-out; /* plays each time a message appears */
 }
 
 .git-note:empty {
@@ -1302,6 +1303,7 @@ code.hljs {
     border-radius: 4px;
     cursor: pointer;
     white-space: nowrap;
+    transition: background 0.12s ease;
 }
 
 
@@ -1309,8 +1311,17 @@ code.hljs {
     background: var(--accent-hover);
 }
 
+/* a long name used to push the + button and status letter out of the sidebar */
 .git-file-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--text-primary);
+}
+
+.git-file .tab-icon,
+.git-file .git-icon-btn,
+.git-status {
     flex-shrink: 0;
 }
 
@@ -1352,4 +1363,29 @@ code.hljs {
 .git-status-D,
 .git-status-conflict {
     color: #e06c75;
+}
+
+@keyframes git-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes git-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* the delay keeps quick actions (stage, unstage) from flickering; push and pull spin the icon */
+#git-view.busy #git-refresh-btn {
+    animation: git-spin 0.8s linear 0.25s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .git-note,
+    #git-view.busy #git-refresh-btn {
+        animation: none;
+    }
 }

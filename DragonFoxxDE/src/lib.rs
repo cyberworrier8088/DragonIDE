@@ -37,6 +37,7 @@ pub fn run() {
             delete_entry,
             document_count,
             open_document,
+            close_document,
             save_document,
             update_document,
             execute_code,
@@ -160,6 +161,16 @@ fn open_document(path: String, state: tauri::State<'_, IdeState>) -> Result<Stri
     let document = documents.open(path, content);
 
     Ok(document.text.clone())
+}
+
+// forget the cached text, so the next open reads the file from disk
+#[tauri::command]
+fn close_document(path: String, state: tauri::State<'_, IdeState>) -> Result<(), String> {
+    let mut documents = state.documents.lock().map_err(|error| error.to_string())?;
+
+    documents.close(&PathBuf::from(path));
+
+    Ok(())
 }
 
 #[tauri::command]

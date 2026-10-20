@@ -18,9 +18,13 @@ pub struct GitStatus {
 
 fn git(root: &str, args: &[&str]) -> Result<String, String> {
     let output = crate::command("git")
+        // a folder's own .git/config can name a program for git to run, so switch that off
+        .args(["-c", "core.fsmonitor=false"])
         .args(args)
         .current_dir(root)
         .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_LITERAL_PATHSPECS", "1") // file names like [id].js are not patterns
+        .env("GIT_OPTIONAL_LOCKS", "0") // background status must not lock the index
         .output()
         .map_err(|e| {
             if e.kind() == std::io::ErrorKind::NotFound {
@@ -88,7 +92,8 @@ fn parse_status(text: &str, prefix: &str, root: &Path) -> GitStatus {
         let y = entry.as_bytes()[1] as char;
         let path = entry[3..].strip_prefix(prefix).unwrap_or(&entry[3..]);
 
-        if x == 'R' || x == 'C' {
+        // a rename or copy is followed by its old name, in the index (x) or work tree (y)
+        if matches!(x, 'R' | 'C') || matches!(y, 'R' | 'C') {
             entries.next();
         }
 
@@ -399,5 +404,51 @@ mod tests {
         let error = git(&repo.root(), &["commit", "-m", "nothing"]).unwrap_err();
 
         assert!(error.contains("nothing to commit"), "{}", error);
+    }
+
+    #[test]
+    fn skips_the_old_name_of_a_work_tree_rename() {
+        let files = parse_status("## main\0 R new.txt\0old.txt\0", "", Path::new("/p")).files;
+
+        assert_eq!(files.len(), 1);
+        assert_eq!(files[0].path, "new.txt");
+    }
+
+    #[test]
+    fn staging_a_wildcard_file_name_leaves_its_neighbour() {
+        let repo = TempRepo::new("wildcard");
+        repo.init();
+        repo.write("[id].js", "a");
+        repo.write("i.js", "a");
+        git(&repo.root(), &with_paths(&["add", "-A"], &[])).unwrap();
+        git(&repo.root(), &["commit", "-m", "first"]).unwrap();
+
+        repo.write("[id].js", "b");
+        repo.write("i.js", "b");
+        let only = ["[id].js".to_string()];
+        git(&repo.root(), &with_paths(&["add", "-A"], &only)).unwrap();
+
+        assert_eq!(
+            repo.files(),
+            [file("[id].js", "M", true), file("i.js", "M", false)]
+        );
+    }
+
+    #[test]
+    fn status_does_not_run_programs_named_in_the_repo_config() {
+        let repo = TempRepo::new("fsmonitor");
+        repo.init();
+        repo.write("a.txt", "a");
+        git(&repo.root(), &with_paths(&["add", "-A"], &[])).unwrap();
+        git(&repo.root(), &["commit", "-m", "first"]).unwrap();
+        git(
+            &repo.root(),
+            &["config", "core.fsmonitor", "echo ran > fsmonitor_ran.txt; echo"],
+        )
+        .unwrap();
+
+        status(&repo.root()).unwrap();
+
+        assert!(!repo.0.join("fsmonitor_ran.txt").exists());
     }
 }

@@ -208,6 +208,8 @@ async function refreshWorkspace() {
     const tree = document.getElementById("file-tree");
     if (!tree) return;
 
+    window.refreshGit?.(); // startup, open folder, file changes and terminal commands all land here
+
     if (!currentWorkspace) {
         tree.innerHTML = `
             <div class="explorer-empty">
@@ -823,9 +825,12 @@ async function closeTab(path, force = false) {
         } else {
             const nextIndex = Math.min(index, openTabs.length - 1);
 
-            activateTab(openTabs[nextIndex].path)
+            await activateTab(openTabs[nextIndex].path)
         }
     }
+
+    // after the tab switch above, which still saves the closed tab's text; reopening reads the disk
+    invoke("close_document", { path }).catch(error => console.warn("close_document failed:", error));
 
     renderTabs();
 }
@@ -1056,7 +1061,7 @@ document.addEventListener("keydown", async (event) => {
             }
 
             console.log("Saved:", currentFile.path);
-            window.refreshGitIfVisible?.();
+            window.refreshGit?.();
 
         } catch (error) {
             console.error(

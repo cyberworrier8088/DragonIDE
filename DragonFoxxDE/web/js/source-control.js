@@ -19,11 +19,6 @@ function gitInvoke(command, args = {}) {
     return invoke(command, { root: window.currentWorkspace, ...args });
 }
 
-function isGitViewVisible() {
-    const view = document.getElementById("git-view");
-    return view && view.style.display !== "none";
-}
-
 function showGitNote(text, isError = false) {
     const note = document.getElementById("git-note");
     if (!note) return;
@@ -52,10 +47,6 @@ async function refreshGit() {
         if (requestId !== gitRequestId) return;
         showGitNote(String(error), true);
     }
-}
-
-function refreshGitIfVisible() {
-    if (isGitViewVisible()) refreshGit();
 }
 
 function renderGit(status, hint) {
@@ -110,7 +101,8 @@ function fillGitList(listId, files, action) {
     const fragment = document.createDocumentFragment();
 
     for (const file of files) {
-        const parts = file.path.split("/");
+        const isFolder = file.path.endsWith("/"); // a repo inside the project shows as one folder row
+        const parts = file.path.replace(/\/$/, "").split("/");
         const name = parts.pop();
 
         const row = document.createElement("div");
@@ -144,7 +136,7 @@ function fillGitList(listId, files, action) {
 
         row.append(icon, nameSpan, folder, button, letter);
 
-        if (file.status !== "D") {
+        if (file.status !== "D" && !isFolder) {
             row.addEventListener("click", () => {
                 openFile({ name: name, path: file.full_path, is_directory: false });
             });
@@ -161,6 +153,7 @@ async function runGitAction(action, startNote = "") {
 
     gitBusy = true;
     showGitNote(startNote); // clear the last message
+    document.getElementById("git-view")?.classList.add("busy"); // spins the refresh icon
     document.querySelectorAll("#git-view button").forEach(button => button.disabled = true);
 
     try {
@@ -171,6 +164,7 @@ async function runGitAction(action, startNote = "") {
         gitBusy = false;
         document.querySelectorAll("#git-view button").forEach(button => button.disabled = false);
         await refreshGit();
+        document.getElementById("git-view")?.classList.remove("busy");
     }
 }
 
@@ -184,17 +178,13 @@ function commitGit() {
         return;
     }
 
-    if (!gitStatus || gitStatus.files.length === 0) {
-        showGitNote("Nothing to commit.", true);
+    // never stage for the user: untracked secrets and conflict markers would be committed
+    if (!gitStatus || !gitStatus.files.some(file => file.staged)) {
+        showGitNote("Nothing is staged. Use + to stage files.", true);
         return;
     }
 
     runGitAction(async () => {
-
-        if (!gitStatus.files.some(file => file.staged)) {
-            await gitInvoke("git_stage", { paths: [] });
-        }
-
         const result = await gitInvoke("git_commit", { message: message });
 
         box.value = "";
@@ -252,10 +242,10 @@ function initSourceControl() {
     });
 
     
-    window.addEventListener("focus", refreshGitIfVisible);
+    window.addEventListener("focus", refreshGit);
 }
 
-window.refreshGitIfVisible = refreshGitIfVisible;
+window.refreshGit = refreshGit;
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initSourceControl);
