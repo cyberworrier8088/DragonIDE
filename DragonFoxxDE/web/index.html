@@ -89,6 +89,14 @@
                 <span id="git-badge" class="activity-badge" style="display: none;"></span>
             </button>
 
+            <button class="activity-button" id="music-activity-btn" title="Music">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                </svg>
+            </button>
+
             <div class="activity-spacer"></div>
 
             <button class="activity-button" id="settings-button" title="Settings"><img src="assets/icon/setting.svg"
@@ -172,6 +180,23 @@
                         <div id="git-changes-list"></div>
                     </div>
                 </div>
+            </div>
+
+            <div id="music-view" style="display: none;">
+                <div id="music-vibes"></div>
+
+                <div id="music-player">
+                    <div id="music-now">Pick a vibe, then a station</div>
+
+                    <div class="music-controls">
+                        <button id="music-play-btn" class="git-button primary">Play</button>
+                        <button id="music-next-btn" class="git-button">Next</button>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                    </div>
+                </div>
+
+                <div id="music-stations"></div>
+                <audio id="music-audio"></audio>
             </div>
         </aside>
 
@@ -511,6 +536,7 @@
     <script src="js/search.js"></script>
     <script src="js/quick-open.js"></script>
     <script src="js/source-control.js"></script>
+    <script src="js/music.js"></script>
     <script src="js/terminal.js"></script>
     <script src="js/panel-resize.js"></script>
     <script src="js/layout.js"></script>

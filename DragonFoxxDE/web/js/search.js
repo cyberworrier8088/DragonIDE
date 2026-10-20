@@ -16,7 +16,8 @@ function getWorkspace() {
 const SIDEBAR_VIEWS = {
     explorer: { panel: "file-explorer", button: "explorer-activity-btn", title: "explorer", display: "block"},
     search: { panel: "search-view", button: "search-activity-btn", title: "search", display: "flex" },
-    git: { panel: "git-view", button: "git-activity-btn", title: "sourceControl", display: "flex"}
+    git: { panel: "git-view", button: "git-activity-btn", title: "sourceControl", display: "flex"},
+    music: { panel: "music-view", button: "music-activity-btn", title: "music", display: "flex"}
 };
 
 function showSidebarView(view) {

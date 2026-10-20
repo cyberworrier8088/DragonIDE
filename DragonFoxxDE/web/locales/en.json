@@ -62,5 +62,6 @@
     "timeSeconds": "ms",
     "stop": "Stop",
     "search": "SEARCH",
-    "sourceControl": "SOURCE CONTROL"
+    "sourceControl": "SOURCE CONTROL",
+    "music": "MUSIC"
 }
