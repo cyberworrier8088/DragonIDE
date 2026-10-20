@@ -1143,6 +1143,7 @@ code.hljs {
     right: 8px;
     bottom: 8px;
     min-width: 16px;
+    height: 16px;
     padding: 0 4px;
     border-radius: 8px;
     background: var(--accent-blue);
@@ -1190,6 +1191,7 @@ code.hljs {
     border-radius: 4px;
     background: var(--bg-primary);
     color: var(--text-primary);
+    font: inherit;
     font-size: 13px;
     resize: vertical;
     outline: none;
@@ -1249,7 +1251,7 @@ code.hljs {
     color: var(--text-primary);
 }
 
-.git-not {
+.git-note {
     font-size: 11px;
     color: var(--text-muted);
     white-space: pre-wrap;
@@ -1339,6 +1341,11 @@ code.hljs {
 .git-status-M,
 .git-status-R,
 .git-status-C {
+    color: #e5c07b;
+}
+
+.git-status-A,
+.git-status-U {
     color: #98c379;
 }
 
