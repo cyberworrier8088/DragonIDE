@@ -13,28 +13,32 @@ function getWorkspace() {
     return null;
 }
 
+const SIDEBAR_VIEWS = {
+    explorer: { panel: "file-explorer", button: "explorer-activity-btn", title: "explorer", display: "block"},
+    search: { panel: "search-view", button: "search-activity-btn", title: "search", display: "flex" },
+    git: { panel: "git-view", button: "git-activity-btn", title: "sourceControl", display: "flex"}
+};
+
 function showSidebarView(view) {
-    const explorer = document.getElementById("file-explorer");
-    const searchView = document.getElementById("search-view");
-    const title = document.getElementById("sidebar-title") || document.querySelector(".sidebar-header span");
-    const isSearch = view === "search";
 
-    if (explorer) explorer.style.display = isSearch ? "none" : "block";
-    if (searchView) searchView.style.display = isSearch ? "flex" : "none";
+    if (!SIDEBAR_VIEWS[view]) view = "explorer";
 
-    if (title) {
-        const key = isSearch ? "search" : "explorer";
-        title.setAttribute("data-i18n", key);
-        title.textContent = typeof t === "function" ? t(key) : key.toUpperCase();
+    for (const [name, info] of Object.entries(SIDEBAR_VIEWS)) {
+        const panel = document.getElementById(info.panel);
+        if (panel) panel.style.display = name === view ? info.display : "none";
+
+        document.getElementById(info.button)?.classList.toggle("active", name === view);
     }
 
-    const explorerBtn = document.getElementById("explorer-activity-btn") || document.querySelector("#activity-bar .activity-button:first-child");
-    const searchBtn = document.getElementById("search-activity-btn") || document.querySelectorAll("#activity-bar .activity-button")[1];
+    const title = document.getElementById("sidebar-title") || document.querySelector(".sidebar-header span");
 
-    if (explorerBtn) explorerBtn.classList.toggle("active", !isSearch);
-    if (searchBtn) searchBtn.classList.toggle("active", isSearch);
-
-    if (isSearch) {
+    if (title) {
+        
+        const key = SIDEBAR_VIEWS[view].title;
+        title.setAttribute("data-i18n", key);
+        title.textContent = typeof t === "function" ? t(key) : key.toUpperCase()
+    }
+    if (view === "search") {
         const input = document.getElementById("search-input");
         input?.focus();
         input?.select();
