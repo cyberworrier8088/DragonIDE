@@ -17,6 +17,7 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - Quick Open (`Ctrl+P`) and search across all files (`Ctrl+Shift+F`)
 - Run single Rust, JavaScript or Python files, with a Stop button
 - Terminal with live output, `cd`, command history and `Ctrl+C`
+- Source Control Panel (`Ctrl+Shift+G`): see changed files, stage/unstage, commit (`Ctrl+Enter`), push, pull and start a new repo
 - Image preview (png, jpg, gif, webp, bmp, ico)
 - Drag tabs, resize or hide the explorer and bottom panel
 - 8 themes. On Windows, the Glass theme uses the real acrylic blur.
@@ -27,7 +28,7 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - The terminal can't take keyboard input, so interactive programs (a Python prompt, `npm init`) don't work. No colors in output yet.
 - Run Code compiles one `.rs` file with `rustc`. It doesn't run Cargo projects.
 - I mostly test on Windows. CI builds on Linux and macOS, but I don't use those every day.
-- No Git panel yet, and the "DB" button doesn't do anything.
+- The Git panel can't show diffs or switch branches yet
 
 If you find a bug, please [open an issue](https://github.com/cyberworrier8088/DragonIDE/issues).
 
@@ -69,6 +70,8 @@ The first build takes a few minutes. Run Code uses `rustc`, `node` and `python` 
 | `Ctrl+Alt+R` | Run code (again to stop) |
 | `Ctrl+B` / `Ctrl+J` | Hide or show explorer / bottom panel |
 | `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | Zoom in / out / reset |
+| `Ctrl+Shift+G` | Open Source Control |
+| `Ctrl+Enter` | Commit (in Source Control) |
 
 ## Repo layout
 
