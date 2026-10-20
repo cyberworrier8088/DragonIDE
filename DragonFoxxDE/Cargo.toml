@@ -30,5 +30,5 @@ tauri-plugin-dialog = "2"
 panic = "abort"
 codegen-units = 1
 lto = true
-opt-level = "s"  # Use "z" to optimize even more aggressively for size
+opt-level = "z"  # smallest code; "s" was 3.5 MB for app.exe
 strip = true     # Remove debug symbols
