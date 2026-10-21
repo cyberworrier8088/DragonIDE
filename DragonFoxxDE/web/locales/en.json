@@ -63,5 +63,6 @@
     "stop": "Stop",
     "search": "SEARCH",
     "sourceControl": "SOURCE CONTROL",
-    "music": "MUSIC"
+    "music": "MUSIC",
+    "aiComplete": "AI Autocomplete"
 }

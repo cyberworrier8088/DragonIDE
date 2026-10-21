@@ -239,6 +239,7 @@
                             autocapitalize="off"></textarea>
 
                         <pre id="code-highlight"><code id="code-highlight-inner"></code></pre>
+                        <pre id="code-ghost" aria-hidden="true"></pre>
                     </div>
                 </div>
 
@@ -299,6 +300,7 @@
                     <span>DragonFoxIDE</span>
                 </div>
                 <div id="status-right">
+                    <span id="ai-status"></span>
                     <span>UTF-8</span>
                     <span>LF</span>
                     <span id="cursor-position">Ln 1, Col 1</span>
@@ -389,6 +391,15 @@
                             <input type="checkbox" id="auto-brackets-toggle" checked>
                             <span data-i18n="autoBrackets">Auto Close Brackets</span>
                         </label>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="settings-label">
+                            <input type="checkbox" id="ai-enabled-toggle" checked>
+                            <span data-i18n="aiComplete">AI Autocomplete</span>
+                        </label>
+
+                        <input type="password" id="ai-key-input" placeholder="API key (sk-...)" autocomplete="off" spellcheck="false">
                     </div>
 
                     <div class="settings-section">
@@ -542,6 +553,7 @@
     <script src="js/layout.js"></script>
     <script src="js/image-preview.js"></script>
     <script src="js/file-icons.js"></script>
+    <script src="js/ai-complete.js"></script>
     <script src="js/main.js"></script>
     <script src="js/titlebar.js"></script>
 </body>

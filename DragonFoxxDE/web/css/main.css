@@ -475,7 +475,8 @@ button:focus-visible {
 }
 
 #code-editor,
-#code-highlight {
+#code-highlight,
+#code-ghost {
     position: absolute;
     top: 0;
     left: 0;
@@ -1467,4 +1468,33 @@ code.hljs {
 .music-hint {
     color: var(--text-muted);
     font-size: 13px;
+}
+
+/* ai autocomplete */
+#code-ghost {
+    color: transparent;
+    background: transparent !important;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.ghost-text {
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+#ai-key-input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    outline: none;
+}
+
+#ai-key-input:focus {
+    border-color: var(--accent-blue);
 }

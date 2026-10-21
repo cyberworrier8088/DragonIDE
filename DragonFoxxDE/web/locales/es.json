@@ -63,5 +63,6 @@
     "stop": "Detener",
     "search": "BUSCAR",
     "sourceControl": "CONTROL DE CÓDIGO",
-    "music": "MÚSICA"
+    "music": "MÚSICA",
+    "aiComplete": "Autocompletado con IA"
 }
