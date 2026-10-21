@@ -443,7 +443,11 @@ mod tests {
         git(&repo.root(), &["commit", "-m", "first"]).unwrap();
         git(
             &repo.root(),
-            &["config", "core.fsmonitor", "echo ran > fsmonitor_ran.txt; echo"],
+            &[
+                "config",
+                "core.fsmonitor",
+                "echo ran > fsmonitor_ran.txt; echo",
+            ],
         )
         .unwrap();
 
