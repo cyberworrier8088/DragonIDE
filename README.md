@@ -18,6 +18,7 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - Run single Rust, JavaScript or Python files, with a Stop button
 - Terminal with live output, `cd`, command history and `Ctrl+C`
 - Source Control Panel (`Ctrl+Shift+G`): see changed files, stage/unstage, commit (`Ctrl+Enter`), push, pull and start a new repo
+- Music panel: pick a vibeyyy (lofi, jazz, synthwave...) and play free internet radio while you code :0
 - Image preview (png, jpg, gif, webp, bmp, ico)
 - Drag tabs, resize or hide the explorer and bottom panel
 - 8 themes. On Windows, the Glass theme uses the real acrylic blur.
