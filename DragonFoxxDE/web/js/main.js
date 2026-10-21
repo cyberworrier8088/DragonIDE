@@ -1276,6 +1276,9 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("click", hideContextMenu);
 document.addEventListener("contextmenu", event => {
     if (!event.target.closest(".file-entry")) hideContextMenu();
+
+    // hide the browser menu (inspect, reload, back...). Hold shift to still get ir while dev
+    if (!event.shiftKey) event.preventDefault();
 });
 window.addEventListener("blur", hideContextMenu);
 
