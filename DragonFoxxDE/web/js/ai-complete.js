@@ -1,12 +1,12 @@
 // Ai autocomplete: grey "ghost text" at the cursor. Tab accepts, Esc hides :)))
-// the seggestion come from my code AI server API.md
+// the suggestions come from my code AI server API.md
 
 const AI_URL = "https://imu.hackclub.app/v1/autocomplete";
 
 let aiTimer = null;
 let aiController = null;
-let aiSuggesion = "";
-let aiCursor = -1; // where the suggestion stats
+let aiSuggestion = "";
+let aiCursor = -1; // where the suggestion start
 
 function aiEnabled() {
     return localStorage.getItem("ai-enabled") !== "false" && !!localStorage.getItem("ai-key");
@@ -162,7 +162,7 @@ function onAiKeydown(event) {
         event.preventDefault();
         event.stopImmediatePropagation();
         acceptSuggestion();
-    } else if (aiSuggesion && event.key === "Escape") {
+    } else if (aiSuggestion && event.key === "Escape") {
 
         event.preventDefault();
         clearSuggestion();
