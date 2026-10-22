@@ -1,0 +1,55 @@
+name: Release
+
+# push a tag like v0.2.0 and this build windows, macos and linx
+on:
+    push:
+        tags: ["v*"]
+
+permissions:
+    contents: write # needed to create the release and upload the installers
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # ubuntu 22.04 so the Linux app also runs on older Linux versions
+        os: [windows-latest, macos-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Linux libraries for Tauri
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: DragonFoxxDE
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: DragonFoxxDE
+          tauriScript: cargo tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: DragonIDE ${{ github.ref_name }}
+          releaseBody: |
+            Download the installer for your computer below.
+
+            - Windows: `.exe` (setup) or `.msi`
+            - macOS: `.dmg`
+            - Linux: `.AppImage` or `.deb`
+
+            Windows may say "Windows protected your PC" because the app is not signed yet. Click More info, then Run anyway.
+          releaseDraft: false
+          prerelease: false
