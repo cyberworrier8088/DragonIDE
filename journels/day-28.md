@@ -7,7 +7,7 @@ Source version conrtoller image:
 
 if you change something come this image:
 
-![change](img/day-27v2.png)
+![change](img/day-28v2.png)
 
 
 Why this toook 2h:
