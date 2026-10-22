@@ -4,7 +4,7 @@ Today i added AI autocomplete and some other features to DragonIDE.
 
 ## 1. AI Autocomplete
 
-![AI autocomplete](img/day23v1.png)
+![AI autocomplete](img/day33v1.png)
 
 Finally added ghost text autocomplete!! When i type code and stop for a little time, it shows a grey suggestion. Press `Tab` to accept it and `Esc` to close it.
 
@@ -41,4 +41,4 @@ Some bugs took longer to find than actually writing the feature. I had to test t
 
 FoxAI is still my goal for autocomplete. For now, Qwen is helping me get the feature working while i continue learning and improving my own model.
 
-More updates tomorrow! 🦊
+More updates tomorrow! 
