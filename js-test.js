@@ -3,4 +3,5 @@ console.log("hi");
 for (let i = 1; i <= 9; i++) {
     console.log(i);
     console.log("hi");
+    console.log
 }
