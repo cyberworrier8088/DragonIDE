@@ -113,9 +113,20 @@ button:focus-visible {
 }
 
 #file-explorer {
+    flex: 1;
     padding: 8px;
     min-height: 0;
     overflow: auto;
+}
+
+/* right-click on empty explorer space: only new file, new folder, paste */
+.context-menu.root-menu .entry-only {
+    display: none;
+}
+
+.context-menu .menu-item.disabled {
+    opacity: 0.4;
+    pointer-events: none;
 }
 
 .explorer-section {

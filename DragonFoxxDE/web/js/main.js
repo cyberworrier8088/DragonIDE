@@ -4,6 +4,7 @@ let currentFile = null;
 let currentFileContent = "";
 let editorChangeTimer = null;
 let openTabs = [];
+let fileClipboard = null;
 window.openTabs = openTabs;
 let currentWorkspace = null;
 window.currentWorkspace = null;
@@ -93,7 +94,7 @@ async function startDragonIDE() {
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
-            console.error("Error creating file:", err);
+            alert("Could not create file: " + err);
         }
     });
 
@@ -115,7 +116,7 @@ async function startDragonIDE() {
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
-            console.error("Error creating folder:", err);
+            alert("Could not create folder: " + err);
         }
     });
 
@@ -138,7 +139,7 @@ async function startDragonIDE() {
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
-            console.error("Error renaming entry:", err);
+            alert("Could not rename: " + err);
         }
     });
 
@@ -160,7 +161,7 @@ async function startDragonIDE() {
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
-            console.error("Error deleting entry:", err);
+            alert("Could not delete: " + err);
         }
     });
 
@@ -170,6 +171,61 @@ async function startDragonIDE() {
         hideContextMenu();
         await navigator.clipboard.writeText(selectedContextEntry.path);
         hideContextMenu();
+    });
+
+
+    document.getElementById("file-explorer")?.addEventListener("contextmenu", (event) => {
+
+        if (!currentWorkspace || event.target.closest(".file-entry")) return;
+
+        showContextMenu(event, { name: "", path: currentWorkspace, is_directory: true, isRoot: true });
+    });
+
+    document.getElementById("ctx-cut")?.addEventListener("click", () => {
+        if (!selectedContextEntry) return;
+        fileClipboard = { path: selectedContextEntry.path, cut: true };
+        hideContextMenu();
+    });
+
+    document.getElementById("ctx-copy")?.addEventListener("click", () => {
+
+        if (!selectedContextEntry) return;
+        fileClipboard = { path: selectedContextEntry.path, cut: false };
+
+        hideContextMenu();
+    });
+
+    document.getElementById("ctx-paste")?.addEventListener("click", async () => {
+
+        if (!selectedContextEntry || !fileClipboard) return;
+        hideContextMenu();
+
+        const targetDir = selectedContextEntry.is_directory ? selectedContextEntry.path : getParentPath(selectedContextEntry.path);
+
+        if (fileClipboard.cut && openTabs.some(tab => tab.path === fileClipboard.path && tab.modified)) {
+            alert("Save the file before moving it.");
+            return;
+        }
+
+        try {
+            await invoke("paste_entry", { from: fileClipboard.path, toDir: targetDir, cut: fileClipboard.cut });
+
+            if (fileClipboard.cut) {
+                await closeTab(fileClipboard.path, true); // the old path is gone
+                fileClipboard = null;
+            }
+
+            await refreshWorkspace();
+        } catch (err) {
+            alert("Could not paste: " + err);
+        }
+    });
+
+    document.getElementById("ctx-copy-relative-path")?.addEventListener("click", async () => {
+        if (!selectedContextEntry) return;
+        hideContextMenu();
+        const relative = selectedContextEntry.path.slice(currentWorkspace.length + 1);
+        await navigator.clipboard.writeText(relative);
     });
 }
 
@@ -1220,9 +1276,13 @@ function showContextMenu(event, entry) {
     event.stopPropagation();
 
     selectedContextEntry = entry;
+
     const menu = document.getElementById("file-context-menu");
     if (!menu) return;
 
+    menu.classList.toggle("root-menu", !!entry.isRoot);
+    document.getElementById("ctx-paste")?.classList.toggle("disabled", !fileClipboard);
+    
     menu.classList.remove("hidden");
     menu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - menu.offsetWidth - 8))}px`;
     menu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - menu.offsetHeight - 8))}px`;

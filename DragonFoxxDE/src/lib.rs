@@ -35,6 +35,7 @@ pub fn run() {
             create_directory,
             rename_entry,
             delete_entry,
+            paste_entry,
             document_count,
             open_document,
             close_document,
@@ -141,6 +142,12 @@ fn rename_entry(old_path: String, new_path: String) -> Result<(), String> {
 fn delete_entry(path: String, is_directory: bool) -> Result<(), String> {
     let path = PathBuf::from(path);
     workspace::filesystem::delete_entry(&path, is_directory)
+}
+
+#[tauri::command]
+fn paste_entry(from: String, to_dir: String, cut: bool) -> Result<String, String> {
+    workspace::filesystem::paste_entry(&PathBuf::from(from), &PathBuf::from(to_dir), cut)
+        .map(|path| path.to_string_lossy().to_string())
 }
 
 #[tauri::command]
