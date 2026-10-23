@@ -56,6 +56,15 @@ async function startDragonIDE() {
         console.error("Error during startup:", error);
     }
 
+    // on the phone: always the folder the laptop opened
+    if (window.isRemote) {
+        try {
+            localStorage.setItem(WORKSPACE_STORAGE_KEY, await invoke("remote_workspace"));
+        } catch (error) {
+            alert(error);
+        }
+    }
+
     // Restore saved workspace if any
     try {
         const savedWorkspace = localStorage.getItem(WORKSPACE_STORAGE_KEY);

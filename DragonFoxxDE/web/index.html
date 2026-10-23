@@ -402,6 +402,19 @@
                         <input type="password" id="ai-key-input" placeholder="API key (sk-...)" autocomplete="off" spellcheck="false">
                     </div>
 
+                    <div class="settings-section" id="remote-section">
+                        <label class="settings-label">Remote Access (phone)</label>
+                        <p class="remote-hint">Code from your phone on the same WiFi. Everthing stays on this computer.</p>
+
+                        <button id="remote-start-btn" class="git-button primary">Start</button>
+                        <button id="remote-stop-btn" class="git-button" style="display: none;">Stop</button>
+
+                        <div id="remote-info" style="display: none;">
+                            <div id="remote-qr"></div>
+                            <input type="text" id="remote-url" readonly>
+                        </div>
+                    </div>
+
                     <div class="settings-section">
                         <label class="settings-label" data-i18n="language">Language</label>
 
@@ -538,6 +551,7 @@
     </div>
 
 
+    <script src="js/remote.js"></script>
     <script src="lib/highlight.min.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/settings.js"></script>

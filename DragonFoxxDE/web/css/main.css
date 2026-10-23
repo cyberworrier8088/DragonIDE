@@ -1509,3 +1509,38 @@ code.hljs {
 #ai-key-input:focus {
     border-color: var(--accent-blue);
 }
+
+/* remote access */
+.remote-hint {
+    margin: 4px 0 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+#remote-qr svg {
+    display: block;
+    width: 180px;
+    height: 180px;
+    margin: 10px 0;
+    border-radius: 6px;
+}
+
+#remote-url {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+/* on the phone: no window buttons, no remote settings, and no Run or terminal yet */
+.remote #minimize-btn,
+.remote #maximize-btn,
+.remote #close-btn,
+.remote #run-btn,
+.remote #remote-section,
+.remote .panel-tab[data-panel="terminal"] {
+    display: none;
+}

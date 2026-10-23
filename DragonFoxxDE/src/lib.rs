@@ -3,6 +3,7 @@ use std::path::PathBuf;
 mod core;
 mod editor;
 mod git;
+mod remote;
 mod workspace;
 
 use core::state::IdeState;
@@ -16,6 +17,7 @@ fn get_ide_name() -> String {
 pub fn run() {
     tauri::Builder::default()
         .manage(IdeState::default())
+        .manage(remote::RemoteServer::default())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
@@ -55,7 +57,9 @@ pub fn run() {
             git::git_commit,
             git::git_push,
             git::git_pull,
-            git::git_init
+            git::git_init,
+            remote::start_remote,
+            remote::stop_remote
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

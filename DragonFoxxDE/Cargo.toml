@@ -24,6 +24,9 @@ log = "0.4"
 tauri = { version = "2.11.3", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
+tiny_http = "0.12"
+getrandom = "0.3"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
 
 
 [profile.release]
