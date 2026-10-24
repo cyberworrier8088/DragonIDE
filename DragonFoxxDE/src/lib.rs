@@ -317,7 +317,9 @@ async fn execute_terminal_command(
     on_event: tauri::ipc::Channel<TerminalEvent>,
 ) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || {
-        run_terminal_command(&command, &current_dir, on_event)
+        run_terminal_command(&command, &current_dir, move |event| {
+            let _ = on_event.send(event);
+        })
     })
     .await
     .map_err(|e| e.to_string())?
@@ -326,7 +328,7 @@ async fn execute_terminal_command(
 fn run_terminal_command(
     command_text: &str,
     current_dir: &str,
-    on_event: tauri::ipc::Channel<TerminalEvent>,
+    send: impl Fn(TerminalEvent) + Clone + Send + 'static,
 ) -> Result<(), String> {
     use std::process::Stdio;
 
@@ -369,24 +371,20 @@ fn run_terminal_command(
     let stderr = child.stderr.take().unwrap();
 
     // read stderr on its own thread, so a full pipe can't block the other one
-    let err_channel = on_event.clone();
-    let err_thread = std::thread::spawn(move || send_lines(stderr, true, &err_channel));
-    send_lines(stdout, false, &on_event);
+    let err_send = send.clone();
+    let err_thread = std::thread::spawn(move || send_lines(stderr, true, &err_send));
+    send_lines(stdout, false, &send);
     let _ = err_thread.join();
 
     let status = child.wait();
     *TERMINAL_PID.lock().unwrap() = None;
 
     let code = status.ok().and_then(|s| s.code()).unwrap_or(-1);
-    let _ = on_event.send(TerminalEvent::Done { code });
+    send(TerminalEvent::Done { code });
     Ok(())
 }
 
-fn send_lines<R: std::io::Read>(
-    reader: R,
-    error: bool,
-    channel: &tauri::ipc::Channel<TerminalEvent>,
-) {
+fn send_lines<R: std::io::Read>(reader: R, error: bool, send: &impl Fn(TerminalEvent)) {
     use std::io::BufRead;
 
     let mut reader = std::io::BufReader::new(reader);
@@ -400,7 +398,7 @@ fn send_lines<R: std::io::Read>(
                 let text = String::from_utf8_lossy(&buf)
                     .trim_end_matches(['\r', '\n'])
                     .to_string();
-                let _ = channel.send(TerminalEvent::Line { text, error });
+                send(TerminalEvent::Line { text, error });
             }
         }
     }

@@ -11,11 +11,15 @@ use tiny_http::{Header, Method, Request, Response, Server};
 
 const PORT: u16 = 7777;
 const MAX_BODY: u64 = 10 * 1024 * 1024; // nothing bigger than 10MB comes from a phone
+const MAX_TERMINAL_LINES: usize = 10_000;
 
 struct Remote {
     app: AppHandle,
     token: String,
     root: PathBuf,
+    allow_run: bool,
+    // terminal lwaiting for the phone to pick them up
+    terminal: Arc<Mutex<Vec<crate::TerminalEvent>>>,
 }
 
 #[derive(Default)]
@@ -33,6 +37,7 @@ pub struct RemoteInfo {
 pub fn start_remote(
     app: AppHandle,
     workspace: String,
+    allow_run: bool,
     server: tauri::State<'_, RemoteServer>,
 ) -> Result<RemoteInfo, String> {
     let root = PathBuf::from(&workspace)
@@ -52,6 +57,8 @@ pub fn start_remote(
         app,
         token: token.clone(),
         root,
+        allow_run,
+        terminal: Arc::default(),
     });
 
     std::thread::spawn(move || {
@@ -218,9 +225,61 @@ async fn run(remote: &Remote, command: &str, args: &Value) -> Result<Value, Stri
         "git_commit" => json!(crate::git::git_commit(path("root")?, text("message")?).await?),
         "git_push" => json!(crate::git::git_push(path("root")?).await?),
         "git_pull" => json!(crate::git::git_pull(path("root")?).await?),
+        "terminal_change_dir" => {
+            let dir = crate::terminal_change_dir(path("currentDir")?, text("target")?)?;
+            if !inside(&remote.root, Path::new(&dir)) {
+                return Err("cd: that folder is outside the opened folder".to_string());
+            }
+            json!(dir)
+        }
+        "terminal_poll" => json!(std::mem::take(&mut *remote.terminal.lock().unwrap())),
+
+        "execute_code" | "stop_code" | "execute_terminal_command" | "stop_terminal_command"
+            if !remote.allow_run =>
+        {
+            return Err(
+                "Running code from the phone is off. Turn it on in Settings on the laptop"
+                    .to_string(),
+            )
+        }
+        "execute_code" => {
+            json!(crate::execute_code(path("filePath")?, text("language")?, text("code")?).await)
+        }
+        "stop_code" => json!(crate::stop_code()?),
+        "execute_terminal_command" => {
+            start_terminal(remote, text("command")?, path("currentDir")?);
+            Value::Null
+        }
+        "stop_terminal_command" => json!(crate::stop_terminal_command()?),
         _ => return Err(format!("\"{}\" does not work from a phone yet", command)),
     };
     Ok(result)
+}
+
+fn start_terminal(remote: &Remote, command: String, dir: String) {
+    let events = remote.terminal.clone();
+    events.lock().unwrap().clear();
+
+    std::thread::spawn(move || {
+        let sink = events.clone();
+        let result = crate::run_terminal_command(&command, &dir, move |event| {
+            let mut events = sink.lock().unwrap();
+            let done = matches!(event, crate::TerminalEvent::Done { .. });
+
+            if done || events.len() < MAX_TERMINAL_LINES {
+                events.push(event);
+            }
+        });
+
+        if let Err(error) = result {
+            let mut events = events.lock().unwrap();
+            events.push(crate::TerminalEvent::Line {
+                text: error,
+                error: true,
+            });
+            events.push(crate::TerminalEvent::Done { code: -1 });
+        }
+    });
 }
 
 fn list(args: &Value, name: &str) -> Vec<String> {

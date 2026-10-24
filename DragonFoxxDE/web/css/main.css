@@ -1539,8 +1539,10 @@ code.hljs {
 .remote #minimize-btn,
 .remote #maximize-btn,
 .remote #close-btn,
-.remote #run-btn,
-.remote #remote-section,
-.remote .panel-tab[data-panel="terminal"] {
+.remote #remote-section {
     display: none;
+}
+
+.remote-warning {
+    color: #e5c07b;
 }

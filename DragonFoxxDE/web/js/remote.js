@@ -25,6 +25,22 @@ if (!window.__TAURI__) {
         return data.result;
     };
 
+    const runTerminal = async ({ onEvent, ...args }) => {
+        await remoteInvoke("execute_terminal_command", args);
+
+        while (true) {
+            const events = await remoteInvoke("terminal_poll");
+            for (const event of events) {
+                onEvent.onmessage?.(event);
+                if (event.kind === "done") return;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+    };
+
+    const invoke = (command, args) => command === "execute_terminal_command" ? runTerminal(args) : remoteInvoke(command, args);
+
     const noWindow = {
         minimize: async () => { },
         toggleMaximize: async () => { },
@@ -38,7 +54,7 @@ if (!window.__TAURI__) {
     document.documentElement.classList.add("remote");
 
     window.__TAURI__ = {
-        core: { invoke: remoteInvoke, Channel: class { } },
+        core: { invoke, Channel: class { onmessage = null; } },
         dialog: { open: async () => null, confirm: async (message) => confirm(message) },
         window: { getCurrentWindow: () => noWindow }
     };
@@ -62,7 +78,8 @@ function initRemoteSettings() {
 
         try {
             const remote = await invoke("start_remote", {
-                workspace: window.currentWorkspace
+                workspace: window.currentWorkspace,
+                allowRun: document.getElementById("remote-allow-run").checked
             });
 
             qr.innerHTML = remote.qr_svg; // made by our own rust code, not from the internet
