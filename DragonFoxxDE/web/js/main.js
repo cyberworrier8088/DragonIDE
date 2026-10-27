@@ -1455,10 +1455,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const outputContent = document.getElementById('output-content');
     const noOutput = document.getElementById('no-output');
+    const panel = document.getElementById('bottom-panel');
+    const foldButton = document.getElementById('panel-fold-btn');
+
+    // fold the panel down to its tabs (more room for code on a phone), a tab opens it again
+    const setFolded = (folded) => {
+        panel.classList.toggle('collapsed', folded);
+        foldButton?.setAttribute('aria-expanded', String(!folded));
+    };
+    foldButton?.addEventListener('click', () => setFolded(!panel.classList.contains('collapsed')));
 
     panelTabs.forEach(tab => {
         tab.addEventListener('click', () => {
 
+            setFolded(false);
             panelTabs.forEach(t => t.classList.remove('active'));
 
             tab.classList.add('active');

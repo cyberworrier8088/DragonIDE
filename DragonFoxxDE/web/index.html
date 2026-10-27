@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- resizes-content: the on-screen keyboard shrinks the page, so the editor stays above it -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#191b22">
     <title>DragonFoxIDE</title>
 
     <link rel="stylesheet" href="css/main.css">
@@ -274,6 +276,11 @@
                         <button id="clear-output-btn" class="panel-action-btn" data-i18n="clear">Clear</button>
                         <button id="copy-output-btn" class="panel-action-btn" data-i18n="copyOutput">Copy
                             Output</button>
+                        <button id="panel-fold-btn" class="panel-action-btn" title="Hide or show the panel"
+                            aria-label="Hide or show the panel" aria-expanded="true">
+                            <svg width="12" height="12" viewBox="0 0 16 16"><path fill="none" stroke="currentColor"
+                                    stroke-width="2" d="M3 6l5 5 5-5" /></svg>
+                        </button>
                     </div>
                 </div>
 

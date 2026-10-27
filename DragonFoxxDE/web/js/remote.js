@@ -105,32 +105,49 @@ function initRemoteSettings() {
 document.addEventListener("DOMContentLoaded", initRemoteSettings);
 
 
-// the menu and save buttons only show on small screens (CSS), so make them everywhere
+const PHONE_ICONS = {
+    menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+    tab: '<path d="M4 12h12M12 8l4 4-4 4M20 6v12"/>',
+    find: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+    save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>'
+};
+
+// a titlebar button for touch screens (no keyboard shortcuts there)
+function phoneButton(id, title, icon, onClick) {
+    const button = document.createElement("button");
+    button.id = id;
+    button.className = "titlebar-button phone-btn";
+    button.title = title;
+    button.setAttribute("aria-label", title);
+    button.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${PHONE_ICONS[icon]}</svg>`;
+    button.addEventListener("mousedown", e => e.preventDefault()); // the editor keeps focus, so the keyboard and AI suggestion stay
+    button.addEventListener("click", onClick);
+    return button;
+}
+
+// press a key like the keyboard would: Tab goes to the editor, Ctrl+key to the shortcuts
+function pressKey(key, ctrlKey = false) {
+    const target = ctrlKey ? document : document.getElementById("code-editor");
+    target?.dispatchEvent(new KeyboardEvent("keydown", { key, ctrlKey, bubbles: true, cancelable: true }));
+}
+
+// the phone buttons only show on small screens (CSS), so make them everywhere
 function initPhoneLayout() {
     if (window.isRemote) {
-        document.querySelector('meta[name="viewport"]')?.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1");
+        document.querySelector('meta[name="viewport"]')?.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content");
     }
 
     const closeMenu = () => document.documentElement.classList.remove("menu-open");
 
-    const menuButton = document.createElement("button");
-    menuButton.id = "phone-menu-btn";
-    menuButton.className = "titlebar-button";
-    menuButton.title = "Files";
-    menuButton.textContent = "☰";
-    menuButton.addEventListener("click", () => document.documentElement.classList.toggle("menu-open"));
-    document.getElementById("titlebar-left")?.prepend(menuButton);
+    document.getElementById("titlebar-left")?.prepend(
+        phoneButton("phone-menu-btn", "Files", "menu", () => document.documentElement.classList.toggle("menu-open"))
+    );
 
-    const saveButton = document.createElement("button");
-    saveButton.id = "phone-save-btn";
-    saveButton.className = "titlebar-button";
-    saveButton.title = "Save";
-    saveButton.textContent = "S";
-    saveButton.addEventListener("click", () => {
-        document.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
-    });
-
-    document.getElementById("run-btn")?.before(saveButton);
+    document.getElementById("run-btn")?.before(
+        phoneButton("phone-tab-btn", "Tab (accept AI suggestion)", "tab", () => pressKey("Tab")),
+        phoneButton("phone-find-btn", "Find", "find", () => pressKey("f", true)),
+        phoneButton("phone-save-btn", "Save", "save", () => pressKey("s", true))
+    );
 
     // tap next to the open menu to close it
     const backdrop = document.createElement("div");
@@ -148,6 +165,7 @@ function initPhoneLayout() {
         const touch = event.touches[0];
         pressTimer = setTimeout(() => {
             longPressed = true;
+            navigator.vibrate?.(12); // a tiny buzz, like native apps
             event.target.dispatchEvent(new MouseEvent("contextmenu", {
                 bubbles: true,
                 clientX: touch.clientX,

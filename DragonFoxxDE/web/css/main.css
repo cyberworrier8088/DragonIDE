@@ -1,5 +1,6 @@
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* no blue flash on taps, buttons have their own press effect */
 }
 
 html,
@@ -1560,6 +1561,24 @@ code.hljs {
     color: #e5c07b;
 }
 
+/* folded bottom panel: only its tabs stay */
+#bottom-panel.collapsed {
+    height: auto !important;
+}
+
+#bottom-panel.collapsed #panel-content {
+    display: none;
+}
+
+#panel-fold-btn svg {
+    display: block;
+    transition: transform 0.25s ease;
+}
+
+#bottom-panel.collapsed #panel-fold-btn svg {
+    transform: rotate(180deg);
+}
+
 /* animations: views, menus and dialogs ease in each time they are shown */
 @keyframes fade-in {
     from {
@@ -1619,10 +1638,15 @@ code.hljs {
 }
 
 /* phone and tablet layout: any small screen (remote, narrow window, mobile app) */
-#phone-menu-btn,
-#phone-save-btn,
+.titlebar-button.phone-btn,
 #phone-backdrop {
     display: none;
+}
+
+@media (max-width: 480px) {
+    #app-title {
+        display: none; /* room for the buttons, the file name is in the middle */
+    }
 }
 
 @media (max-width: 900px) {
@@ -1635,12 +1659,23 @@ code.hljs {
         height: calc(100dvh - 32px);
     }
 
-    #phone-menu-btn,
-    #phone-save-btn {
+    /* buttons keep their full tap size, the file name in the middle gives way */
+    #titlebar-content {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .titlebar-button {
+        flex-shrink: 0;
+    }
+
+    .titlebar-button.phone-btn {
         display: grid;
         place-items: center;
-        width: 42px;
-        font-size: 18px;
+        width: 40px;
+    }
+
+    #run-btn {
+        width: 40px;
     }
 
     #titlebar-left {
