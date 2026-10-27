@@ -123,14 +123,52 @@ fn handle(remote: &Remote, mut request: Request) {
 fn page(remote: &Remote, url: &str) -> Response<Cursor<Vec<u8>>> {
     let path = url.split('?').next().unwrap_or("/");
 
-    match remote.app.asset_resolver().get(path.to_string()) {
-        Some(asset) => {
-            Response::from_data(asset.bytes).with_header(header("Content-Type", &asset.mime_type))
+    if path.contains("..") || path.contains('\\') || path.contains('%') {
+        return Response::from_data(b"Not found".to_vec()).with_status_code(404);
+    }
+
+    let file = remote
+        .app
+        .asset_resolver()
+        .get(path.to_string())
+        .map(|asset| (asset.bytes, asset.mime_type))
+        .or_else(|| dev_file(path));
+
+    match file {
+        Some((bytes, mime_type)) => {
+            Response::from_data(bytes).with_header(header("Content-Type", &mime_type))
         }
-        None => Response::from_data(b"No found".to_vec()).with_status_code(404),
+        None => Response::from_data(b"Not found".to_vec()).with_status_code(404),
     }
 }
 
+fn dev_file(path: &str) -> Option<(Vec<u8>, String)> {
+    if !cfg!(debug_assertions) || path.contains("..") {
+        return None;
+    }
+
+    let relative = match path.trim_start_matches('/') {
+        "" => "index.html",
+        file => file,
+    };
+
+    let file = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("web")
+        .join(relative);
+
+    let bytes = std::fs::read(&file).ok()?;
+
+    let mime_type = match file.extension().and_then(|e| e.to_str()) {
+        Some("html") => "text/html",
+        Some("css") => "text/css",
+        Some("js") => "text/javascript",
+        Some("json") => "application/json",
+        Some("svg") => "image/svg+xml",
+        Some("png") => "image/png",
+        _ => "application/octet-stream",
+    };
+    Some((bytes, mime_type.to_string()))
+}
 fn api(remote: &Remote, command: &str, request: &mut Request) -> (u16, Value) {
     let sent = request
         .headers()
