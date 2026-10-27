@@ -143,8 +143,15 @@ async function startDragonIDE() {
         const parentDir = getParentPath(oldPath);
         const newPath = joinPath(parentDir, newName);
 
+        const openInside = tabsInside(oldPath);
+        if (openInside.some(isTabUnsaved)) {
+            alert("Save the file before renaming it.");
+            return;
+        }
+
         try {
             await invoke("rename_entry", { oldPath, newPath });
+            await moveOpenTabs(openInside, oldPath, newPath);
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
@@ -1302,6 +1309,41 @@ function hideContextMenu() {
     if (menu) {
         menu.classList.add("hidden");
     }
+}
+
+// open tabs for this file
+function tabsInside(path) {
+    const separator = path.includes("\\") ? "\\" : "/";
+    return openTabs.filter(tab => tab.path === path || tab.path.startsWith(path + separator));
+}
+
+function isTabUnsaved(tab) {
+    return tab.modified || (typeof autoSaveFile !== "undefined" && autoSaveState.unsavedFiles?.get(tab.path));
+}
+
+async function moveOpenTabs(tabs, oldPath, newPath) {
+    for (const tab of tabs) {
+        const oldTabPath = tab.path;
+        tab.path = newPath + oldTabPath.slice(oldPath.length);
+        tab.name = tab.path.split(/[\\/]/).pop();
+
+        invoke("close_document", { path: oldTabPath }).catch(error => console.warn("close_document failed:", error));
+
+        if (typeof autoSaveState !== "undefined") {
+            autoSaveState.unsavedFiles.delete(oldTabPath);
+            delete autoSaveState.lastSavedContent[oldTabPath];
+        }
+
+        if (currentFile?.path === oldTabPath) {
+            currentFile = { ...currentFile, path: tab.path, name: tab.name };
+            if (!currentFile.isImage) await invoke("open_document", { path: tab.path });
+            if (typeof initAutoSaveForFile === "function") initAutoSaveForFile(tab.path);
+
+            window.dispatchEvent(new CustomEvent("file-opened", { detail: tab.name }));
+        }
+    }
+
+    renderTabs();
 }
 
 function getParentPath(path) {
