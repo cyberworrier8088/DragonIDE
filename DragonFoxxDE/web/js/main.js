@@ -715,6 +715,8 @@ function renderTabs() {
 
         tabs.appendChild(element);
     }
+
+    tabs.querySelector(".tab.active")?.scrollIntoView({ block: "nearest", inline: "nearest" });
 }
 
 

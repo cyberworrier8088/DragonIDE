@@ -66,6 +66,11 @@ function initTabDrag() {
     const tabs = document.getElementById("tabs");
     if (!tabs) return;
 
+    // the mouse wheel scrolls a long row of tabs sideways
+    tabs.addEventListener("wheel", (e) => {
+        tabs.scrollLeft += e.deltaY;
+    }, { passive: true });
+
     tabs.addEventListener("mousedown", (e) => {
         const tab = e.target.closest(".tab[data-path]");
         if (!tab || e.button !== 0 || e.target.closest(".tab-close")) return;

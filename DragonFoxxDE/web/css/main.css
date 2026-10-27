@@ -184,13 +184,22 @@ button:focus-visible {
 
 #tabs {
     height: 42px;
+    flex-shrink: 0;
     display: flex;
+    overflow-x: auto; /* many tabs scroll instead of being cut off */
+    overflow-y: hidden;
+    scrollbar-width: none;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
 }
 
+#tabs::-webkit-scrollbar {
+    display: none;
+}
+
 .tab {
     min-width: 140px;
+    flex-shrink: 0;
     height: 42px;
     display: flex;
     align-items: center;
