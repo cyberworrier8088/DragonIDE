@@ -391,8 +391,10 @@ function createFileEntry(entry) {
         arrow.classList.add("collapsed");
         icon.classList.add("folder");
 
-        element.addEventListener("click", () => {
-            toggleDirectory(element, entry, arrow);
+        element.addEventListener("click", async () => {
+            await toggleDirectory(element, entry, arrow);
+            // unfold animation only on a click, not when the tree refreshes
+            if (arrow.classList.contains("expanded")) element.nextElementSibling?.classList.add("opening");
         });
     } else {
         icon.classList.add("file");
@@ -665,13 +667,14 @@ function addOrActivateTab(entry) {
 
 function renderTabs() {
     const tabs = document.getElementById("tabs");
+    const shown = new Set([...tabs.children].map(element => element.dataset.path));
 
     tabs.innerHTML = "";
 
     for (const tab of openTabs) {
         const element = document.createElement("div");
 
-        element.className = "tab";
+        element.className = shown.has(tab.path) ? "tab" : "tab tab-new"; // only new tabs slide in
         element.dataset.path = tab.path;
 
         if (
@@ -1421,6 +1424,15 @@ codeEditor.addEventListener("input", handleEditorChange);
 
 codeEditor.addEventListener("scroll", () => {
     syncEditorScroll();
+});
+
+// the code fades in when another file opens
+window.addEventListener("file-opened", () => {
+    const wrapper = document.getElementById("code-editor-wrapper");
+    if (!wrapper) return;
+    wrapper.classList.remove("file-in");
+    void wrapper.offsetWidth; // restart the animation
+    wrapper.classList.add("file-in");
 });
 
 codeEditor.addEventListener("keyup", updateCursorPosition);

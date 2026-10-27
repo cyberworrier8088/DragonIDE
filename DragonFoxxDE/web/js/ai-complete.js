@@ -113,6 +113,7 @@ function setAiStatus(text, title = "") {
     if (!status) return;
     status.textContent = text;
     status.title = title;
+    status.classList.toggle("thinking", text.endsWith("..."));
 }
 
 function updateAiStatus() {
@@ -129,7 +130,7 @@ function clearSuggestion() {
     if (ghost) ghost.textContent = "";
 }
 
-function showSuggestion(text, cursor) {
+function showSuggestion(text, cursor, fresh = false) {
 
     const editor = document.getElementById("code-editor");
     const ghost = document.getElementById("code-ghost");
@@ -147,7 +148,7 @@ function showSuggestion(text, cursor) {
     before.textContent = editor.value.slice(0, cursor);
 
     const hint = document.createElement("span");
-    hint.className = "ghost-text";
+    hint.className = fresh ? "ghost-text ghost-new" : "ghost-text"; // fade in only a new suggestion, not each typed letter
     hint.textContent = text;
 
     const after = document.createElement("span");
@@ -198,7 +199,7 @@ async function fetchSuggestion() {
         if (editor.value !== code || editor.selectionStart !== cursor) return;
 
         const line = code.slice(code.lastIndexOf("\n", cursor - 1) + 1, cursor);
-        showSuggestion(cleanCompletion(text, line), cursor);
+        showSuggestion(cleanCompletion(text, line), cursor, true);
     } catch (error) {
         if (error.name === "AbortError") return;
         setAiStatus("⚠ AI", error.message);

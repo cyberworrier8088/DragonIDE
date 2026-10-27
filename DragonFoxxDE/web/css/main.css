@@ -80,7 +80,7 @@ button:focus-visible {
     height: 22px;
     pointer-events: none;
     color: inherit;
-    transition: color 0.15s ease, opacity 0.15s ease;
+    transition: color 0.15s ease, opacity 0.15s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .activity-button:hover {
@@ -1600,6 +1600,13 @@ code.hljs {
     }
 }
 
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+}
+
 /* for things centered with translate(-50%, -50%) */
 @keyframes center-in {
     from {
@@ -1623,9 +1630,75 @@ code.hljs {
     animation: center-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* title, line and buttons come in one after another */
+.welcome > * {
+    animation: rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.welcome > :nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.welcome > :nth-child(3) {
+    animation-delay: 0.2s;
+}
+
 .context-menu {
     transform-origin: top left;
-    animation: pop-in 0.12s ease-out;
+    animation: pop-in 0.18s cubic-bezier(0.34, 1.4, 0.64, 1); /* a little springy overshoot */
+}
+
+/* new tabs slide in, opened folders unfold, the code fades in on a file switch */
+@keyframes tab-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+    }
+}
+
+.tab-new {
+    animation: tab-in 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.file-children.opening {
+    animation: rise-in 0.2s ease-out;
+}
+
+#code-editor-wrapper.file-in {
+    animation: fade-in 0.22s ease-out;
+}
+
+/* AI: a new suggestion fades in, the status pulses while it thinks */
+.ghost-new {
+    animation: fade-in 0.3s ease-out;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+#ai-status.thinking {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* hover: icons pop a little, the settings gear turns */
+.activity-button:hover img,
+.activity-button:hover svg {
+    transform: scale(1.12);
+}
+
+#settings-button:hover img {
+    transform: rotate(60deg);
+}
+
+#run-btn svg {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#run-btn:hover svg {
+    transform: scale(1.2);
 }
 
 .git-button:active:not(:disabled),
@@ -1709,6 +1782,28 @@ code.hljs {
 
     .menu-open #sidebar {
         box-shadow: 12px 0 32px rgba(0, 0, 0, 0.35);
+    }
+
+    /* the menu's icons and files slide in one after another */
+    .menu-open .activity-button,
+    .menu-open #sidebar > * {
+        animation: slide-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
+
+    .menu-open .activity-button:nth-child(2) {
+        animation-delay: 0.04s;
+    }
+
+    .menu-open .activity-button:nth-child(3) {
+        animation-delay: 0.08s;
+    }
+
+    .menu-open .activity-button:nth-child(4) {
+        animation-delay: 0.12s;
+    }
+
+    .menu-open #sidebar > * {
+        animation-delay: 0.08s;
     }
 
     .menu-open #phone-backdrop {
