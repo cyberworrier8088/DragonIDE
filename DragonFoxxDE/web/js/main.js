@@ -1318,7 +1318,7 @@ function tabsInside(path) {
 }
 
 function isTabUnsaved(tab) {
-    return tab.modified || (typeof autoSaveFile !== "undefined" && autoSaveState.unsavedFiles?.get(tab.path));
+    return tab.modified || (typeof autoSaveState !== "undefined" && autoSaveState.unsavedFiles?.get(tab.path));
 }
 
 async function moveOpenTabs(tabs, oldPath, newPath) {
