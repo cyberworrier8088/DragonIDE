@@ -19,7 +19,7 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - Terminal with live output, `cd`, command history and `Ctrl+C`
 - Source Control Panel (`Ctrl+Shift+G`): see changed files, stage/unstage, commit (`Ctrl+Enter`), push, pull and start a new repo
 - Music panel: pick a vibeyyy (lofi, jazz, synthwave...) and play free internet radio while you code :0
-- AI autocomplete: grey ghost-text suggestions while you type, Tab to accept
+- AI autocomplete: grey ghost-text suggestions while you type, Tab to accept. Works with DragonIDE AI, OpenAI (ChatGPT), Google Gemini (AI Studio), Anthropic (Claude), OpenRouter, Groq, DeepSeek, Mistral, or any OpenAI-compatible server (Ollama, LM Studio). Pick one in Settings
 - Explorer right-click menu like VS Code: new file/folder, cut, copy, paste, rename, delete, copy path
 - Remote access: code from your phone on the same WIFI. Scan a QR code, then edit, save, run code and use the terminal, while everything runs on the laptop
 - Image preview (png, jpg, gif, webp, bmp, ico)

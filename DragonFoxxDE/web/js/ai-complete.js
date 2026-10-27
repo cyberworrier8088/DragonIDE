@@ -1,15 +1,110 @@
 // Ai autocomplete: grey "ghost text" at the cursor. Tab accepts, Esc hides :)))
-// the suggestions come from my code AI server API.md
+// the suggestions come from my code AI server API.md, or any provider below
 
-const AI_URL = "https://imu.hackclub.app/v1/autocomplete";
+// everything except dragon, gemini and anthropic talks the OpenAI chat format
+const AI_PROVIDERS = {
+    dragon: { url: "https://imu.hackclub.app/v1/autocomplete" },
+    openai: { url: "https://api.openai.com/v1/chat/completions", model: "gpt-4.1-mini" },
+    gemini: { url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent", model: "gemini-2.5-flash" },
+    anthropic: { url: "https://api.anthropic.com/v1/messages", model: "claude-haiku-5-5" },
+    openrouter: { url: "https://openrouter.ai/api/v1/chat/completions", model: "openai/gpt-4.1-mini" },
+    groq: { url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.1-8b-instant" },
+    deepseek: { url: "https://api.deepseek.com/chat/completions", model: "deepseek-chat" },
+    mistral: { url: "https://api.mistral.ai/v1/chat/completions", model: "codestral-latest" },
+    custom: { url: "http://localhost:11434/v1/chat/completions", model: "qwen2.5-coder" }
+};
+
+const AI_SYSTEM = "You complete code. Reply with only the new code that goes at <CURSOR>, never repeat code before it. No explanation, no markdown.";
+const AI_MAX_TOKENS = 32; // we only show one line
 
 let aiTimer = null;
 let aiController = null;
 let aiSuggestion = "";
 let aiCursor = -1; // where the suggestion start
 
+function aiProvider() {
+    const provider = localStorage.getItem("ai-provider");
+    return provider in AI_PROVIDERS ? provider : "dragon";
+}
+
+// dragon keeps the old "ai-key" name so saved keys still work
+function aiStoreName(field) {
+    const provider = aiProvider();
+    return provider === "dragon" ? `ai-${field}` : `ai-${field}-${provider}`;
+}
+
+function aiSetting(field) {
+    return localStorage.getItem(aiStoreName(field)) || "";
+}
+
 function aiEnabled() {
-    return localStorage.getItem("ai-enabled") !== "false" && !!localStorage.getItem("ai-key");
+    // custom is usually a local server (Ollama, LM Studio) that needs no key
+    return localStorage.getItem("ai-enabled") !== "false" && (!!aiSetting("key") || aiProvider() === "custom");
+}
+
+// shortcut: 32 output tokens, so "thinking" models (gpt-5, o-series, gemini pro) can reply empty; use a fast model
+function buildAiRequest(provider, key, model, prefix, suffix, filename) {
+    const prompt = `File: ${filename}\n${prefix}<CURSOR>${suffix}`;
+
+    if (provider === "dragon") return {
+        headers: { Authorization: `Bearer ${key}` },
+        body: { prefix, suffix, filename, single_line: true, max_tokens: AI_MAX_TOKENS },
+        text: data => data.completion
+    };
+
+    if (provider === "gemini") return {
+        headers: { "x-goog-api-key": key },
+        body: {
+            systemInstruction: { parts: [{ text: AI_SYSTEM }] },
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: AI_MAX_TOKENS, thinkingConfig: { thinkingBudget: 0 } }
+        },
+        text: data => data.candidates?.[0]?.content?.parts?.[0]?.text
+    };
+
+    if (provider === "anthropic") return {
+        headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: { model, max_tokens: AI_MAX_TOKENS, system: AI_SYSTEM, messages: [{ role: "user", content: prompt }] },
+        text: data => data.content?.[0]?.text
+    };
+
+    return {
+        headers: { Authorization: `Bearer ${key}` },
+        body: { model, max_tokens: AI_MAX_TOKENS, messages: [{ role: "system", content: AI_SYSTEM }, { role: "user", content: prompt }] },
+        text: data => data.choices?.[0]?.message?.content
+    };
+}
+
+// one request to the chosen provider: the reply text, or throws with the API's error message
+async function callAi(prefix, suffix, filename, signal) {
+    const provider = aiProvider();
+    const model = aiSetting("model") || AI_PROVIDERS[provider].model;
+    const url = (aiSetting("url") || AI_PROVIDERS[provider].url).replace("{model}", model);
+    const request = buildAiRequest(provider, aiSetting("key"), model, prefix, suffix, filename);
+
+    const response = await fetch(url, {
+        method: "POST",
+        signal,
+        headers: { ...request.headers, "Content-Type": "application/json" },
+        body: JSON.stringify(request.body)
+    }).catch(error => {
+        throw error.name === "AbortError" ? error : new Error("Can't reach the AI server: " + error.message);
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error?.message || `Error ${response.status}`);
+    return data.cancelled ? "" : request.text(data) || "";
+}
+
+// chat models wrap code in ``` and repeat the indent or the start of the line: keep only the new part of the first line
+function cleanCompletion(text, line) {
+    text = text.replace(/^\s*```[\w+-]*\n?/, "");
+    if (!line.trim()) text = text.replace(/^\n+/, ""); // cursor on a fresh line: the reply is that line
+
+    if (text.startsWith(line)) text = text.slice(line.length);
+    else if (line.trim() && text.trimStart().startsWith(line.trim())) text = text.trimStart().slice(line.trim().length);
+
+    return text.split("\n")[0];
 }
 
 function setAiStatus(text, title = "") {
@@ -21,7 +116,7 @@ function setAiStatus(text, title = "") {
 }
 
 function updateAiStatus() {
-    if (aiEnabled()) setAiStatus("✦ AI", "AI autocomplete is on");
+    if (aiEnabled()) setAiStatus("✦ AI", `AI autocomplete is on (${aiProvider()})`);
     else setAiStatus("AI off", "Add your API key in Settings");
 }
 
@@ -73,7 +168,7 @@ function syncGhostScroll() {
 
 function requestSuggestion() {
     clearSuggestion();
-    aiTimer = setTimeout(fetchSuggestion, 300);
+    aiTimer = setTimeout(fetchSuggestion, 500); // wait for a real pause: fewer requests, fewer tokens
 }
 
 async function fetchSuggestion() {
@@ -96,37 +191,17 @@ async function fetchSuggestion() {
     setAiStatus("✦ Ai...", "Thinking");
 
     try {
-        const response = await fetch(AI_URL, {
-            method: "POST",
-            signal: aiController.signal,
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("ai-key")}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                prefix: code.slice(Math.max(0, cursor - 2000), cursor),
-                suffix: code.slice(cursor, cursor + 500),
-                filename: currentFile.name,
-                single_line: true,
-                max_tokens: 48
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            setAiStatus("⚠ AI", data.error?.message || `Error ${response.status}`);
-            return;
-        }
-
+        // small context = fewer tokens per request
+        const text = await callAi(code.slice(Math.max(0, cursor - 1000), cursor), code.slice(cursor, cursor + 200), currentFile.name, aiController.signal);
         updateAiStatus();
 
-        if (data.cancelled || editor.value !== code || editor.selectionStart !== cursor) return;
+        if (editor.value !== code || editor.selectionStart !== cursor) return;
 
-        showSuggestion(data.completion.split("\n")[0], cursor);
+        const line = code.slice(code.lastIndexOf("\n", cursor - 1) + 1, cursor);
+        showSuggestion(cleanCompletion(text, line), cursor);
     } catch (error) {
         if (error.name === "AbortError") return;
-        setAiStatus("⚠ AI", "Can't reach the AI server: " + error.message);
+        setAiStatus("⚠ AI", error.message);
     }
 }
 
@@ -174,17 +249,57 @@ function onAiKeydown(event) {
     }
 }
 
+// show the saved key/model/url of the chosen provider
+function loadAiFields() {
+    const select = document.getElementById("ai-provider");
+    if (!select) return;
+
+    const { url, model } = AI_PROVIDERS[aiProvider()];
+    const modelInput = document.getElementById("ai-model-input");
+    const urlInput = document.getElementById("ai-url-input");
+
+    select.value = aiProvider();
+    document.getElementById("ai-key-input").value = aiSetting("key");
+    modelInput.value = aiSetting("model");
+    modelInput.placeholder = `Model (${model})`;
+    modelInput.hidden = !model;
+    urlInput.value = aiSetting("url");
+    urlInput.placeholder = url;
+    document.getElementById("ai-test-result").textContent = "";
+    updateAiStatus();
+}
+
+function saveAiFields() {
+    for (const field of ["key", "model", "url"]) {
+        localStorage.setItem(aiStoreName(field), document.getElementById(`ai-${field}-input`).value.trim());
+    }
+    updateAiStatus();
+}
+
+// Done: save, then one tiny request so a wrong key, model or url shows right here
+async function testAi() {
+    const result = document.getElementById("ai-test-result");
+    saveAiFields();
+    result.textContent = "Saved. Testing...";
+
+    try {
+        const text = cleanCompletion(await callAi("def add(a, b):\n    return ", "\n", "test.py"), "    return ");
+        result.textContent = text ? `✓ Works! It answered: ${text}` : "✓ Saved, but the reply was empty. Try a faster model.";
+    } catch (error) {
+        result.textContent = `✗ ${error.message}`;
+    }
+}
 
 function initAiComplete() {
     const editor = document.getElementById("code-editor");
     const toggle = document.getElementById("ai-enabled-toggle");
-    const keyInput = document.getElementById("ai-key-input");
+    const select = document.getElementById("ai-provider");
 
     if (!editor) return;
 
     if (toggle) {
         toggle.checked = localStorage.getItem("ai-enabled") !== "false";
-        
+
         toggle.addEventListener("change", () => {
             localStorage.setItem("ai-enabled", toggle.checked);
             clearSuggestion();
@@ -192,12 +307,19 @@ function initAiComplete() {
         });
     }
 
-    if (keyInput) {
-        keyInput.value = localStorage.getItem("ai-key") || "";
-        keyInput.addEventListener("change", () => {
-            localStorage.setItem("ai-key", keyInput.value.trim());
-            updateAiStatus();
+    if (select) {
+        select.addEventListener("change", () => {
+            localStorage.setItem("ai-provider", select.value);
+            clearSuggestion();
+            loadAiFields();
         });
+
+        for (const field of ["key", "model", "url"]) {
+            document.getElementById(`ai-${field}-input`).addEventListener("change", saveAiFields);
+        }
+        document.getElementById("ai-done-btn").addEventListener("click", testAi);
+
+        loadAiFields();
     }
 
     editor.addEventListener("input", onAiInput);

@@ -1495,7 +1495,7 @@ code.hljs {
     opacity: 0.8;
 }
 
-#ai-key-input {
+.ai-field {
     width: 100%;
     margin-top: 8px;
     padding: 6px 8px;
@@ -1506,8 +1506,16 @@ code.hljs {
     outline: none;
 }
 
-#ai-key-input:focus {
+.ai-field:focus {
     border-color: var(--accent-blue);
+}
+
+#ai-done-btn {
+    margin-top: 8px;
+}
+
+#ai-test-result {
+    overflow-wrap: anywhere;
 }
 
 /* remote access */

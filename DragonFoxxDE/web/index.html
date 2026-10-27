@@ -399,7 +399,22 @@
                             <span data-i18n="aiComplete">AI Autocomplete</span>
                         </label>
 
-                        <input type="password" id="ai-key-input" placeholder="API key (sk-...)" autocomplete="off" spellcheck="false">
+                        <select id="ai-provider" class="ai-field">
+                            <option value="dragon">DragonIDE AI (Qwen)</option>
+                            <option value="openai">OpenAI (ChatGPT)</option>
+                            <option value="gemini">Google Gemini (AI Studio)</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="openrouter">OpenRouter</option>
+                            <option value="groq">Groq</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="mistral">Mistral (Codestral)</option>
+                            <option value="custom">Other (OpenAI-compatible, Ollama...)</option>
+                        </select>
+                        <input type="password" id="ai-key-input" class="ai-field" placeholder="API key" autocomplete="off" spellcheck="false">
+                        <input type="text" id="ai-model-input" class="ai-field" autocomplete="off" spellcheck="false">
+                        <input type="text" id="ai-url-input" class="ai-field" autocomplete="off" spellcheck="false">
+                        <button id="ai-done-btn" class="git-button primary">Done</button>
+                        <p id="ai-test-result" class="remote-hint" aria-live="polite"></p>
                     </div>
 
                     <div class="settings-section" id="remote-section">
