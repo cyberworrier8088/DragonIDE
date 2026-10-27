@@ -105,10 +105,11 @@ function initRemoteSettings() {
 document.addEventListener("DOMContentLoaded", initRemoteSettings);
 
 
+// the menu and save buttons only show on small screens (CSS), so make them everywhere
 function initPhoneLayout() {
-    if (!window.isRemote) return;
-
-    document.querySelector('meta[name="viewport"]')?.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1");
+    if (window.isRemote) {
+        document.querySelector('meta[name="viewport"]')?.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1");
+    }
 
     const closeMenu = () => document.documentElement.classList.remove("menu-open");
 

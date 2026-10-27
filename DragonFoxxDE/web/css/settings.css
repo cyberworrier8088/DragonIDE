@@ -25,13 +25,8 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .modal-content {
-        animation: none;
-    }
-}
-
 .modal-backdrop {
+    animation: fade-in 0.16s ease-out;
     position: absolute;
     top: 0;
     left: 0;
@@ -535,8 +530,9 @@
     border-radius: 8px;
     padding: 24px;
     z-index: 2000;
-    min-width: 350px;
+    min-width: min(350px, calc(100vw - 32px)); /* fits on a phone */
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: center-in 0.2s ease-out;
 }
 
 .unsaved-dialog h3 {
