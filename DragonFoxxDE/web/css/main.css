@@ -1546,3 +1546,119 @@ code.hljs {
 .remote-warning {
     color: #e5c07b;
 }
+
+/* phone layout (remote mode on a small screen) */
+#phone-menu-btn,
+#phone-save-btn,
+#phone-backdrop {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    
+    .remote body {
+        height: 100dvh;
+    }
+
+    .remote #app {
+        height: calc(100dvh - 32px);
+    }
+
+    .remote #phone-menu-btn,
+    .remote #phone-save-btn {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        font-size: 18px;
+    }
+
+    .remote #titlebar-left {
+        padding-left: 0;
+    }
+
+    .remote #activity-bar,
+    .remote #sidebar {
+        position: fixed;
+        top: 32px;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(calc(-100% - 52px));
+        transition: transform 0.2s ease;
+    }
+
+    .remote #activity-bar {
+        left: 0;
+    }
+
+    .remote #sidebar {
+        left: 52px;
+        width: min(80vw, 300px) !important;
+        display: flex !important;
+    }
+
+    .remote.menu-open #activity-bar,
+    .remote.menu-open #sidebar {
+        transform: none;
+    }
+
+    .remote.menu-open #phone-backdrop {
+        display: block;
+        position: fixed;
+        inset: 32px 0 0 0;
+        z-index: 999;
+        background: rgba(0, 0, 0, 0.45);
+    }
+
+    .remote #sidebar-resizer,
+    .remote #panel-resizer {
+        display: none;
+    }
+
+    .remote .file-entry,
+    .remote .git-file,
+    .remote .search-result,
+    .remote .music-station {
+        min-height: 38px;
+        font-size: 15px;
+    }
+
+    .remote .context-menu .menu-item {
+        min-height: 40px;
+        font-size: 15px;
+    }
+
+    .remote #tabs {
+        overflow-x: auto;
+        flex-shrink: 0;
+    }
+
+    .remote .tab {
+        min-width: auto;
+        flex-shrink: 0;
+    }
+
+    .remote .tab-close {
+        opacity: 1;
+    }
+
+    .remote #line-numbers {
+        width: 40px;
+    }
+
+    .remote #bottom-panel {
+        height: 35dvh !important; /* ignore the height saved on the laptop */
+    }
+
+    .remote #status-left,
+    .remote #status-right > span:not(#cursor-position):not(#saved-indicator):not(#saving-indicator) {
+        display: none;
+    }
+
+    .remote #status-bar {
+        justify-content: flex-end;
+    }
+
+    .remote .welcome-actions {
+        display: none;
+    }
+}

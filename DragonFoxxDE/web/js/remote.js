@@ -103,3 +103,68 @@ function initRemoteSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", initRemoteSettings);
+
+
+function initPhoneLayout() {
+    if (!window.isRemote) return;
+
+    document.querySelector('meta[name="viewport"]')?.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1");
+
+    const closeMenu = () => document.documentElement.classList.remove("menu-open");
+
+    const menuButton = document.createElement("button");
+    menuButton.id = "phone-menu-btn";
+    menuButton.className = "titlebar-button";
+    menuButton.title = "Files";
+    menuButton.textContent = "☰";
+    menuButton.addEventListener("click", () => document.documentElement.classList.toggle("menu-open"));
+    document.getElementById("titlebar-left")?.prepend(menuButton);
+
+    const saveButton = document.createElement("button");
+    saveButton.id = "phone-save-btn";
+    saveButton.className = "titlebar-button";
+    saveButton.title = "Save";
+    saveButton.textContent = "S";
+    saveButton.addEventListener("click", () => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "s", ctrlKey: true, bubbles: true }));
+    });
+
+    document.getElementById("run-btn")?.before(saveButton);
+
+    // tap next to the open menu to close it
+    const backdrop = document.createElement("div");
+    backdrop.id = "phone-backdrop";
+    backdrop.addEventListener("click", closeMenu);
+    document.getElementById("app")?.append(backdrop);
+
+    window.addEventListener("file-opened", closeMenu);
+
+    let pressTimer = null;
+    let longPressed = false;
+    document.addEventListener("touchstart", (event) => {
+        longPressed = false;
+        if (!event.target.closest("#file-explorer")) return;
+        const touch = event.touches[0];
+        pressTimer = setTimeout(() => {
+            longPressed = true;
+            event.target.dispatchEvent(new MouseEvent("contextmenu", {
+                bubbles: true,
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            }));
+        }, 550);
+    }, { passive: true });
+
+    for (const name of ["touchend", "touchmove", "touchcancel", "contextmenu"]) {
+        document.addEventListener(name, () => clearTimeout(pressTimer), true);
+    }
+
+    document.addEventListener("click", (event) => {
+        if (!longPressed) return;
+        longPressed = false;
+        event.preventDefault();
+        event.stopPropagation();
+    }, true);
+}
+
+document.addEventListener("DOMContentLoaded", initPhoneLayout);

@@ -12,6 +12,7 @@ use tiny_http::{Header, Method, Request, Response, Server};
 const PORT: u16 = 7777;
 const MAX_BODY: u64 = 10 * 1024 * 1024; // nothing bigger than 10MB comes from a phone
 const MAX_TERMINAL_LINES: usize = 10_000;
+const MAX_IMAGE: u64 = 10 * 1024 * 1024;
 
 struct Remote {
     app: AppHandle,
@@ -270,6 +271,18 @@ async fn run(remote: &Remote, command: &str, args: &Value) -> Result<Value, Stri
             }
             json!(dir)
         }
+
+        "read_image" => {
+            let path = path("path")?;
+            let size = std::fs::metadata(&path).map_err(|e| e.to_string())?.len();
+
+            if size > MAX_IMAGE {
+                return Err("This image is too big to show on the phone (over 10 MB)".to_string());
+            }
+
+            json!(std::fs::read(&path).map_err(|e| e.to_string())?)
+        }
+
         "terminal_poll" => json!(std::mem::take(&mut *remote.terminal.lock().unwrap())),
 
         "execute_code" | "stop_code" | "execute_terminal_command" | "stop_terminal_command"
