@@ -128,7 +128,8 @@ function initSidebarResize() {
         localStorage.setItem(SIDEBAR_WIDTH_KEY, parseInt(sidebar.style.width, 10));
     }
 
-    resizer.addEventListener("mousedown", (e) => {
+    // pointer events: mouse, touch and pen
+    resizer.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         dragging = true;
         resizer.classList.add("dragging");
@@ -136,7 +137,7 @@ function initSidebarResize() {
         document.body.style.userSelect = "none";
     });
 
-    document.addEventListener("mousemove", (e) => {
+    document.addEventListener("pointermove", (e) => {
         if (!dragging) return;
 
         const left = sidebar.getBoundingClientRect().left;
@@ -144,7 +145,8 @@ function initSidebarResize() {
         sidebar.style.width = width + "px";
     });
 
-    document.addEventListener("mouseup", stopDragging);
+    document.addEventListener("pointerup", stopDragging);
+    document.addEventListener("pointercancel", stopDragging);
     window.addEventListener("blur", stopDragging);
 
     resizer.addEventListener("dblclick", () => {

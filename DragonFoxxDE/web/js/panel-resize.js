@@ -27,7 +27,8 @@ function initPanelResize() {
         localStorage.setItem(PANEL_HEIGHT_KEY, parseInt(panel.style.height, 10));
     }
 
-    resizer.addEventListener("mousedown", (e) => {
+    // pointer events: mouse, touch and pen
+    resizer.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         dragging = true;
         resizer.classList.add("dragging");
@@ -35,7 +36,7 @@ function initPanelResize() {
         document.body.style.userSelect = "none";
     });
 
-    document.addEventListener("mousemove", (e) => {
+    document.addEventListener("pointermove", (e) => {
         if (!dragging) return;
 
         const mainRect = main.getBoundingClientRect();
@@ -48,8 +49,9 @@ function initPanelResize() {
     });
 
 
-    // Stop when the mouse button is released
-    document.addEventListener("mouseup", stopDragging);
+    // Stop when the mouse button or finger is released
+    document.addEventListener("pointerup", stopDragging);
+    document.addEventListener("pointercancel", stopDragging);
 
     // Also stop if the window loses focus 
     window.addEventListener("blur", stopDragging);

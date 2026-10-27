@@ -818,6 +818,7 @@ code.hljs {
     height: 4px;
     flex-shrink: 0;
     cursor: ns-resize;
+    touch-action: none; /* a finger drags it instead of scrolling the page */
     background: transparent;
     transition: background 0.15s ease;
 }
@@ -1039,6 +1040,7 @@ code.hljs {
     width: 4px;
     flex-shrink: 0;
     cursor: ew-resize;
+    touch-action: none;
     background: transparent;
     transition: background 0.15s ease;
 }
@@ -1735,6 +1737,24 @@ code.hljs {
 
     .git-file .git-icon-btn {
         visibility: visible;
+    }
+
+    /* the 4px resize handles get a finger-sized invisible grip */
+    #sidebar-resizer,
+    #panel-resizer {
+        position: relative;
+    }
+
+    #sidebar-resizer::after,
+    #panel-resizer::after {
+        content: "";
+        position: absolute;
+        inset: 0 -10px;
+        z-index: 5;
+    }
+
+    #panel-resizer::after {
+        inset: -10px 0;
     }
 }
 
