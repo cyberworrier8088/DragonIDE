@@ -173,7 +173,9 @@ async function startDragonIDE() {
                 isDirectory: selectedContextEntry.is_directory
             });
 
-            await closeTab(selectedContextEntry.path, true);
+            for (const tab of tabsInside(selectedContextEntry.path)) {
+                await closeTab(tab.path, true);
+            }
             await refreshWorkspace();
             hideContextMenu();
         } catch (err) {
@@ -218,16 +220,18 @@ async function startDragonIDE() {
 
         const targetDir = selectedContextEntry.is_directory ? selectedContextEntry.path : getParentPath(selectedContextEntry.path);
 
-        if (fileClipboard.cut && openTabs.some(tab => tab.path === fileClipboard.path && tab.modified)) {
+        const openInside = fileClipboard.cut ? tabsInside(fileClipboard.path) : [];
+        if (openInside.some(isTabUnsaved)) {
             alert("Save the file before moving it.");
             return;
         }
 
         try {
-            await invoke("paste_entry", { from: fileClipboard.path, toDir: targetDir, cut: fileClipboard.cut });
+
+            const newPath = await invoke("paste_entry", { from: fileClipboard.path, toDir: targetDir, cut: fileClipboard.cut });
 
             if (fileClipboard.cut) {
-                await closeTab(fileClipboard.path, true); // the old path is gone
+                await moveOpenTabs(openInside, fileClipboard.path, newPath); // the tabs follow the files
                 fileClipboard = null;
             }
 
@@ -1138,10 +1142,8 @@ document.addEventListener("keydown", async (event) => {
             window.refreshGit?.();
 
         } catch (error) {
-            console.error(
-                "Failed to save document:",
-                error
-            );
+            console.error("Failed to save document:", error);
+            alert("Could not save: " + error); // the tab stays unsaved, so nothing looks saved when it
         }
     }
 });
