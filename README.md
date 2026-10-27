@@ -19,6 +19,9 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - Terminal with live output, `cd`, command history and `Ctrl+C`
 - Source Control Panel (`Ctrl+Shift+G`): see changed files, stage/unstage, commit (`Ctrl+Enter`), push, pull and start a new repo
 - Music panel: pick a vibeyyy (lofi, jazz, synthwave...) and play free internet radio while you code :0
+- AI autocomplete: grey ghost-text suggestions while you type, Tab to accept
+- Explorer right-click menu like VS Code: new file/folder, cut, copy, paste, rename, delete, copy path
+- Remote access: code from your phone on the same WIFI. Scan a QR code, then edit, save, run code and use the terminal, while everything runs on the laptop
 - Image preview (png, jpg, gif, webp, bmp, ico)
 - Drag tabs, resize or hide the explorer and bottom panel
 - 8 themes. On Windows, the Glass theme uses the real acrylic blur.
@@ -30,6 +33,8 @@ It's a work in progress. It runs and the basics work, but it's not ready to repl
 - Run Code compiles one `.rs` file with `rustc`. It doesn't run Cargo projects.
 - I mostly test on Windows. CI builds on Linux and macOS, but I don't use those every day.
 - The Git panel can't show diffs or switch branches yet
+- Remote access only works on the same WiFi. Don't share the QR code: anyone who has it can edit your files (and run commands, if you allowed it).
+- If the same file is open on the laptop and the phone, the last save wins.
 
 If you find a bug, please [open an issue](https://github.com/cyberworrier8088/DragonIDE/issues).
 
