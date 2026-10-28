@@ -186,7 +186,8 @@ async function fetchSuggestion() {
     const lineEnd = code.indexOf("\n", cursor);
     const restOfLine = code.slice(cursor, lineEnd === -1 ? code.length : lineEnd);
 
-    if (restOfLine.trim() !== "") return;
+    // auto-close brackets puts ) ] } or a quote after the cursor, that still counts as the end of the line
+    if (!/^[\s)\]}"'`;,]*$/.test(restOfLine)) return;
 
     aiController = new AbortController();
     setAiStatus("✦ Ai...", "Thinking");
