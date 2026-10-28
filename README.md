@@ -16,6 +16,7 @@
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Hackatime](https://hackatime.hackclub.com/api/v1/badge/U0B312F4FS5/cyberworrier8088/DragonIDE)](https://hackatime.hackclub.com)
 
 **[Download](#download)** · **[Features](#features)** · **[Phone mode](#code-from-your-phone)** · **[Build](#build-from-source)** · **[Roadmap](#roadmap)**
 
