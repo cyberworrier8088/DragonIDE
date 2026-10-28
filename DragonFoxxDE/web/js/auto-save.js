@@ -108,11 +108,10 @@ function markAsSaved(path) {
 // 8pdate tab indicator (red dot)
 function updateTabIndicator(path) {
     if (!path) return;
-    const fileName = path.split(/[\\/]/).pop();
     const tabs = document.querySelectorAll(".tab");
 
     tabs.forEach(tab => {
-        if (tab.textContent.includes(fileName)) {
+        if (tab.dataset.path === path) {
             const isUnsaved = autoSaveState.unsavedFiles.get(path);
             if (isUnsaved) {
                 tab.classList.add("unsaved");
