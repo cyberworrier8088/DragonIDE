@@ -210,7 +210,8 @@ function handleBracketInput(event) {
         const after = text.substring(editor.selectionEnd);
 
         editor.value = before + char + selectedText + closingChar + after;
-        editor.setSelectionRange(editor.selectionStart + 1, editor.selectionStart + 1 + selectedText.length);
+        // setting value moves the caret to the end of the file, so use the old position
+        editor.setSelectionRange(cursorPos + 1, cursorPos + 1 + selectedText.length);
         editor.dispatchEvent(new Event('input', { bubbles: true }));
         return;
     }
