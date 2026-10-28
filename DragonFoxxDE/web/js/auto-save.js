@@ -384,15 +384,8 @@ if (document.readyState === "loading") {
 
 // Prevent data loss on window close / unload
 window.addEventListener("beforeunload", (e) => {
-    let hasUnsaved = false;
-    for (let [path, isUnsaved] of autoSaveState.unsavedFiles) {
-        if (isUnsaved) {
-            hasUnsaved = true;
-            break;
-        }
-    }
-
-    if (hasUnsaved) {
+    // same check as closing the window: with auto-save off only tab.modified knows
+    if (openTabs.some(isTabUnsaved)) {
         e.preventDefault();
         e.returnValue = "";
         return "";
