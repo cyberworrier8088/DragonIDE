@@ -297,7 +297,7 @@ fn stop_code() -> Result<(), String> {
         command("kill").args(["-9", pid.as_str()]).status()
     };
 
-    stutus
+    status
         .map(|_| ())
         .map_err(|e| format!("Failed to stop: {}", e))
 }
