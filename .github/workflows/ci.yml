@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - "journels/**"
+      - "journal/**"
       - "**.md"
   pull_request:
     paths-ignore:
-      - "journels/**"
+      - "journal/**"
       - "**.md"
   workflow_dispatch:
   workflow_call: # release.yml runs all these checks first
