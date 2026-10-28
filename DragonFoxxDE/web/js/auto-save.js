@@ -203,13 +203,6 @@ async function autoSaveFile(path) {
 
     const content = editor.value;
 
-    // Check if content actually changed
-    if (autoSaveState.lastSavedContent[path] === content) {
-        console.log("No changes to save for:", path);
-        markAsSaved(path);
-        return;
-    }
-
     showSavingIndicator();
 
     try {
