@@ -289,7 +289,7 @@ fn stop_code() -> Result<(), String> {
     };
 
     let pid = pid.to_string();
-    let stutus = if cfg!(target_os = "windows") {
+    let status = if cfg!(target_os = "windows") {
         command("taskkill")
             .args(["/PID", pid.as_str(), "/T", "/F"])
             .status()
