@@ -12,22 +12,31 @@ document.getElementById("maximize-btn").addEventListener("click", async () => {
     await toggleMaximize();
 });
 
-document.getElementById("close-btn").addEventListener("click", async () => {
+document.getElementById("close-btn").addEventListener("click", () => appWindow.close());
+
+let closeAnyway = false;
+appWindow.onCloseRequested?.((event) => {
 
     const unsaved = openTabs.filter(isTabUnsaved);
-    if (unsaved.length === 0) return appWindow.close();
+    if (closeAnyway || unsaved.length === 0) return;
+    event.preventDefault();
 
     const name = unsaved.length === 1 ? unsaved[0].path : `${unsaved.length} files`;
     showUnsavedDialog(name, async () => {
         try {
             await saveAllTabs(unsaved);
         } catch (error) {
-            alert("Could not save: " + error); // stay open, so nothing is lost
+            alert("Could not save: " + error);
             return;
         }
-        await appWindow.close();
-    }, () => appWindow.close());
+        closeAnyway = true;
+        appWindow.close();
+    }, () => {
+        closeAnyway = true;
+        appWindow.close();
+    });
 });
+
 
 async function saveAllTabs(tabs) {
     const { invoke } = window.__TAURI__.core;
