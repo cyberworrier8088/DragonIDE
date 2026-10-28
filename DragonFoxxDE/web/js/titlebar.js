@@ -13,35 +13,33 @@ document.getElementById("maximize-btn").addEventListener("click", async () => {
 });
 
 document.getElementById("close-btn").addEventListener("click", async () => {
-    // Check if any file has unsaved changes before closing window
-    if (typeof autoSaveState !== "undefined" && autoSaveState.unsavedFiles) {
-        let unsavedPath = null;
-        for (let [path, isUnsaved] of autoSaveState.unsavedFiles) {
-            if (isUnsaved) {
-                unsavedPath = path;
-                break;
-            }
-        }
 
-        if (unsavedPath && typeof showUnsavedDialog === "function") {
-            showUnsavedDialog(
-                unsavedPath,
-                async () => {
-                    if (typeof autoSaveFile === "function") {
-                        await autoSaveFile(unsavedPath);
-                    }
-                    await appWindow.close();
-                },
-                async () => {
-                    await appWindow.close();
-                }
-            );
+    const unsaved = openTabs.filter(isTabUnsaved);
+    if (unsaved.length === 0) return appWindow.close();
+
+    const name = unsaved.length === 1 ? unsaved[0].path : `${unsaved.length} files`;
+    showUnsavedDialog(name, async () => {
+        try {
+            await saveAllTabs(unsaved);
+        } catch (error) {
+            alert("Could not save: " + error); // stay open, so nothing is lost
             return;
         }
-    }
-
-    await appWindow.close();
+        await appWindow.close();
+    }, () => appWindow.close());
 });
+
+async function saveAllTabs(tabs) {
+    const { invoke } = window.__TAURI__.core;
+    const editor = document.getElementById("code-editor");
+
+    if (currentFile && !currentFile.isImage) {
+        await invoke("update_document", { path: currentFile.path, text: editor.value });
+    }
+    for (const tab of tabs) {
+        await invoke("save_document", { path: tab.path });
+    }
+}
 
 document.getElementById("titlebar").addEventListener("dblclick", async (event) => {
     if (!event.target.closest(".titlebar-button")) {
@@ -57,7 +55,6 @@ function updateTitlebarFileName(fileName) {
     setTitlebarText(center, fileName, modified);
 }
 
-// file names come from disk, so build text nodes instead of HTML
 function setTitlebarText(center, fileName, modified) {
     center.replaceChildren();
     if (!fileName) return;

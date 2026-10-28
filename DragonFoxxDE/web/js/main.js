@@ -1083,6 +1083,8 @@ function saveUndoState() {
             selectionStart: lastSavedState.selectionStart,
             selectionEnd: lastSavedState.selectionEnd
         });
+        if (undoStack.length > 200) undoStack.shift(); // every step keeps the shole file, so keep only the last 200
+        
         redoStack = [];
     }
 
