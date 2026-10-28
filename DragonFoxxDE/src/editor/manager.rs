@@ -57,7 +57,7 @@ impl DocumentManager {
             if let Ok(disk) = std::fs::read_to_string(&document.path) {
                 if disk != document.disk_text {
                     return Err(format!(
-                        "{}: anthor prgram changed this file",
+                        "{}: another prgram changed this file",
                         CHANGED_ON_DISK
                     ));
                 }
