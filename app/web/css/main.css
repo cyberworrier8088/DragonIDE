@@ -1498,8 +1498,17 @@ code.hljs {
 }
 
 .ghost-text {
-    color: var(--text-muted);
-    opacity: 0.8;
+    color: var(--text-muted); /* no opacity: its background must fully hide the real ) */
+}
+
+/* the hint and the moved ) cover the real ) underneath */
+.ghost-text,
+.ghost-rest {
+    background: var(--editor-bg);
+}
+
+.ghost-rest {
+    color: var(--editor-text);
 }
 
 .ai-field {

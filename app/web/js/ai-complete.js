@@ -154,10 +154,16 @@ function showSuggestion(text, cursor, fresh = false) {
     hint.className = fresh ? "ghost-text ghost-new" : "ghost-text"; // fade in only a new suggestion, not each typed letter
     hint.textContent = text;
 
-    const after = document.createElement("span");
-    after.textContent = editor.value.slice(cursor);
+    // the ) or quote after the cursor is redrawn after the hint, so the hint pushes it right instead of covering it
+    const lineEnd = editor.value.indexOf("\n", cursor);
+    const restOfLine = document.createElement("span");
+    restOfLine.className = "ghost-rest";
+    restOfLine.textContent = editor.value.slice(cursor, lineEnd === -1 ? undefined : lineEnd);
 
-    ghost.replaceChildren(before, hint, after);
+    const after = document.createElement("span");
+    after.textContent = lineEnd === -1 ? "" : editor.value.slice(lineEnd);
+
+    ghost.replaceChildren(before, hint, restOfLine, after);
     syncGhostScroll();
 }
 
@@ -204,7 +210,11 @@ async function fetchSuggestion() {
         if (editor.value !== code || editor.selectionStart !== cursor) return;
 
         const line = code.slice(code.lastIndexOf("\n", cursor - 1) + 1, cursor);
-        showSuggestion(cleanCompletion(text, line), cursor, true);
+        let suggestion = cleanCompletion(text, line);
+        // the model often writes the ) or quote that auto-close already put after the cursor
+        const tail = restOfLine.trim();
+        if (tail && suggestion.endsWith(tail)) suggestion = suggestion.slice(0, -tail.length);
+        showSuggestion(suggestion, cursor, true);
     } catch (error) {
         if (error.name === "AbortError") return;
         setAiStatus("⚠ AI", error.message);
