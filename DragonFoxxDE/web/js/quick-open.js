@@ -2,6 +2,7 @@ let quickOpenTimer = null;
 let quickOpenRequestId = 0;
 let quickOpenResults = [];
 let quickOpenSelected = 0;
+let quickOpenSearch = null; // the newest search, so Enter can wait for its answer
 
 function openQuickOpen() {
     const modal = document.getElementById("quick-open-modal");
@@ -11,7 +12,7 @@ function openQuickOpen() {
     modal.classList.remove("hidden");
     input.value = "";
     input.focus();
-    runQuickOpen();
+    quickOpenSearch = runQuickOpen();
 }
 
 function closeQuickOpen() {
@@ -107,7 +108,7 @@ function initQuickOpen() {
         quickOpenTimer = setTimeout(() => {
 
             quickOpenTimer = null;
-            runQuickOpen();
+            quickOpenSearch = runQuickOpen();
         }, 150);
     });
 
@@ -123,12 +124,13 @@ function initQuickOpen() {
         } else if (e.key === "Enter") {
 
             e.preventDefault();
-            // typed fast and pressed enter before the search
+            // typed fast and pressed enter before the search, or before its answer came back
             if (quickOpenTimer) {
                 clearTimeout(quickOpenTimer);
                 quickOpenTimer = null;
-                await runQuickOpen();
+                quickOpenSearch = runQuickOpen();
             }
+            await quickOpenSearch;
             pickQuickOpen(quickOpenSelected);
         } else if (e.key === "Escape") {
             e.preventDefault();
