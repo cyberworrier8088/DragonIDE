@@ -5,6 +5,7 @@ let executionState = {
     output: [],
     startTime: null
 };
+let outputScrollFrame = null;
 
 function detectExecutionLanguage(filePath) {
     if (!filePath) return null;
@@ -63,9 +64,12 @@ function addOutputLine(text, type = 'normal') {
     line.textContent = text;
     outputContent.appendChild(line);
 
-    // auto-scroll to bottom
-    const panel = document.getElementById("panel-content");
-    if (panel) panel.scrollTop = panel.scrollHeight;
+    // auto-scroll to bottom once per frame: reading scrollHeight after every line forces a full layout each time
+    cancelAnimationFrame(outputScrollFrame);
+    outputScrollFrame = requestAnimationFrame(() => {
+        const panel = document.getElementById("panel-content");
+        if (panel) panel.scrollTop = panel.scrollHeight;
+    });
 }
 
 function showExecutionStatus(isRunning) {
