@@ -47,7 +47,7 @@ impl DocumentManager {
         self.documents.len()
     }
 
-    pub fn save(&mut self, path: &PathBuf) -> Result<(), String> {
+    pub fn save(&mut self, path: &PathBuf, force: bool) -> Result<(), String> {
         let document = self
             .documents
             .get_mut(path)
