@@ -11,6 +11,7 @@ on:
       - "journels/**"
       - "**.md"
   workflow_dispatch:
+  workflow_call: # release.yml runs all these checks first
 
 permissions:
   contents: read

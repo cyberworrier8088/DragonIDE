@@ -9,14 +9,52 @@ permissions:
     contents: write # needed to create the release and upload the installers
 
 jobs:
+  # all CI checks again, so a broken commit can never become a release
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  check:
+    name: Check version and write notes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      notes: ${{ steps.notes.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # all tags and commits, for the notes
+
+      - name: Tag must match the version in Cargo.toml and tauri.conf.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          CARGO=$(grep -m1 '^version' DragonFoxxDE/Cargo.toml | cut -d'"' -f2)
+          TAURI=$(grep -m1 '"version"' DragonFoxxDE/tauri.conf.json | cut -d'"' -f4)
+          if [ "$TAG" != "$CARGO" ] || [ "$TAG" != "$TAURI" ]; then
+            echo "::error::Tag is v$TAG but Cargo.toml says $CARGO and tauri.conf.json says $TAURI. Change both versions, run cargo build, commit, then make the tag again."
+            exit 1
+          fi
+          echo "Version $TAG is the same everywhere"
+
+      - name: Release notes from the fix and feat commits since the last tag
+        id: notes
+        run: |
+          PREV=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
+          {
+            echo "notes<<END_OF_NOTES"
+            git log "${PREV:+$PREV..}$GITHUB_REF_NAME" --pretty='- %s' | grep -E '^- (feat|fix)' || echo "- small fixes"
+            echo "END_OF_NOTES"
+          } >> "$GITHUB_OUTPUT"
+
   build:
     name: Build (${{ matrix.os }})
+    needs: [ci, check]
     strategy:
       fail-fast: false
       matrix:
         # ubuntu 22.04 so the Linux app also runs on older Linux versions
         os: [windows-latest, macos-latest, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
 
@@ -44,8 +82,10 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: DragonIDE ${{ github.ref_name }}
           releaseBody: |
-            Download the installer for your computer below.
+            ## What changed
+            ${{ needs.check.outputs.notes }}
 
+            ## Download
             - Windows: `.exe` (setup) or `.msi`
             - macOS: `.dmg`
             - Linux: `.AppImage` or `.deb`
