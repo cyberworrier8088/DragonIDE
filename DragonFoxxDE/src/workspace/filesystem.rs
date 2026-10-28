@@ -36,7 +36,14 @@ pub fn read_directory(root: &Path) -> Result<Vec<FileEntry>, String> {
     Ok(files)
 }
 
+const MAX_TEXT_FILE: u64 = 50 * 1024 * 1024; // same limit as the image preview
+
 pub fn read_file(path: &Path) -> Result<String, String> {
+    // read_to_string loads all of a huge log or binary into memory before it can fail
+    if fs::metadata(path).is_ok_and(|m| m.len() > MAX_TEXT_FILE) {
+        return Err("This file is too big to open (over 50MB)".to_string());
+    }
+
     fs::read_to_string(path).map_err(|error| {
         if error.kind() == std::io::ErrorKind::InvalidData {
             "This is not a text file, so DragonIDE can't open it".to_string()
