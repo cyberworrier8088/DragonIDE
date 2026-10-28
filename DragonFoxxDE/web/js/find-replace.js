@@ -264,16 +264,17 @@ function replaceOne() {
     const replaceInput = document.getElementById("replace-input");
     const replaceText = replaceInput ? replaceInput.value : "";
 
-    const before = editor.value.substring(0, match.start);
-    const after = editor.value.substring(match.end);
-    editor.value = before + replaceText + after;
+    editor.setRangeText(replaceText, match.start, match.end, "end");
 
     editor.dispatchEvent(new Event('input', { bubbles: true }));
 
     highlightMatches();
 
+    // go on from the replaced text, not from the second match of the file
+    const next = findReplaceState.matches.findIndex(m => m.start >= match.start + replaceText.length);
     if (findReplaceState.matches.length > 0) {
-        findNext();
+        findReplaceState.currentMatchIndex = Math.max(next, 0);
+        navigateToMatch(findReplaceState.currentMatchIndex);
     }
 }
 
