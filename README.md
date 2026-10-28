@@ -1,93 +1,218 @@
+<div align="center">
+
+<img src="docs/logo.png" alt="DragonIDE logo" width="112">
+
 # DragonIDE
 
-[![CI](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml/badge.svg)](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/cyberworrier8088/DragonIDE)](https://github.com/cyberworrier8088/DragonIDE/releases/latest)
+**A lightweight code editor built with Rust and Tauri.**
 
-DragonIDE is a code editor I'm building with Rust and Tauri 2. The front end is plain HTML, CSS and JavaScript, with no npm packages.
+1.2 MB installer · No Electron · No npm · Code from your phone
 
-It's a work in progress. It runs and the basics work, but it's not ready to replace your main editor, and there are no installers yet.
+<br>
 
-![DragonIDE](journels/img/full-desktop.png)
+[![Release](https://img.shields.io/github/v/release/cyberworrier8088/DragonIDE?style=flat-square&label=release&color=24C8DB)](https://github.com/cyberworrier8088/DragonIDE/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/cyberworrier8088/DragonIDE/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml)
+[![Downloads](https://img.shields.io/github/downloads/cyberworrier8088/DragonIDE/total?style=flat-square&color=blue)](https://github.com/cyberworrier8088/DragonIDE/releases)
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
+[![Rust](https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-## What works now
+**[Download](#download)** · **[Features](#features)** · **[Phone mode](#code-from-your-phone)** · **[Build](#build-from-source)** · **[Roadmap](#roadmap)**
 
-- Editor with syntax highlighting, line numbers, undo/redo per tab, auto indent and bracket matching
-- Tab / Shift+Tab indent and unindent the selected lines
-- Find and replace (case sensitive, whole word, regex), go to line, zoom
-- File explorer: new file/folder, rename, delete, copy path
-- Quick Open (`Ctrl+P`) and search across all files (`Ctrl+Shift+F`)
-- Run single Rust, JavaScript or Python files, with a Stop button
-- Terminal with live output, `cd`, command history and `Ctrl+C`
-- Source Control Panel (`Ctrl+Shift+G`): see changed files, stage/unstage, commit (`Ctrl+Enter`), push, pull and start a new repo
-- Music panel: pick a vibeyyy (lofi, jazz, synthwave...) and play free internet radio while you code :0
-- AI autocomplete: grey ghost-text suggestions while you type, Tab to accept. Works with DragonIDE AI, OpenAI (ChatGPT), Google Gemini (AI Studio), Anthropic (Claude), OpenRouter, Groq, DeepSeek, Mistral, or any OpenAI-compatible server (Ollama, LM Studio). Pick one in Settings
-- Explorer right-click menu like VS Code: new file/folder, cut, copy, paste, rename, delete, copy path
-- Remote access: code from your phone on the same WIFI. Scan a QR code, then edit, save, run code and use the terminal, while everything runs on the laptop
-- Image preview (png, jpg, gif, webp, bmp, ico)
-- Drag tabs, resize or hide the explorer and bottom panel
-- 8 themes. On Windows, the Glass theme uses the real acrylic blur.
-- English and Spanish
+<br>
 
-## Known problems
+<a href="docs/demo.mp4"><img src="docs/demo.gif" alt="DragonIDE demo: opening files, Quick Open, running Python, the terminal, Source Control and themes" width="900"></a>
 
-- The terminal can't take keyboard input, so interactive programs (a Python prompt, `npm init`) don't work. No colors in output yet.
-- Run Code compiles one `.rs` file with `rustc`. It doesn't run Cargo projects.
-- I mostly test on Windows. CI builds on Linux and macOS, but I don't use those every day.
-- The Git panel can't show diffs or switch branches yet
-- Remote access only works on the same WiFi. Don't share the QR code: anyone who has it can edit your files (and run commands, if you allowed it).
-- If the same file is open on the laptop and the phone, the last save wins.
+<sub>Opening a project, Quick Open, running a Python file, the terminal, Source Control and themes. Click for the full-quality video.</sub>
 
-If you find a bug, please [open an issue](https://github.com/cyberworrier8088/DragonIDE/issues).
+</div>
 
-## Run it
+<br>
 
-You need [Rust](https://rustup.rs) and the Tauri CLI:
+## About
 
-```
-cargo install tauri-cli --version "^2" --locked
-```
+DragonIDE is a desktop code editor built as a [Tauri 2](https://tauri.app) app. The heavy work (files, search, git, running code and the terminal) happens in Rust, and the interface runs in the web view your operating system already has. Because it doesn't bundle a browser, the Windows installer is **1.2 MB**, where an Electron editor ships around 100 MB.
 
-Tauri also needs some system libraries:
+The interface is plain HTML, CSS and JavaScript. It has no framework, no bundler and no `node_modules`.
 
-- **Windows:** [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) ("Desktop development with C++")
-- **macOS:** `xcode-select --install`
-- **Linux (Debian/Ubuntu):** `sudo apt install libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev`
+<table>
+<tr>
+<td width="33%" valign="top">
 
-Then:
+**Small by design**<br>
+A 1.2 MB installer that uses the system web view instead of bundling a browser.
 
-```
-git clone https://github.com/cyberworrier8088/DragonIDE.git
-cd DragonIDE/DragonFoxxDE
-cargo tauri dev
-```
+</td>
+<td width="33%" valign="top">
 
-The first build takes a few minutes. Run Code uses `rustc`, `node` and `python` from your computer, so install the ones you need.
+**Everything in one window**<br>
+Editor, terminal, Git, project search and Run, with no setup.
+
+</td>
+<td width="33%" valign="top">
+
+**Your work is protected**<br>
+Unsaved-change warnings, auto-save, and protection when another program changes an open file.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+**Code from your phone**<br>
+Scan a QR code and edit the project on your laptop from any phone browser.
+
+</td>
+<td valign="top">
+
+**AI autocomplete**<br>
+Inline suggestions from the provider you choose, or a local model.
+
+</td>
+<td valign="top">
+
+**Cross-platform**<br>
+Native installers for Windows, macOS and Linux on every release.
+
+</td>
+</tr>
+</table>
+
+## Download
+
+| Platform | Package | Size |
+|:--|:--|--:|
+| **Windows** 10 / 11 | [`.exe` installer](https://github.com/cyberworrier8088/DragonIDE/releases/latest) or `.msi` | 1.2 MB |
+| **macOS** (Apple Silicon) | [`.dmg`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) | 2.0 MB |
+| **Linux** | [`.deb`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) or `.rpm` | 1.6 MB |
+| **Linux** (any distribution) | [`.AppImage`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) | 80 MB |
+
+> [!NOTE]
+> Builds are not code-signed yet. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**.
+
+## Features
+
+### Editing
+- Syntax highlighting for common languages, line numbers and bracket matching
+- Auto indent, auto-closing brackets and quotes, and multi-line indent with `Tab` / `Shift+Tab`
+- Undo and redo history for each tab, and tabs you can drag to reorder
+- Find and replace with match case, whole word and regular expressions
+- Quick Open (`Ctrl+P`) and search across the whole project (`Ctrl+Shift+F`)
+- Eight themes, including Glass, which uses native acrylic blur on Windows
+- English and Spanish interface
+
+### Run, terminal and Git
+- Run Rust, JavaScript and Python files with `Ctrl+Alt+R`, and stop them at any time
+- Integrated terminal with live output, `cd`, command history and `Ctrl+C`
+- Source Control panel: review changes, stage, unstage, commit, push, pull and initialize a repository
+
+### Reliability
+- Auto-save, with an adjustable interval
+- Every way of closing (the close button, `Alt+F4`, the taskbar or a reload) warns about unsaved files
+- If another program changes an open file, for example `git pull`, DragonIDE asks before overwriting it
+- CRLF line endings are preserved, so saving doesn't create noisy diffs
+- Large files and runaway programs can't freeze the editor: very large files open without highlighting, files over 50 MB are refused, and program output is capped at 1 MB
+
+### AI autocomplete
+Inline ghost-text suggestions, accepted with `Tab`. Bring your own key for OpenAI, Google Gemini, Anthropic, OpenRouter, Groq, DeepSeek or Mistral, or run a local model with Ollama or LM Studio. Keys are stored on your machine and are sent only to the provider you select.
+
+## Code from your phone
+
+DragonIDE can serve its interface over your local network. Open the project on your laptop, scan a QR code with your phone, and you get the full editor in the phone's browser. Files, Git and running code all stay on the laptop. The phone only shows the interface.
+
+1. Open a folder in DragonIDE.
+2. Open **Settings** (the gear in the bottom left), find **Remote Access (phone)** and click **Start**.
+3. Scan the QR code with a phone on the same Wi-Fi network.
+
 
 ## Keyboard shortcuts
 
-| Keys | Action |
-|---|---|
+<details>
+<summary><b>Show all shortcuts</b></summary>
+<br>
+
+| Shortcut | Action |
+|:--|:--|
 | `Ctrl+S` | Save |
 | `Ctrl+P` | Quick Open |
 | `Ctrl+Shift+F` | Search in files |
-| `Ctrl+F` / `Ctrl+H` | Find / replace |
+| `Ctrl+F` / `Ctrl+H` | Find / Replace |
 | `Ctrl+G` | Go to line |
-| `Tab` / `Shift+Tab` | Indent / unindent selected lines |
+| `Tab` / `Shift+Tab` | Indent / unindent selection |
 | `Ctrl+Shift+\` | Jump to matching bracket |
-| `Ctrl+Alt+R` | Run code (again to stop) |
-| `Ctrl+B` / `Ctrl+J` | Hide or show explorer / bottom panel |
+| `Ctrl+Alt+R` | Run current file (again to stop) |
+| `Ctrl+B` / `Ctrl+J` | Toggle explorer / bottom panel |
 | `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | Zoom in / out / reset |
-| `Ctrl+Shift+G` | Open Source Control |
+| `Ctrl+Shift+G` | Source Control |
 | `Ctrl+Enter` | Commit (in Source Control) |
 
-## Repo layout
+</details>
 
-- `DragonFoxxDE/` is the editor. Rust code is in `src/`, the UI is in `web/`.
-- `FoxAi/` is a small code-completion model I'm training from scratch in Rust with [Burn](https://burn.dev). It's not good enough to use in the editor yet. See [FoxAi/README.md](FoxAi/README.md).
-- `journels/` is my day-by-day dev journal, with screenshots of each step.
+## Build from source
+
+**Prerequisites:** [Rust](https://rustup.rs) (stable), the Tauri CLI, and the [system dependencies for Tauri](https://tauri.app/start/prerequisites/).
+
+```sh
+cargo install tauri-cli --version "^2" --locked
+```
+
+<details>
+<summary><b>System dependencies by platform</b></summary>
+<br>
+
+| OS | Command or download |
+|:--|:--|
+| Windows | [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), with "Desktop development with C++" |
+| macOS | `xcode-select --install` |
+| Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev` |
+
+</details>
+
+```sh
+git clone https://github.com/cyberworrier8088/DragonIDE.git
+cd DragonIDE/DragonFoxxDE
+
+cargo tauri dev      # run with live reload
+cargo tauri build    # build installers into target/release/bundle/
+```
+
+Run uses the `rustc`, `node` and `python` already installed on your system.
+
+## Architecture
+
+```
+DragonIDE/
+├── DragonFoxxDE/         the Tauri app
+│   ├── src/              Rust backend: commands, documents, files, search, git, terminal, remote server
+│   ├── web/              frontend: HTML, CSS and JavaScript, with no build step
+│   ├── capabilities/     Tauri permission set
+│   └── tests/            frontend tests (node --test)
+├── FoxAi/                an experimental code-completion model, trained from scratch in Rust with Burn
+└── journels/             development journal
+```
+
+The frontend calls Rust through Tauri commands (`invoke`). Phone mode runs a small HTTP server ([`tiny_http`](https://crates.io/crates/tiny_http)) in the same process, so phone requests go through the same commands and the same path checks as the desktop window.
+
+Found a bug or have an idea? [Open an issue](https://github.com/cyberworrier8088/DragonIDE/issues).
+
+## Contributing
+
+Contributions are welcome. Please run the same checks as CI before you open a pull request:
+
+```sh
+cd DragonFoxxDE
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+node --test tests/web.test.js
+```
+
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org) (`feat:`, `fix:`, `docs:`, `ci:`). Release notes are generated from `feat:` and `fix:` commits.
+
+## Releases
+
+DragonIDE follows [Semantic Versioning](https://semver.org). Pushing a `v*` tag runs the release pipeline. It checks that the tag matches the app version, runs the full test suite on all three platforms, builds the installers, and publishes a GitHub release with generated notes.
 
 ## License
 
-[MIT](LICENSE)
-
-Thankyou so much
+Released under the [MIT License](LICENSE).
