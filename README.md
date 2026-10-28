@@ -188,7 +188,7 @@ DragonIDE/
 │   ├── capabilities/     Tauri permission set
 │   └── tests/            frontend tests (node --test)
 ├── FoxAi/                an experimental code-completion model, trained from scratch in Rust with Burn
-└── journels/             development journal
+└── journal/             development journal
 ```
 
 The frontend calls Rust through Tauri commands (`invoke`). Phone mode runs a small HTTP server ([`tiny_http`](https://crates.io/crates/tiny_http)) in the same process, so phone requests go through the same commands and the same path checks as the desktop window.

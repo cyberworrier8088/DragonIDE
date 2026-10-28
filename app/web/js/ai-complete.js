@@ -1,5 +1,5 @@
 // Ai autocomplete: grey "ghost text" at the cursor. Tab accepts, Esc hides :)))
-// the suggestions come from my code AI server API.md, or any provider below
+// the suggestions come from my code AI server docs/API.md, or any provider below
 
 // everything except dragon, gemini and anthropic talks the OpenAI chat format
 const AI_PROVIDERS = {
