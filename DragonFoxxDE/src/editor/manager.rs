@@ -100,4 +100,18 @@ mod tests {
 
         assert_eq!(manager.open(path, "new".to_string()).text, "new");
     }
+
+    #[test]
+    fn editor_text_keeps_the_files_crlf() {
+        let mut manager = DocumentManager::new();
+        let path = PathBuf::from("main.rs");
+        manager.open(path.clone(), "a\r\nb\r\n".to_string());
+
+        let document = manager.get_mut(&path).unwrap();
+        document.set_text("a\nb\n".to_string()); // the textarea hands back LF
+        assert!(!document.modified);
+
+        document.set_text("a\nb\nc".to_string());
+        assert_eq!(document.text, "a\r\nb\r\nc");
+    }
 }

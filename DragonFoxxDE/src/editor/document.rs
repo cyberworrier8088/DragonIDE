@@ -21,7 +21,16 @@ impl Document {
     }
 
     pub fn set_text(&mut self, text: String) {
-        self.text = text;
+        // the editor is a textarea, which turns CRLF into LF: keep the file's own line endings
+        let crlf = self
+            .disk_text
+            .split_once('\n')
+            .is_some_and(|(line, _)| line.ends_with('\r'));
+        self.text = if crlf && !text.contains('\r') {
+            text.replace('\n', "\r\n")
+        } else {
+            text
+        };
         self.version += 1;
         self.modified = self.text != self.disk_text;
     }
