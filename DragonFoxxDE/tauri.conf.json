@@ -4,7 +4,8 @@
   "version": "0.3.5",
   "identifier": "com.imu.dragonide",
   "build": {
-    "frontendDist": "./web"
+    "frontendDist": "./web",
+    "removeUnusedCommands": true
   },
   "app": {
     "withGlobalTauri": true,

@@ -483,7 +483,7 @@ fn run_tracked(mut cmd: std::process::Command) -> (String, String, bool) {
 
     let program = cmd.get_program().to_string_lossy().to_string();
 
-    let child = match cmd
+    let mut child = match cmd
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -500,15 +500,32 @@ fn run_tracked(mut cmd: std::process::Command) -> (String, String, bool) {
     };
 
     *RUNNING_PID.lock().unwrap() = Some(child.id());
-    let result = child.wait_with_output();
+    let stdout = child.stdout.take().unwrap();
+    let stderr = child.stderr.take().unwrap();
+    let errors = std::thread::spawn(move || read_limited(stderr));
+    let output = read_limited(stdout);
+    let errors = errors.join().unwrap_or_default();
+    let result = child.wait();
     *RUNNING_PID.lock().unwrap() = None;
 
     match result {
-        Ok(output) => (
-            String::from_utf8_lossy(&output.stdout).to_string(),
-            String::from_utf8_lossy(&output.stderr).to_string(),
-            output.status.success(),
-        ),
+        Ok(status) => (output, errors, status.success()),
         Err(e) => (String::new(), format!("Failed to run: {}", e), false),
     }
+}
+
+const MAX_OUTPUT: u64 = 1024 * 1024;
+
+fn read_limited(mut pipe: impl std::io::Read) -> String {
+    use std::io::Read;
+
+    let mut kept = Vec::new();
+    let _ = pipe.by_ref().take(MAX_OUTPUT).read_to_end(&mut kept);
+    let cut = std::io::copy(&mut pipe, &mut std::io::sink()).unwrap_or(0) > 0;
+
+    let mut text = String::from_utf8_lossy(&kept).to_string();
+    if cut {
+        text.push_str("\n... output too long, only the first 1MB is shown");
+    }
+    text
 }
