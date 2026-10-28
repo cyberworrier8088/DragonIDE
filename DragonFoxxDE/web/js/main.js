@@ -1259,7 +1259,8 @@ function syncHighlight() {
     const language = currentFile ? detectLanguageFromPath(currentFile.path) : "text";
     const text = editor.value || "";
 
-    if (typeof hljs !== "undefined" && language !== "text" && hljs.getLanguage(language)) {
+    // shortcut: files over 200k characters skip colors (hljs redoes the whole file every frame); highlight only the visible lines to lift this
+    if (typeof hljs !== "undefined" && language !== "text" && text.length < 200000 && hljs.getLanguage(language)) {
         try {
             const result = hljs.highlight(text, { language: language, ignoreIllegals: true });
             highlightInner.innerHTML = result.value + (text.endsWith("\n") ? "\n" : "");
