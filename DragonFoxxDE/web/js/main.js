@@ -1083,7 +1083,9 @@ function saveUndoState() {
             selectionStart: lastSavedState.selectionStart,
             selectionEnd: lastSavedState.selectionEnd
         });
-        if (undoStack.length > 200) undoStack.shift(); // every step keeps the whole file, so keep only the last 200
+        // every step keeps the whole file: the last 200 steps, fewer for big files (about 50M characters in all)
+        while (undoStack.length > 1 && undoStack.length * currentText.length > 50000000) undoStack.shift();
+        if (undoStack.length > 200) undoStack.shift();
         
         redoStack = [];
     }
