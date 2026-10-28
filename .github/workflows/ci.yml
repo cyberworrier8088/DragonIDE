@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: DragonFoxxDE
+        working-directory: app
     steps:
       - uses: actions/checkout@v6
 
@@ -48,7 +48,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: DragonFoxxDE
+          workspaces: app
 
       # same result on every OS, so only once
       - name: Format
@@ -75,13 +75,13 @@ jobs:
 
       - name: Check every JS file
         run: |
-          for f in DragonFoxxDE/web/js/*.js; do
+          for f in app/web/js/*.js; do
             echo "checking $f"
             node --check "$f"
           done
 
       - name: Tests (files, languages, AI autocomplete)
-        run: node --test DragonFoxxDE/tests/web.test.js
+        run: node --test app/tests/web.test.js
 
   foxai:
     name: FoxAi

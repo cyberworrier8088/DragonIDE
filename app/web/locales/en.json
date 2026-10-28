@@ -1,6 +1,6 @@
 {
     "explorer": "EXPLORER",
-    "welcomeTitle": "DragonFoxIDE",
+    "welcomeTitle": "DragonIDE",
     "welcomeSub": "A Powerful IDE built with Rust",
     "openFolder": "Open Folder",
     "createProject": "Create Project",

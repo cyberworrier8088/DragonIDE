@@ -1,4 +1,4 @@
-// Web UI checks, run with: node --test DragonFoxxDE/tests/web.test.js
+// Web UI checks, run with: node --test app/tests/web.test.js
 const test = require("node:test");
 const assert = require("node:assert");
 const fs = require("node:fs");

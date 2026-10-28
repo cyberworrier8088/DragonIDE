@@ -170,7 +170,7 @@ cargo install tauri-cli --version "^2" --locked
 
 ```sh
 git clone https://github.com/cyberworrier8088/DragonIDE.git
-cd DragonIDE/DragonFoxxDE
+cd DragonIDE/app
 
 cargo tauri dev      # run with live reload
 cargo tauri build    # build installers into target/release/bundle/
@@ -182,7 +182,7 @@ Run uses the `rustc`, `node` and `python` already installed on your system.
 
 ```
 DragonIDE/
-├── DragonFoxxDE/         the Tauri app
+├── app/         the Tauri app
 │   ├── src/              Rust backend: commands, documents, files, search, git, terminal, remote server
 │   ├── web/              frontend: HTML, CSS and JavaScript, with no build step
 │   ├── capabilities/     Tauri permission set
@@ -200,7 +200,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/cyberworrier8088
 Contributions are welcome. Please run the same checks as CI before you open a pull request:
 
 ```sh
-cd DragonFoxxDE
+cd app
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo test

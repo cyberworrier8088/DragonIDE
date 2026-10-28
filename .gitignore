@@ -2,7 +2,7 @@
 # will have compiled files and executables
 target/
 **/target/
-DragonFoxxDE/target/
+app/target/
 FoxAi/target/
 FoxAi/dataset
 
