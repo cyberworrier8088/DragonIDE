@@ -227,6 +227,8 @@ async function autoSaveFile(path) {
 
 // Show unsaved changes warning dialog
 function showUnsavedDialog(path, onSave, onDiscard) {
+    // a pending auto-save must not write the changes the user may be about to discard
+    clearTimeout(autoSaveState.currentSaveTimer);
     const fileName = path.split(/[\\/]/).pop();
 
     // Clean up any existing dialogs
