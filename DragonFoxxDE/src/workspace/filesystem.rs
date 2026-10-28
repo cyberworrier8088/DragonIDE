@@ -37,7 +37,13 @@ pub fn read_directory(root: &Path) -> Result<Vec<FileEntry>, String> {
 }
 
 pub fn read_file(path: &Path) -> Result<String, String> {
-    fs::read_to_string(path).map_err(|error| error.to_string())
+    fs::read_to_string(path).map_err(|error| {
+        if error.kind() == std::io::ErrorKind::InvalidData {
+            "This is not a text file, so DragonIDE can't open it".to_string()
+        } else {
+            error.to_string()
+        }
+    })
 }
 
 pub fn create_file(path: &Path) -> Result<(), String> {

@@ -252,7 +252,11 @@ async fn run(remote: &Remote, command: &str, args: &Value) -> Result<Value, Stri
         "document_count" => json!(crate::document_count(state)?),
         "open_document" => json!(crate::open_document(path("path")?, state)?),
         "update_document" => json!(crate::update_document(path("path")?, text("text")?, state)?),
-        "save_document" => json!(crate::save_document(path("path")?, state)?),
+        "save_document" => json!(crate::save_document(
+            path("path")?,
+            Some(flag("force")),
+            state
+        )?),
         "close_document" => json!(crate::close_document(path("path")?, state)?),
         "search_workspace" => json!(
             crate::search_workspace(path("root")?, text("query")?, flag("caseSensitive")).await?

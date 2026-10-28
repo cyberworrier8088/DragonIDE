@@ -206,13 +206,14 @@ fn update_document(
 #[tauri::command]
 fn save_document(
     path: String,
+    force: Option<bool>,
     state: tauri::State<'_, core::state::IdeState>,
 ) -> Result<(), String> {
     let path = PathBuf::from(path);
 
     let mut documents = state.documents.lock().map_err(|error| error.to_string())?;
 
-    documents.save(&path)
+    documents.save(&path, force.unwrap_or(false))
 }
 
 #[tauri::command]

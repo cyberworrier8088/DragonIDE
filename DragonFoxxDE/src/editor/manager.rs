@@ -3,6 +3,8 @@ use std::path::PathBuf;
 
 use super::document::Document;
 
+pub const CHANGED_ON_DISK: &str = "changed on disk";
+
 #[derive(Debug, Default)]
 pub struct DocumentManager {
     documents: HashMap<PathBuf, Document>,
@@ -16,9 +18,16 @@ impl DocumentManager {
     }
 
     pub fn open(&mut self, path: PathBuf, text: String) -> &Document {
-        self.documents
+        let document = self
+            .documents
             .entry(path.clone())
-            .or_insert_with(|| Document::new(path, text))
+            .or_insert_with(|| Document::new(path, text.clone()));
+
+        if !document.modified && document.disk_text != text {
+            document.text = text.clone();
+            document.disk_text = text;
+        }
+        document
     }
 
     #[allow(dead_code)] // used by tests; not called by the app yet
@@ -43,6 +52,17 @@ impl DocumentManager {
             .documents
             .get_mut(path)
             .ok_or_else(|| "Document is not open".to_string())?;
+
+        if !force {
+            if let Ok(disk) = std::fs::read_to_string(&document.path) {
+                if disk != document.disk_text {
+                    return Err(format!(
+                        "{}: anthor prgram changed this file",
+                        CHANGED_ON_DISK
+                    ));
+                }
+            }
+        }
 
         std::fs::write(&document.path, &document.text).map_err(|error| error.to_string())?;
 

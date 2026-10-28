@@ -555,6 +555,7 @@ async function openFile(entry) {
             "Failed to open file:",
             error
         );
+        alert(`Can't open "${entry.name}": ${error}`);
     }
 }
 
@@ -1120,9 +1121,17 @@ document.addEventListener("keydown", async (event) => {
             const text = document.getElementById("code-editor").value;
             clearTimeout(editorChangeTimer);
             await invoke("update_document", { path, text });
-            await invoke("save_document", {
-                path
-            });
+            try {
+                await invoke("save_document", { path });
+            } catch (error) {
+
+                if (!String(error).includes("changed on disk")) throw error;
+
+                const overwrite = confirm(`"${currentFile.name}" was changed by another program (like git pull). Save your version over it?`);
+                
+                if (!overwrite) return;
+                await invoke("save_document", { path, force: true });
+            }
 
             currentFileContent = text;
 
