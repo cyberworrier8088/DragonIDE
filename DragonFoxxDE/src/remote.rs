@@ -365,8 +365,45 @@ fn inside(root: &Path, path: &Path) -> bool {
         return false;
     }
 
+    // the phone may not touch .git: git runs programs named in .git/config and .git/hooks,
+    // so writing there would get around "Allow run" being off
     existing
         .canonicalize()
-        .map(|real| real.starts_with(root))
-        .unwrap_or(false)
+        .ok()
+        .and_then(|real| {
+            real.join(new_part)
+                .strip_prefix(root)
+                .ok()
+                .map(Path::to_path_buf)
+        })
+        .is_some_and(|rest| !rest.components().any(is_git_folder))
+}
+
+// Windows opens ".GIT", ".git." and ".git:stream" as the same folder as ".git"
+fn is_git_folder(part: Component) -> bool {
+    let name = part.as_os_str().to_string_lossy();
+    let name = name.split(':').next().unwrap_or_default();
+    name.trim_end_matches(['.', ' '])
+        .eq_ignore_ascii_case(".git")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn phone_paths_stay_in_the_folder_and_out_of_git() {
+        let dir = std::env::temp_dir().join(format!("dragonide_remote_{}", std::process::id()));
+        std::fs::create_dir_all(dir.join(".git")).unwrap();
+        let root = dir.canonicalize().unwrap();
+
+        assert!(inside(&root, &root.join("src").join("new.rs")));
+        assert!(inside(&root, &root.join(".gitignore")));
+        assert!(!inside(&root, &root.join(".git").join("config")));
+        assert!(!inside(&root, &root.join(".GIT").join("config")));
+        assert!(!inside(&root, &root.join(".git.")));
+        assert!(!inside(&root, &root.join("..").join("other")));
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
