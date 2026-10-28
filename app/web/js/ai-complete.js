@@ -68,9 +68,12 @@ function buildAiRequest(provider, key, model, prefix, suffix, filename) {
         text: data => data.content?.[0]?.text
     };
 
+    // openrouter/auto and /free can pick a thinking model, which spends all 32 tokens thinking and answers empty
+    const noThinking = provider === "openrouter" ? { reasoning: { enabled: false } } : {};
+
     return {
         headers: { Authorization: `Bearer ${key}` },
-        body: { model, max_tokens: AI_MAX_TOKENS, messages: [{ role: "system", content: AI_SYSTEM }, { role: "user", content: prompt }] },
+        body: { model, max_tokens: AI_MAX_TOKENS, ...noThinking, messages: [{ role: "system", content: AI_SYSTEM }, { role: "user", content: prompt }] },
         text: data => data.choices?.[0]?.message?.content
     };
 }
@@ -195,7 +198,8 @@ async function fetchSuggestion() {
     try {
         // small context = fewer tokens per request
         const text = await callAi(code.slice(Math.max(0, cursor - 1000), cursor), code.slice(cursor, cursor + 200), currentFile.name, aiController.signal);
-        updateAiStatus();
+        if (text.trim()) updateAiStatus();
+        else setAiStatus("⚠ AI", "The model answered empty. Pick a fast model in Settings, like google/gemini-2.0-flash-001");
 
         if (editor.value !== code || editor.selectionStart !== cursor) return;
 
