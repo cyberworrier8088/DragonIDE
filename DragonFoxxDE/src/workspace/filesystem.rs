@@ -70,7 +70,8 @@ pub fn create_directory(path: &Path) -> Result<(), String> {
 }
 
 pub fn rename_entry(old_path: &Path, new_path: &Path) -> Result<(), String> {
-    if new_path.exists() {
+    // on Windows and macOS "README.md" finds "readme.md" itself, so let a case-only rename through
+    if new_path.exists() && new_path.canonicalize().ok() != old_path.canonicalize().ok() {
         return Err("A file or folder with that name already exists".to_string());
     }
 
@@ -160,4 +161,30 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), String> {
 
     Ok(())
 }
-// test not need :)
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rename_changes_case_but_never_overwrites() {
+        let dir = std::env::temp_dir().join(format!("dragonide_rename_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("readme.md"), "a").unwrap();
+        fs::write(dir.join("other.md"), "b").unwrap();
+
+        rename_entry(&dir.join("readme.md"), &dir.join("README.md")).unwrap();
+        let names: Vec<String> = read_directory(&dir)
+            .unwrap()
+            .into_iter()
+            .map(|f| f.name)
+            .collect();
+        assert!(names.contains(&"README.md".to_string()), "{:?}", names);
+
+        assert!(rename_entry(&dir.join("README.md"), &dir.join("other.md")).is_err());
+        assert_eq!(fs::read_to_string(dir.join("other.md")).unwrap(), "b");
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
