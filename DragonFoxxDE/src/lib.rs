@@ -294,7 +294,10 @@ fn stop_code() -> Result<(), String> {
             .args(["/PID", pid.as_str(), "/T", "/F"])
             .status()
     } else {
-        command("kill").args(["-9", pid.as_str()]).status()
+        // "-PID" means the whole process group, so what the program started stops too
+        command("kill")
+            .args(["-9", "--", &format!("-{}", pid)])
+            .status()
     };
 
     status
@@ -482,6 +485,13 @@ fn run_tracked(mut cmd: std::process::Command) -> (String, String, bool) {
     use std::process::Stdio;
 
     let program = cmd.get_program().to_string_lossy().to_string();
+
+    // own process group, so stop kills the program and everything it started
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        cmd.process_group(0);
+    }
 
     let mut child = match cmd
         .stdin(Stdio::null())
