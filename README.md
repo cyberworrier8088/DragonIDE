@@ -1,6 +1,7 @@
 # DragonIDE
 
 [![CI](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml/badge.svg)](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/cyberworrier8088/DragonIDE)](https://github.com/cyberworrier8088/DragonIDE/releases/latest)
 
 DragonIDE is a code editor I'm building with Rust and Tauri 2. The front end is plain HTML, CSS and JavaScript, with no npm packages.
 
@@ -88,3 +89,5 @@ The first build takes a few minutes. Run Code uses `rustc`, `node` and `python` 
 ## License
 
 [MIT](LICENSE)
+
+Thankyou so much
