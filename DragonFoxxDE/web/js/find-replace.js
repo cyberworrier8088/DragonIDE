@@ -302,7 +302,7 @@ function replaceAll() {
             const pattern = options.wholeWord ? `\\b${escapedSearch}\\b` : escapedSearch;
             const flags = options.caseSensitive ? 'g' : 'gi';
             const regex = new RegExp(pattern, flags);
-            newText = newText.replace(regex, replaceText);
+            newText = newText.replace(regex, () => replaceText); // plain text: "$&" or "$$" stay as typed
         }
     } catch (e) {
         console.error("Regex Error:", e);
