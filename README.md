@@ -1,136 +1,96 @@
-<div align="center">
-
-<img src="docs/logo.png" alt="DragonIDE logo" width="112">
-
 # DragonIDE
 
-**A lightweight code editor built with Rust and Tauri.**
-
-1.2 MB installer · No Electron · No npm · Code from your phone
-
-<br>
+A small desktop code editor built with Rust and Tauri.
 
 [![Release](https://img.shields.io/github/v/release/cyberworrier8088/DragonIDE?style=flat-square&label=release&color=24C8DB)](https://github.com/cyberworrier8088/DragonIDE/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/cyberworrier8088/DragonIDE/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/cyberworrier8088/DragonIDE/actions/workflows/ci.yml)
-[![Downloads](https://img.shields.io/github/downloads/cyberworrier8088/DragonIDE/total?style=flat-square&color=blue)](https://github.com/cyberworrier8088/DragonIDE/releases)
-[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
-[![Rust](https://img.shields.io/badge/Rust-stable-B7410E?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Hackatime](https://hackatime.hackclub.com/api/v1/badge/U0B312F4FS5/cyberworrier8088/DragonIDE)](https://hackatime.hackclub.com)
 
-**[Download](#download)** · **[Features](#features)** · **[Phone mode](#code-from-your-phone)** · **[Build](#build-from-source)** · **[Roadmap](#roadmap)**
+## Description
 
-<br>
+DragonIDE is a code editor built on [Tauri 2](https://tauri.app). Files, search, git, running code and the terminal are handled in Rust. The interface is plain HTML, CSS and JavaScript (no framework, no bundler, no `node_modules`) and runs in the web view your operating system already has. Since it doesn't bundle a browser, the Windows installer is 1.2 MB. An Electron editor is usually around 100 MB.
 
-<a href="docs/demo.mp4"><img src="docs/demo.gif" alt="DragonIDE demo: opening files, Quick Open, running Python, the terminal, Source Control and themes" width="900"></a>
+What it does:
 
-<sub>Opening a project, Quick Open, running a Python file, the terminal, Source Control and themes. Click for the full-quality video.</sub>
+* Editor with syntax highlighting, line numbers, bracket matching, auto indent and auto-closing brackets and quotes
+* Tabs with their own undo history, which you can drag to reorder
+* Find and replace (match case, whole word, regex), Quick Open and project-wide search
+* Run Rust, JavaScript and Python files, with output shown in an integrated terminal
+* Source Control panel: review changes, stage, unstage, commit, push, pull and init a repository
+* Auto-save with an adjustable interval
+* AI autocomplete as inline suggestions, using your own API key or a local model
+* Eight themes (Glass uses native acrylic blur on Windows) and English and Spanish interface
+* Phone mode: use the editor from a phone browser while everything runs on your laptop
 
-</div>
+Safety features:
 
-<br>
+* Every way of closing the app (close button, `Alt+F4`, taskbar, reload) warns about unsaved files
+* If another program changes an open file, for example `git pull`, DragonIDE asks before overwriting it
+* CRLF line endings are preserved, so saving doesn't create extra diffs
+* Files over 50 MB are refused, very large files open without highlighting, and program output is capped at 1 MB
 
-## About
+### Screenshots
 
-DragonIDE is a desktop code editor built as a [Tauri 2](https://tauri.app) app. The heavy work (files, search, git, running code and the terminal) happens in Rust, and the interface runs in the web view your operating system already has. Because it doesn't bundle a browser, the Windows installer is **1.2 MB**, where an Electron editor ships around 100 MB.
+[![DragonIDE demo](docs/demo.gif)](docs/demo.mp4)
 
-The interface is plain HTML, CSS and JavaScript. It has no framework, no bundler and no `node_modules`.
+Opening a project, Quick Open, running a Python file, the terminal, Source Control and themes. Click the image for the full-quality video.
 
-<table>
-<tr>
-<td width="33%" valign="top">
+## Getting Started
 
-**Small by design**<br>
-A 1.2 MB installer that uses the system web view instead of bundling a browser.
+### Dependencies
 
-</td>
-<td width="33%" valign="top">
+To run a release build:
 
-**Everything in one window**<br>
-Editor, terminal, Git, project search and Run, with no setup.
+* Windows 10 or 11, macOS (Apple Silicon), or Linux
 
-</td>
-<td width="33%" valign="top">
+To run code from inside the editor you also need the tools for your language installed: `rustc`, `node` or `python`.
 
-**Your work is protected**<br>
-Unsaved-change warnings, auto-save, and protection when another program changes an open file.
+To build from source:
 
-</td>
-</tr>
-<tr>
-<td valign="top">
+* [Rust](https://rustup.rs) (stable)
+* Tauri CLI: `cargo install tauri-cli --version "^2" --locked`
+* The [system dependencies for Tauri](https://tauri.app/start/prerequisites/):
 
-**Code from your phone**<br>
-Scan a QR code and edit the project on your laptop from any phone browser.
+| OS | What to install |
+|:--|:--|
+| Windows | [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), with "Desktop development with C++" |
+| macOS | `xcode-select --install` |
+| Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev` |
 
-</td>
-<td valign="top">
+### Installing
 
-**AI autocomplete**<br>
-Inline suggestions from the provider you choose, or a local model.
-
-</td>
-<td valign="top">
-
-**Cross-platform**<br>
-Native installers for Windows, macOS and Linux on every release.
-
-</td>
-</tr>
-</table>
-
-## Download
+Download an installer from the [latest release](https://github.com/cyberworrier8088/DragonIDE/releases/latest):
 
 | Platform | Package | Size |
 |:--|:--|--:|
-| **Windows** 10 / 11 | [`.exe` installer](https://github.com/cyberworrier8088/DragonIDE/releases/latest) or `.msi` | 1.2 MB |
-| **macOS** (Apple Silicon) | [`.dmg`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) | 2.0 MB |
-| **Linux** | [`.deb`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) or `.rpm` | 1.6 MB |
-| **Linux** (any distribution) | [`.AppImage`](https://github.com/cyberworrier8088/DragonIDE/releases/latest) | 80 MB |
+| Windows 10 / 11 | `.exe` or `.msi` | 1.2 MB |
+| macOS (Apple Silicon) | `.dmg` | 2.0 MB |
+| Linux | `.deb` or `.rpm` | 1.6 MB |
+| Linux (any distribution) | `.AppImage` | 80 MB |
 
-> [!NOTE]
-> Builds are not code-signed yet. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**.
+The builds are not code-signed yet. On Windows, if you see "Windows protected your PC", click **More info**, then **Run anyway**.
 
-## Features
+To build from source instead:
 
-### Editing
-- Syntax highlighting for common languages, line numbers and bracket matching
-- Auto indent, auto-closing brackets and quotes, and multi-line indent with `Tab` / `Shift+Tab`
-- Undo and redo history for each tab, and tabs you can drag to reorder
-- Find and replace with match case, whole word and regular expressions
-- Quick Open (`Ctrl+P`) and search across the whole project (`Ctrl+Shift+F`)
-- Eight themes, including Glass, which uses native acrylic blur on Windows
-- English and Spanish interface
+```sh
+git clone https://github.com/cyberworrier8088/DragonIDE.git
+cd DragonIDE/app
+cargo tauri build
+```
 
-### Run, terminal and Git
-- Run Rust, JavaScript and Python files with `Ctrl+Alt+R`, and stop them at any time
-- Integrated terminal with live output, `cd`, command history and `Ctrl+C`
-- Source Control panel: review changes, stage, unstage, commit, push, pull and initialize a repository
+The installers end up in `target/release/bundle/`.
 
-### Reliability
-- Auto-save, with an adjustable interval
-- Every way of closing (the close button, `Alt+F4`, the taskbar or a reload) warns about unsaved files
-- If another program changes an open file, for example `git pull`, DragonIDE asks before overwriting it
-- CRLF line endings are preserved, so saving doesn't create noisy diffs
-- Large files and runaway programs can't freeze the editor: very large files open without highlighting, files over 50 MB are refused, and program output is capped at 1 MB
+### Executing program
 
-### AI autocomplete
-Inline ghost-text suggestions, accepted with `Tab`. Bring your own key for OpenAI, Google Gemini, Anthropic, OpenRouter, Groq, DeepSeek or Mistral, or run a local model with Ollama or LM Studio. Keys are stored on your machine and are sent only to the provider you select.
+Start DragonIDE and open a folder. To run from source with live reload:
 
-## Code from your phone
+```sh
+cd DragonIDE/app
+cargo tauri dev
+```
 
-DragonIDE can serve its interface over your local network. Open the project on your laptop, scan a QR code with your phone, and you get the full editor in the phone's browser. Files, Git and running code all stay on the laptop. The phone only shows the interface.
-
-1. Open a folder in DragonIDE.
-2. Open **Settings** (the gear in the bottom left), find **Remote Access (phone)** and click **Start**.
-3. Scan the QR code with a phone on the same Wi-Fi network.
-
-
-## Keyboard shortcuts
-
-<details>
-<summary><b>Show all shortcuts</b></summary>
-<br>
+Common shortcuts:
 
 | Shortcut | Action |
 |:--|:--|
@@ -141,64 +101,52 @@ DragonIDE can serve its interface over your local network. Open the project on y
 | `Ctrl+G` | Go to line |
 | `Tab` / `Shift+Tab` | Indent / unindent selection |
 | `Ctrl+Shift+\` | Jump to matching bracket |
-| `Ctrl+Alt+R` | Run current file (again to stop) |
+| `Ctrl+Alt+R` | Run current file (press again to stop) |
 | `Ctrl+B` / `Ctrl+J` | Toggle explorer / bottom panel |
 | `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | Zoom in / out / reset |
 | `Ctrl+Shift+G` | Source Control |
 | `Ctrl+Enter` | Commit (in Source Control) |
 
-</details>
+#### Phone mode
 
-## Build from source
+DragonIDE can serve its interface over your local network. Files, git and running code stay on the laptop. The phone only shows the interface.
 
-**Prerequisites:** [Rust](https://rustup.rs) (stable), the Tauri CLI, and the [system dependencies for Tauri](https://tauri.app/start/prerequisites/).
+1. Open a folder in DragonIDE.
+2. Open **Settings** (the gear in the bottom left), find **Remote Access (phone)** and click **Start**.
+3. Scan the QR code with a phone on the same Wi-Fi network.
 
-```sh
-cargo install tauri-cli --version "^2" --locked
-```
+#### AI autocomplete
 
-<details>
-<summary><b>System dependencies by platform</b></summary>
-<br>
+Suggestions appear as ghost text and you accept them with `Tab`. Supported providers: OpenAI, Google Gemini, Anthropic, OpenRouter, Groq, DeepSeek and Mistral. You can also use a local model through Ollama or LM Studio. API keys are stored on your machine and sent only to the provider you pick.
 
-| OS | Command or download |
-|:--|:--|
-| Windows | [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), with "Desktop development with C++" |
-| macOS | `xcode-select --install` |
-| Debian / Ubuntu | `sudo apt install libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev` |
+## Help
 
-</details>
+If Windows blocks the installer, see the note under Installing.
 
-```sh
-git clone https://github.com/cyberworrier8088/DragonIDE.git
-cd DragonIDE/app
+If phone mode doesn't connect, check that the phone and the laptop are on the same Wi-Fi network and that your firewall allows DragonIDE.
 
-cargo tauri dev      # run with live reload
-cargo tauri build    # build installers into target/release/bundle/
-```
-
-Run uses the `rustc`, `node` and `python` already installed on your system.
-
-## Architecture
-
-```
-DragonIDE/
-├── app/         the Tauri app
-│   ├── src/              Rust backend: commands, documents, files, search, git, terminal, remote server
-│   ├── web/              frontend: HTML, CSS and JavaScript, with no build step
-│   ├── capabilities/     Tauri permission set
-│   └── tests/            frontend tests (node --test)
-├── FoxAi/                an experimental code-completion model, trained from scratch in Rust with Burn
-└── journal/             development journal
-```
-
-The frontend calls Rust through Tauri commands (`invoke`). Phone mode runs a small HTTP server ([`tiny_http`](https://crates.io/crates/tiny_http)) in the same process, so phone requests go through the same commands and the same path checks as the desktop window.
+If a build fails on Linux or Windows, check that the system dependencies above are installed.
 
 Found a bug or have an idea? [Open an issue](https://github.com/cyberworrier8088/DragonIDE/issues).
 
 ## Contributing
 
-Contributions are welcome. Please run the same checks as CI before you open a pull request:
+The repo layout:
+
+```
+DragonIDE/
+├── app/         the Tauri app
+│   ├── src/              Rust backend: commands, documents, files, search, git, terminal, remote server
+│   ├── web/              frontend: HTML, CSS and JavaScript, no build step
+│   ├── capabilities/     Tauri permission set
+│   └── tests/            frontend tests (node --test)
+├── FoxAi/       experimental code-completion model, trained from scratch in Rust with Burn
+└── journal/     development journal
+```
+
+The frontend calls Rust through Tauri commands. Phone mode runs a small [`tiny_http`](https://crates.io/crates/tiny_http) server in the same process, so phone requests go through the same commands and path checks as the desktop window.
+
+Run the CI checks before opening a pull request:
 
 ```sh
 cd app
@@ -210,10 +158,8 @@ node --test tests/web.test.js
 
 Commit messages follow [Conventional Commits](https://www.conventionalcommits.org) (`feat:`, `fix:`, `docs:`, `ci:`). Release notes are generated from `feat:` and `fix:` commits.
 
-## Releases
-
-DragonIDE follows [Semantic Versioning](https://semver.org). Pushing a `v*` tag runs the release pipeline. It checks that the tag matches the app version, runs the full test suite on all three platforms, builds the installers, and publishes a GitHub release with generated notes.
+Releases follow [Semantic Versioning](https://semver.org). Pushing a `v*` tag runs the release pipeline: it checks that the tag matches the app version, runs the tests on all three platforms, builds the installers and publishes a GitHub release.
 
 ## License
 
-Released under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
